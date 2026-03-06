@@ -1,6 +1,7 @@
-import { sendTelegramMessage } from '@lib/telegram';
 import { checkLag, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
+
+export { Monitor } from '@/lib/status-monitor';
 
 // --- Настройки шахтера ---
 const MOVE_DELAY = 100;
@@ -11,7 +12,7 @@ const FORGE_COORDS: Point2D = { x: 888, y: 1874 };
 const CONTAINER_COORDS: Point2D = { x: 890, y: 1875 };
 const MINE_COORDS: Point2D = { x: 772, y: 1697 };
 
-const ORE_CONTAINER_SERIAL = toSerial('0x403853AB'); // контейнер для инготов (перевел в string, т.к. Orion работает со строковыми hex)
+const ORE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Контейнер для инготов
 const RESOURSES_CONTAINER = toSerial('0x403853AA'); // Контейнер с ресурсами (инструменты, еда)
 
 const TOOL_TYPE = toGraphic('0x0E85|0x0E86');
@@ -33,79 +34,6 @@ export function Autostart(): void {
   Orion.Exec('Monitor', true);
   checkLag();
   Orion.ResumeScript('all');
-}
-
-export function Monitor(): void {
-  let lastCheckTime = Orion.Now();
-
-  const friends = toSerial([
-    '0x003D13ED', // Sunrise
-    '0x003D1254', // TaHkucT
-    '0x003EC8CD', // React
-    '0x003EAC3F', // Angular
-    '0x003D096F', // BeKcaHa
-    '0x00623E74', // Svelte
-    '0x003EB2F6', // Vue
-    '0x003B3EDB', // Logi
-    '0x003F0E14', // WanZan
-    '0x003F0C05', // Beaver
-    '0x001DED76', // Durin
-    '0x0032DD44', // Postuh
-  ]);
-
-  while (true) {
-    const currentTime = Orion.Now();
-    const journalLine = Orion.WaitJournal(
-      'Персонал сервера',
-      lastCheckTime,
-      currentTime + 5000,
-      '',
-      '0',
-      'any',
-    );
-
-    if (journalLine) {
-      sendTelegramMessage(
-        `Появился персонал сервера: [${Orion.Time('hh:mm:ss')}]`,
-      );
-      lastCheckTime = currentTime + 5000;
-    } else {
-      lastCheckTime = currentTime;
-    }
-
-    if (Player.Hits() <= 0) {
-      sendTelegramMessage(`${Player.Name()}: Умер [${Orion.Time('hh:mm:ss')}]`);
-      Orion.PauseScript('all');
-    }
-
-    Orion.Ignore(friends);
-    const humans = Orion.FindType(
-      'any',
-      'any',
-      'ground',
-      'human',
-      18,
-      'gray|orange|red|blue|green',
-    );
-    let enemyNames = '';
-
-    for (const serial of humans) {
-      const enemyObj = Orion.FindObject(toSerial(serial));
-      if (enemyObj && enemyObj.Name() !== Player.Name()) {
-        enemyNames += `${enemyObj.Name()} `;
-      }
-    }
-
-    if (enemyNames.trim() !== '') {
-      sendTelegramMessage(
-        `${Player.Name()}: Кто-то тут есть: [${enemyNames.trim()}] [${Orion.Time('hh:mm:ss')}]`,
-      );
-      Orion.Wait(5000);
-    }
-
-    Orion.Ignore(humans);
-    Orion.Wait(500);
-  }
 }
 
 function setBadTiles(): void {
