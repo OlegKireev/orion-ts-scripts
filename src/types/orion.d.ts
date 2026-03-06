@@ -272,4 +272,25 @@ declare namespace Orion {
    * @param params Параметры запроса в формате строки (x-www-form-urlencoded).
    */
   function HttpPost(url: string, params: string): void;
+
+  function ClientOptionGet(optionName: string): number;
+
+  function CreateCustomGump(serial: number): CustomGumpObject;
+
+  function GumpExists(type: string, serial: number): boolean;
+
+  function ClearFakeMapObjects(): void;
+
+  function WaitForAddObject(targetName: string, timeout: number): boolean;
+
+  function ValidateTargetTile(type: string, x: number, y: number): boolean;
+
+  function AddFakeMapObject(
+    serial: number,
+    graphic: Graphic | string,
+    color: string,
+    x: number,
+    y: number,
+    z: number,
+  ): void;
 }

@@ -1,7 +1,9 @@
 import { checkLag, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 
+// Вспомогательные скрипты
 export { Monitor } from '@/lib/status-monitor';
+export { getGumpResponse, markTiles } from './mark-tiles';
 
 // --- Настройки шахтера ---
 const MOVE_DELAY = 100;
