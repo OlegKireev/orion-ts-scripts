@@ -61,6 +61,8 @@ declare namespace Orion {
     startTime?: number,
   ): any;
 
+  function ClearJournal(): void;
+
   // ==========================================
   // ПЕРЕМЕЩЕНИЕ
   // ==========================================
@@ -292,5 +294,15 @@ declare namespace Orion {
     x: number,
     y: number,
     z: number,
+  ): void;
+
+  /**
+   * Применяет указанный скилл.
+   * @param skillName Название скилла из классического списка Sphere 0.55.
+   */
+  function UseSkill(
+    skillName: SkillName,
+    target?: Serial,
+    targetDistance?: number,
   ): void;
 }
