@@ -9,6 +9,7 @@ declare type OrionGlobalSerial =
   (typeof import('../constants').GLOBAL_SERIALS)[number];
 declare type OrionGlobalGraphic =
   (typeof import('../constants').GLOBAL_GRAPHICS)[number];
+declare type SkillName = (typeof import('../constants').SKILLS)[number];
 
 declare type Serial =
   | OrionGlobalSerial
