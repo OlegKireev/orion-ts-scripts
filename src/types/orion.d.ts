@@ -123,14 +123,16 @@ declare namespace Orion {
    * @param flags Флаги поиска (например, 'human', 'item').
    * @param distance Дистанция поиска (если на земле).
    * @param noto Цвет репутации (notoriety), например 'gray|red|blue'.
+   * @param recursive Искать ли рекурсивно во всех вложенных контейнерах (по умолчанию false).
    */
   function FindType(
     type: Graphic,
     color?: string,
-    container?: string,
+    container?: Serial,
     flags?: string,
     distance?: number | string,
     noto?: string,
+    recursive?: boolean,
   ): Serial[];
 
   /**
@@ -154,12 +156,23 @@ declare namespace Orion {
   function OpenContainer(serial: Serial): void;
 
   /**
-   * Перемещает предмет в контейнер.
+   * Перемещает предмет в контейнер или на землю.
    * @param serial Серийник предмета.
    * @param count Количество (0 - все).
-   * @param container Серийник контейнера назначения.
+   * @param container Серийник контейнера назначения (или 'ground').
+   * @param x Координата X внутри контейнера (или на земле). -1 для случайной/дефолтной.
+   * @param y Координата Y внутри контейнера (или на земле). -1 для случайной/дефолтной.
+   * @param z Координата Z (используется только при дропе на землю).
+   * @returns Успешно ли прошло перемещение.
    */
-  function MoveItem(serial: Serial, count: number, container: Serial): void;
+  function MoveItem(
+    serial: Serial,
+    count: number,
+    container: Serial,
+    x?: number,
+    y?: number,
+    z?: number,
+  ): boolean;
 
   /**
    * Ищет предмет по типу и перемещает его.
@@ -204,6 +217,9 @@ declare namespace Orion {
     x: number,
     y: number,
   ): boolean;
+
+  /** Ожидает прицел и кликает по тайлу. */
+  function WaitTargetTile(type: string, x: number, y: number, z: number): void;
 
   /** Ожидает прицел и кликает по относительному тайлу. */
   function WaitTargetTileRelative(
@@ -279,7 +295,7 @@ declare namespace Orion {
 
   function CreateCustomGump(serial: number): CustomGumpObject;
 
-  function GumpExists(type: string, serial: number): boolean;
+  function GumpExists(type: string, serial: Serial | number): boolean;
 
   function ClearFakeMapObjects(): void;
 
@@ -305,4 +321,22 @@ declare namespace Orion {
     target?: Serial,
     targetDistance?: number,
   ): void;
+
+  /**
+   * Возвращает уникальный hex-серийник объекта.
+   * Удобно для конвертации зарезервированных слов ('backpack', 'self') в реальный ID.
+   */
+  function GetSerial(serial: Serial): Serial;
+
+  /**
+   * Возвращает серийник контейнера, в котором лежит указанный предмет.
+   * Если предмет лежит на земле, вернет '0xFFFFFFFF'.
+   */
+  function GetContainer(serial: Serial): Serial;
+
+  /**
+   * Пишет сообщение от имени персонажа.
+   * @param text Текст сообщения.
+   */
+  function Say(text: string): void;
 }
