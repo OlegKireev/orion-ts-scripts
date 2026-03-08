@@ -1,5 +1,5 @@
-import { sendTelegramMessage } from "./telegram";
-import { toSerial } from "./validators";
+import { sendTelegramMessage } from './telegram';
+import { toGraphic, toSerial } from './validators';
 
 export function Monitor(): void {
   let lastCheckTime = Orion.Now();
@@ -21,6 +21,9 @@ export function Monitor(): void {
     '0x0032DD44', // Postuh
   ]);
 
+  const seenPillars: Serial[] = [];
+  const PILLAR_GRAPHIC = toGraphic('0x0ED4');
+
   while (true) {
     const currentTime = Orion.Now();
     const journalLine = Orion.WaitJournal(
@@ -39,6 +42,24 @@ export function Monitor(): void {
       lastCheckTime = currentTime + 5000;
     } else {
       lastCheckTime = currentTime;
+    }
+
+    // ==========================================
+    // 2. ПРОВЕРКА АДМИНСКИХ СТОЛБОВ
+    // ==========================================
+    // Ищем на земле столб в радиусе 30 тайлов
+    const pillars = Orion.FindType(PILLAR_GRAPHIC, 'any', 'ground', '', 40);
+
+    for (const pillarSerial of pillars) {
+      // Если в нашем массиве памяти еще нет этого серийника
+      if (seenPillars.indexOf(pillarSerial) === -1) {
+        // 1. Запоминаем его, чтобы больше не спамить
+        seenPillars.push(pillarSerial);
+        sendTelegramMessage(
+          `🚨[${Player.Name()}]: Появился столб [${Orion.Time('hh:mm:ss')}]`,
+        );
+        Orion.PlayWav('Alarm');
+      }
     }
 
     if (Player.Hits() <= 0) {
