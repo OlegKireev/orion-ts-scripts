@@ -34,3 +34,23 @@ export function EvaluatingIntelligence(): void {
     Orion.CancelWaitTarget();
   }
 }
+
+export function Tracking(): void {
+  const DELAY = 100;
+  Orion.Print('Начинаем прокачку: Tracking...');
+
+  while (true) {
+    Orion.UseSkill('Tracking');
+
+    if (Orion.WaitForMenu(1000)) {
+      const menu = Orion.GetMenu('last');
+
+      if (menu !== null && menu.Name() === 'Tracking') {
+        menu.Select('Players');
+        Orion.Wait(DELAY);
+        menu.Close();
+      }
+    }
+    Orion.Wait(DELAY);
+  }
+}

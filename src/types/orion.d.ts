@@ -208,6 +208,31 @@ declare namespace Orion {
   /** Отменяет ожидание классического меню. */
   function CancelWaitMenu(): void;
 
+  /**
+   * Добавить "ловушку" на меню от сервера.
+   * @param title Заголовок меню или часть заголовка меню.
+   * @param choice Имя или часть имени элемента меню для выбора; 'random' - случайный элемент, 'cancel' - закрытие меню.
+   */
+  function WaitMenu(title: string, choice: string): void;
+
+  /** Ожидание получения меню от сервера.
+   * @param delay Максимальное время ожидания в миллисекундах (по умолчанию 1000)
+   * @returns true, если меню появилось.
+   */
+  function WaitForMenu(delay?: number): boolean;
+
+  /**
+   * Получает объект открытого меню.
+   * @param name Название меню (или 'last' для последнего открытого).
+   */
+  function GetMenu(name: string): ClassicMenu | null;
+
+  /** * Закрывает Гамп.
+   * @param type Тип гампа (обычно 'generic' или 'custom').
+   * @param serial Серийник гампа (или 'any').
+   */
+  function CloseGump(type: GumpType, serial: Serial): void;
+
   /** Кидает появившийся прицел на указанный объект. */
   function WaitTargetObject(serial: Serial): void;
 

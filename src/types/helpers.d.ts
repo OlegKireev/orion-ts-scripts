@@ -7,13 +7,15 @@ interface Point2D {
 
 declare type OrionGlobalSerial =
   (typeof import('../constants').GLOBAL_SERIALS)[number];
-declare type OrionGlobalGraphic =
-  (typeof import('../constants').GLOBAL_GRAPHICS)[number];
-declare type SkillName = (typeof import('../constants').SKILLS)[number];
-
 declare type Serial =
   | OrionGlobalSerial
   | (string & { readonly __brand: 'Serial' });
+
+declare type OrionGlobalGraphic =
+  (typeof import('../constants').GLOBAL_GRAPHICS)[number];
 declare type Graphic =
   | OrionGlobalGraphic
   | (string & { readonly __brand: 'Graphic' });
+
+declare type SkillName = (typeof import('../constants').SKILLS)[number];
+declare type GumpType = (typeof import('../constants').GUMP_TYPES)[number];
