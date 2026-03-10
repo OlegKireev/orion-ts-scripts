@@ -147,7 +147,7 @@ declare namespace Orion {
    * Использует предмет по его типу (графике).
    * @returns true, если предмет найден и использован.
    */
-  function UseType(type: Graphic, color?: string): boolean;
+  function UseType(type: Graphic, color?: string, container?: Serial): boolean;
 
   /** Использует объект (двойной клик) по его серийнику. */
   function UseObject(serial: Serial): void;

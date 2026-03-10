@@ -247,14 +247,16 @@ const ROUTES: Point2D[][] = [
 // ЭКСПОРТИРУЕМЫЕ ФУНКЦИИ
 // ==========================================
 
-export { Monitor } from '@/lib/status-monitor';
-
 export function Autostart(): void {
   Orion.JournalIgnoreCase(true);
-  Orion.Exec('Monitor', true); // Раскомментируй, если у тебя есть глобальный скрипт мониторинга
+  Orion.Exec('Monitor', true);
+  Orion.Exec('Eating', true);
   checkLag();
   Lumberjacking(); // Вызываем напрямую
 }
+
+export { Monitor } from '@/lib/status-monitor';
+export { Eating } from '@/lib/eating';
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {

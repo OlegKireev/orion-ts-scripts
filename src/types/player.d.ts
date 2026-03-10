@@ -12,4 +12,6 @@ declare namespace Player {
   function Weight(): number;
   /** Возвращает максимально допустимый вес. */
   function MaxWeight(): number;
+  /** Возвращает true, если персонаж умер. */
+  function Dead(): boolean;
 }

@@ -90,7 +90,7 @@ export function dropItems(
 export function restockItems(
   items: RestockItem[],
   grabFrom: Serial,
-  dropTo: Serial,
+  dropTo: Serial = 'backpack',
 ): void {
   const heavyMsg =
     'Too many items in that container|Too many items here|The ground collapses|That is too heavy|It appears to be locked';

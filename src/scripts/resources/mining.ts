@@ -1,24 +1,22 @@
 import { checkLag, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
-
-// Вспомогательные скрипты
-export { Monitor } from '@/lib/status-monitor';
-export { getGumpResponse, markTiles } from './mark-tiles';
+import { restockItems } from '@/lib/container';
 
 // --- Настройки шахтера ---
 const MOVE_DELAY = 100;
 const WEIGHT_LIMIT = 30; // запас веса до максимума
-const MINIMUM_TOOLS_COUNT = 3;
 
 const FORGE_COORDS: Point2D = { x: 888, y: 1874 };
 const CONTAINER_COORDS: Point2D = { x: 890, y: 1875 };
 const MINE_COORDS: Point2D = { x: 772, y: 1697 };
 
 const ORE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Контейнер для инготов
-const RESOURSES_CONTAINER = toSerial('0x403853AA'); // Контейнер с ресурсами (инструменты, еда)
+const RESOURCES_CONTAINER = toSerial('0x403853AA'); // Контейнер с ресурсами (инструменты, еда)
 
 const TOOL_TYPE = toGraphic('0x0E85|0x0E86');
 const ORE_TYPE = toGraphic('0x19B7|0x19B8|0x19B9|0x19BA');
+const FOOD_TYPE = toGraphic('0x097B');
+
 const INGOT_TYPE = toGraphic('0x1BEF|0x1BE3|0x1BF5|0x1BE9|0x1BEF');
 const FORGE_TYPE = toGraphic('0x0FB1');
 
@@ -32,11 +30,16 @@ Orion.JournalIgnoreCase(true);
 // ==========================================
 
 export function Autostart(): void {
-  Orion.Exec('Replenishment', true);
   Orion.Exec('Monitor', true);
+  Orion.Exec('Eating', true);
+  Replenishment();
   checkLag();
   Orion.ResumeScript('all');
 }
+
+export { Eating } from '@/lib/eating';
+export { Monitor } from '@/lib/status-monitor';
+export { getGumpResponse, markTiles } from './mark-tiles';
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {
@@ -242,62 +245,88 @@ export function DropIngots(): void {
 }
 
 export function Replenishment(): void {
-  const toolsCount = Orion.Count(TOOL_TYPE, 'any', 'backpack');
+  // const toolsCount = Orion.Count(TOOL_TYPE, 'any', 'backpack');
 
-  if (toolsCount >= MINIMUM_TOOLS_COUNT) {
-    Orion.Print('Инструментов достаточно');
-  } else {
-    Orion.Print('Пополняю запасы');
-    Orion.WalkTo(
-      CONTAINER_COORDS.x,
-      CONTAINER_COORDS.y,
-      Player.Z(),
-      1,
-      255,
-      true,
-    );
-    const chestObj = Orion.FindObject(ORE_CONTAINER_SERIAL);
+  // if (toolsCount >= MINIMUM_TOOLS_COUNT) {
+  //   Orion.Print('Инструментов достаточно');
+  // } else {
+  //   Orion.Print('Пополняю запасы');
+  //   Orion.WalkTo(
+  //     CONTAINER_COORDS.x,
+  //     CONTAINER_COORDS.y,
+  //     Player.Z(),
+  //     1,
+  //     255,
+  //     true,
+  //   );
+  //   const chestObj = Orion.FindObject(ORE_CONTAINER_SERIAL);
 
-    if (!chestObj) {
-      Orion.CharPrint('self', 0x0021, 'Ingot chest not found!');
-      Orion.PlayWav('Alarm');
-      stopBot();
-      return;
-    }
+  //   if (!chestObj) {
+  //     Orion.CharPrint('self', 0x0021, 'Ingot chest not found!');
+  //     Orion.PlayWav('Alarm');
+  //     stopBot();
+  //     return;
+  //   }
 
-    checkLag();
-    Orion.Wait(500);
+  //   checkLag();
+  //   Orion.Wait(500);
 
-    const toolsToTake = MINIMUM_TOOLS_COUNT - toolsCount;
-    let toolsTaken = 0;
+  //   const toolsToTake = MINIMUM_TOOLS_COUNT - toolsCount;
+  //   let toolsTaken = 0;
 
-    Orion.Print(RESOURSES_CONTAINER);
-    Orion.OpenContainer(RESOURSES_CONTAINER);
-    Orion.Wait(100);
-    Orion.Print(`Беру ${toolsToTake} инструмент(ов)`);
+  //   Orion.Print(RESOURSES_CONTAINER);
+  //   Orion.OpenContainer(RESOURSES_CONTAINER);
+  //   Orion.Wait(100);
+  //   Orion.Print(`Беру ${toolsToTake} инструмент(ов)`);
 
-    for (let j = 0; j < toolsToTake; j++) {
-      const isFound = Orion.MoveItemType(
-        TOOL_TYPE,
-        'any',
-        RESOURSES_CONTAINER,
-        1,
-        'backpack',
-      );
-      if (isFound) toolsTaken++;
-      Orion.Wait(100);
-    }
+  //   for (let j = 0; j < toolsToTake; j++) {
+  //     const isFound = Orion.MoveItemType(
+  //       TOOL_TYPE,
+  //       'any',
+  //       RESOURSES_CONTAINER,
+  //       1,
+  //       'backpack',
+  //     );
+  //     if (isFound) toolsTaken++;
+  //     Orion.Wait(100);
+  //   }
 
-    const toolsLeftCount = Orion.Count(TOOL_TYPE, 'any', RESOURSES_CONTAINER);
+  //   const toolsLeftCount = Orion.Count(TOOL_TYPE, 'any', RESOURSES_CONTAINER);
 
-    Orion.Print(
-      `Взял ${toolsTaken} инструмента(ов). В контейнере осталось ${toolsLeftCount}.`,
-    );
-    if (toolsLeftCount <= MINIMUM_TOOLS_COUNT) {
-      Orion.PlayWav('Alarm');
-      Orion.Print('Пополни контейнер с инструментами!');
-    }
-  }
+  //   Orion.Print(
+  //     `Взял ${toolsTaken} инструмента(ов). В контейнере осталось ${toolsLeftCount}.`,
+  //   );
+  //   if (toolsLeftCount <= MINIMUM_TOOLS_COUNT) {
+  //     Orion.PlayWav('Alarm');
+  //     Orion.Print('Пополни контейнер с инструментами!');
+  //   }
+  // }
+
+  restockItems(
+    [
+      {
+        name: 'pickaxe',
+        type: TOOL_TYPE,
+        color: 'any',
+        max: 4,
+        min: 3,
+        box: 'self',
+        x: -1,
+        y: -1,
+      },
+      {
+        name: 'food',
+        type: FOOD_TYPE,
+        color: 'any',
+        max: 10,
+        min: 5,
+        box: 'self',
+        x: -1,
+        y: -1,
+      },
+    ],
+    RESOURCES_CONTAINER,
+  );
 
   if (!Orion.ScriptRunning('ReturnToMine')) {
     Orion.Exec('ReturnToMine', true);
