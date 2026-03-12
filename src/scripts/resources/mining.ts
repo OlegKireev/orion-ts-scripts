@@ -245,62 +245,16 @@ export function DropIngots(): void {
 }
 
 export function Replenishment(): void {
-  // const toolsCount = Orion.Count(TOOL_TYPE, 'any', 'backpack');
+  const resourceContainer = Orion.FindObject(RESOURCES_CONTAINER);
 
-  // if (toolsCount >= MINIMUM_TOOLS_COUNT) {
-  //   Orion.Print('Инструментов достаточно');
-  // } else {
-  //   Orion.Print('Пополняю запасы');
-  //   Orion.WalkTo(
-  //     CONTAINER_COORDS.x,
-  //     CONTAINER_COORDS.y,
-  //     Player.Z(),
-  //     1,
-  //     255,
-  //     true,
-  //   );
-  //   const chestObj = Orion.FindObject(ORE_CONTAINER_SERIAL);
-
-  //   if (!chestObj) {
-  //     Orion.CharPrint('self', 0x0021, 'Ingot chest not found!');
-  //     Orion.PlayWav('Alarm');
-  //     stopBot();
-  //     return;
-  //   }
-
-  //   checkLag();
-  //   Orion.Wait(500);
-
-  //   const toolsToTake = MINIMUM_TOOLS_COUNT - toolsCount;
-  //   let toolsTaken = 0;
-
-  //   Orion.Print(RESOURSES_CONTAINER);
-  //   Orion.OpenContainer(RESOURSES_CONTAINER);
-  //   Orion.Wait(100);
-  //   Orion.Print(`Беру ${toolsToTake} инструмент(ов)`);
-
-  //   for (let j = 0; j < toolsToTake; j++) {
-  //     const isFound = Orion.MoveItemType(
-  //       TOOL_TYPE,
-  //       'any',
-  //       RESOURSES_CONTAINER,
-  //       1,
-  //       'backpack',
-  //     );
-  //     if (isFound) toolsTaken++;
-  //     Orion.Wait(100);
-  //   }
-
-  //   const toolsLeftCount = Orion.Count(TOOL_TYPE, 'any', RESOURSES_CONTAINER);
-
-  //   Orion.Print(
-  //     `Взял ${toolsTaken} инструмента(ов). В контейнере осталось ${toolsLeftCount}.`,
-  //   );
-  //   if (toolsLeftCount <= MINIMUM_TOOLS_COUNT) {
-  //     Orion.PlayWav('Alarm');
-  //     Orion.Print('Пополни контейнер с инструментами!');
-  //   }
-  // }
+  Orion.WalkTo(
+    resourceContainer?.X() || CONTAINER_COORDS.x,
+    resourceContainer?.Y() || CONTAINER_COORDS.y,
+    Player.Z(),
+    1,
+    255,
+    true,
+  );
 
   restockItems(
     [
