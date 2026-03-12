@@ -227,6 +227,11 @@ declare namespace Orion {
    */
   function GetMenu(name: string): ClassicMenu | null;
 
+  /** Возвращает количество открытых классических меню */
+  function MenuCount(): number;
+
+  function CancelWaitMenu(): void;
+
   /** * Закрывает Гамп.
    * @param type Тип гампа (обычно 'generic' или 'custom').
    * @param serial Серийник гампа (или 'any').

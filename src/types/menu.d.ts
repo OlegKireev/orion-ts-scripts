@@ -5,4 +5,6 @@ declare interface ClassicMenu {
   Select(itemName: string): void;
   /** Закрывает меню */
   Close(): void;
+  /** Возвращает серийник выбранного пункта меню */
+  Serial(): Serial;
 }
