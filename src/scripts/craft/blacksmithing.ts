@@ -14,19 +14,10 @@ const MATERIALS: Record<string, MaterialDef> = {
   Silver: { graphic: toGraphic('0x1BF5'), color: '0x0000' },
 };
 
-const allMaterials: MaterialDef[] = [];
-for (const key in MATERIALS) {
-  allMaterials.push(MATERIALS[key]);
-}
-
 const BlacksmithConfig: CraftConfig = {
-  chestSerial: toSerial('0x403853AB'),
-  trashSerial: toSerial('0x40215610'),
+  resourcesContainerSerial: toSerial('0x403853AB'),
+  productsContainerSerial: toSerial('0x40215610'),
   batchSize: 3,
-
-  // Превращаем словарь в массив для функции очистки сумки
-  allMaterials: allMaterials,
-
   recipes: [
     {
       name: 'War Mace',

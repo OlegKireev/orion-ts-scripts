@@ -10,25 +10,32 @@ export interface MaterialDef {
 }
 
 export interface CraftRecipe {
+  /** Название предмета */
   name: string;
+  /** Полный путь пунктов меню, например ["executioner's axe", 'mace', 'War Mace'] */
   path: string[];
+  /** Grapic и color предмета */
   product: MaterialDef;
+  /** Какие материалы и сколько их нужно на крафт 1 предмета  */
   materials: { def: MaterialDef; req: number }[];
 }
 
 export interface CraftConfig {
-  chestSerial: Serial;
-  trashSerial: Serial;
+  /** Откуда берем материалы */
+  resourcesContainerSerial: Serial;
+  /** Куда кладем результат крафта */
+  productsContainerSerial: Serial; //
+  /** На сколько предметов брать реусрсов за раз */
   batchSize: number;
+  /** Рецепты в пордяке приоритета */
   recipes: CraftRecipe[];
-  allMaterials: MaterialDef[]; // Список всех возможных материалов для очистки сумки
-
-  // Функция старта: описывает, как именно вызвать меню крафта
+  /** Функция старта: описывает, как именно вызвать меню крафта */
   startCraftAction: (recipe: CraftRecipe) => void;
 
-  // Опциональные сообщения (если на разных навыках они отличаются)
-  msgStartPattern?: string;
-  msgEndPattern?: string;
+  /** Текст о начале крафта предмета */
+  startMessage?: string;
+  /** Текст об окончании крафта предмета */
+  endMessage?: string;
 }
 
 // ==========================================
@@ -37,12 +44,26 @@ export interface CraftConfig {
 export class UniversalCrafter {
   private config: CraftConfig;
   private endMessages: string;
+  private allMaterials: MaterialDef[] = [];
 
   constructor(config: CraftConfig) {
     this.config = config;
     this.endMessages =
-      config.msgEndPattern ||
+      config.endMessage ||
       'You put the|You failed|You have no|You have gainer|Ваша попытка провалилась';
+
+    const uniqueMaterials: Record<string, MaterialDef> = {};
+
+    for (const recipe of config.recipes) {
+      for (const material of recipe.materials) {
+        const key = `${material.def.graphic}_${material.def.color}`;
+        uniqueMaterials[key] = material.def;
+      }
+    }
+
+    for (const key in uniqueMaterials) {
+      this.allMaterials.push(uniqueMaterials[key]);
+    }
   }
 
   public run(): void {
@@ -66,13 +87,13 @@ export class UniversalCrafter {
 
       for (let i = 0; i < this.config.batchSize; i++) {
         this.craftItem(recipeToCraft);
-        this.trashCraftedItems(recipeToCraft.product);
+        this.moveCraftedItems(recipeToCraft.product);
       }
     }
   }
 
   private findAvailableRecipe(): CraftRecipe | null {
-    Orion.UseObject(this.config.chestSerial);
+    Orion.UseObject(this.config.resourcesContainerSerial);
     Orion.Wait(200);
 
     for (const recipe of this.config.recipes) {
@@ -82,7 +103,7 @@ export class UniversalCrafter {
         const chestAmount = Orion.Count(
           mat.def.graphic,
           mat.def.color,
-          this.config.chestSerial,
+          this.config.resourcesContainerSerial,
         );
         if (chestAmount < mat.req * this.config.batchSize) {
           canCraft = false;
@@ -96,14 +117,14 @@ export class UniversalCrafter {
 
   private prepareMaterials(recipe: CraftRecipe): void {
     // 1. Скидываем АБСОЛЮТНО ВСЕ профильные материалы из сумки в сундук
-    for (const matDef of this.config.allMaterials) {
+    for (const matDef of this.allMaterials) {
       const allBackpackMats = Orion.FindType(
         matDef.graphic,
         matDef.color,
         'backpack',
       );
       for (const item of allBackpackMats) {
-        Orion.MoveItem(item, 0, this.config.chestSerial);
+        Orion.MoveItem(item, 0, this.config.resourcesContainerSerial);
         Orion.Wait(200);
       }
     }
@@ -117,14 +138,14 @@ export class UniversalCrafter {
         const chestMaterials = Orion.FindType(
           mat.def.graphic,
           mat.def.color,
-          this.config.chestSerial,
+          this.config.resourcesContainerSerial,
         );
         if (chestMaterials.length === 0) {
           break;
         }
 
         Orion.MoveItem(chestMaterials[0], needToTake, 'backpack');
-        Orion.Wait(200);
+        Orion.Wait(100);
 
         const haveInBackpack = Orion.Count(
           mat.def.graphic,
@@ -175,7 +196,7 @@ export class UniversalCrafter {
     Orion.CancelWaitTarget();
 
     // Ожидание финала
-    const startPattern = this.config.msgStartPattern || 'Производство отнимет';
+    const startPattern = this.config.startMessage || 'Производство отнимет';
     const timeMsg = Orion.WaitJournal(
       startPattern,
       start,
@@ -194,24 +215,24 @@ export class UniversalCrafter {
           this.endMessages,
           Orion.Now(),
           maxWaitingTime,
-          'sys|my|any',
+          'sys|my',
         );
-        Orion.Wait(300);
+        Orion.Wait(100);
         return;
       }
     }
 
     // Резервный вариант
-    Orion.WaitJournal(this.endMessages, start, start + 10000, 'sys|my|any');
-    Orion.Wait(300);
+    Orion.WaitJournal(this.endMessages, start, start + 10000, 'sys|my');
+    Orion.Wait(100);
   }
 
-  private trashCraftedItems(item: MaterialDef): void {
+  private moveCraftedItems(item: MaterialDef): void {
     const items = Orion.FindType(item.graphic, item.color, 'backpack');
     for (const found of items) {
       checkLag();
-      Orion.MoveItem(found, 0, this.config.trashSerial);
-      Orion.Wait(600);
+      Orion.MoveItem(found, 0, this.config.productsContainerSerial);
+      Orion.Wait(100);
     }
   }
 }
