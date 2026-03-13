@@ -4,8 +4,8 @@ import { checkLag, stopBot } from '@/lib/helpers';
 // ==========================================
 // НАСТРОЙКИ
 // ==========================================
-const CHEST_SERIAL = toSerial('0x40112233');
-const TRASH_SERIAL = toSerial('0x40556677');
+const CHEST_SERIAL = toSerial('0x403853AB');
+const TRASH_SERIAL = toSerial('0x403853A6');
 const TOOL_GRAPHIC = toGraphic('0x13E3');
 const BATCH_SIZE = 3;
 
@@ -20,7 +20,7 @@ const MATERIALS: Record<string, MaterialDef> = {
   Rusty: { graphic: toGraphic('0x1BEF'), color: '0x09EB' },
   OldCopper: { graphic: toGraphic('0x1BEF'), color: '0x09E8' },
   Bronze: { graphic: toGraphic('0x1BEF'), color: '0x06D6' },
-  Cooper: { graphic: toGraphic('0x1BE3'), color: '0x0000' },
+  Copper: { graphic: toGraphic('0x1BE3'), color: '0x0000' },
   Steel: { graphic: toGraphic('0x1BEF'), color: '0x09F1' },
   Silver: { graphic: toGraphic('0x1BF5'), color: '0x0000' },
 };
@@ -48,7 +48,7 @@ const RECIPES: CraftRecipe[] = [
   {
     name: 'Orcish Mace',
     path: ["executioner's axe", 'mace', 'Orcish Mace'],
-    productGraphic: toGraphic('0x0F5C'),
+    productGraphic: toGraphic('0x0A7E'),
     materials: [
       { def: MATERIALS.Bronze, req: 7 },
       { def: MATERIALS.Rusty, req: 15 },
@@ -102,7 +102,7 @@ export function AutostartBlacksmith(): void {
 /** Ищет первый по списку рецепт, на который в сундуке есть ресы минимум на BATCH_SIZE крафтов */
 function findAvailableRecipe(): CraftRecipe | null {
   Orion.UseObject(CHEST_SERIAL);
-  Orion.Wait(500);
+  Orion.Wait(200);
 
   for (const recipe of RECIPES) {
     let canCraft = true;
@@ -141,7 +141,7 @@ function prepareIngots(recipe: CraftRecipe): void {
 
     for (const item of allBackpackMats) {
       Orion.MoveItem(item, 0, CHEST_SERIAL);
-      Orion.Wait(600);
+      Orion.Wait(200);
     }
   }
 
@@ -159,7 +159,7 @@ function prepareIngots(recipe: CraftRecipe): void {
       if (chestMats.length === 0) break;
 
       Orion.MoveItem(chestMats[0], needToTake, 'backpack');
-      Orion.Wait(600);
+      Orion.Wait(200);
 
       const haveInBackpack = Orion.Count(
         mat.def.graphic,
@@ -175,15 +175,17 @@ function prepareIngots(recipe: CraftRecipe): void {
 function craftItem(recipe: CraftRecipe): void {
   checkLag();
 
-  const start = Orion.Now();
-  Orion.UseType(TOOL_GRAPHIC);
+  const primaryMaterial = recipe.materials[0].def;
 
-  // Умный обходчик меню
+  const start = Orion.Now();
+
+  Orion.UseType(primaryMaterial.graphic, primaryMaterial.color, 'backpack');
+
   let timeout = Orion.Now() + 5000;
   let currentLevel = 0;
 
   while (Orion.Now() < timeout) {
-    if (Orion.WaitForMenu(1000)) {
+    if (Orion.WaitForMenu(300)) {
       const menu = Orion.GetMenu('last');
       if (!menu) continue;
 
@@ -192,7 +194,7 @@ function craftItem(recipe: CraftRecipe): void {
       // Идем с конца пути к началу (от названия пушки к базовой категории)
       for (let i = recipe.path.length - 1; i >= currentLevel; i--) {
         menu.Select(recipe.path[i]);
-        Orion.Wait(300);
+        Orion.Wait(100);
 
         // Если меню пропало (MenuCount === 0) или сменило серийник (открылось вложенное)
         if (
@@ -210,14 +212,40 @@ function craftItem(recipe: CraftRecipe): void {
     }
   }
 
-  // Ждем результата крафта
+  Orion.CancelWaitTarget();
+
+  // Ждем максимум 2 секунды, пока сервер не пришлет системное сообщение со временем
+  const timeMsg = Orion.WaitJournal("Производство отнимет", start, Orion.Now() + 2000, "sys|my");
+  const endMessages = 'You put the|You failed|You have no|You have gainer|Ваша попытка провалилась';
+
+  if (timeMsg) {
+      const text = timeMsg.Text();
+      const match = text.match(/(\d+)\s*секунд/);
+
+      if (match) {
+          const seconds = parseInt(match[1], 10);
+          Orion.Print(`Крафчу ${recipe.name}. Жду ${seconds} секунд...`);
+
+
+          // Таймаут = заявленные секунды + 20 секунд запаса на серверные лаги
+          const maxWaitingTime = Orion.Now() + (seconds * 1000) + 20000;
+          Orion.WaitJournal(endMessages, Orion.Now(), maxWaitingTime, 'sys|my');
+          Orion.Wait(300);
+          return;
+      } else {
+        Orion.Print(`[ОШИБКА]: Сообщение о времени крафта не найдено.`)
+      }
+  }
+
+
+  // Резерный вариант
   Orion.WaitJournal(
-    'You put the|You failed|You have no',
+    endMessages,
     start,
     start + 10000,
-    'my|sys',
+    'sys|my',
   );
-  Orion.Wait(500);
+  Orion.Wait(300);
 }
 
 /** Скидывает готовые предметы в мусорку */

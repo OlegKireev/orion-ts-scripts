@@ -42,7 +42,7 @@ declare namespace Orion {
     sender?: string,
     serial?: string,
     color?: string,
-  ): any;
+  ): JournalMessage;
 
   /**
    * Проверяет, есть ли сообщение в журнале.
