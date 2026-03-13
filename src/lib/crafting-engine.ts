@@ -9,12 +9,14 @@ export interface MaterialDef {
   color: string;
 }
 
+export type MenuPathNode = string | { graphic: Graphic };
+
 export interface CraftRecipe {
   /** Название предмета */
   name: string;
   /** Полный путь пунктов меню, например ["executioner's axe", 'mace', 'War Mace'] */
-  path: (string | number)[];
-  /** Grapic и color предмета */
+  path: MenuPathNode[];
+  /** Graphic и color предмета */
   product: MaterialDef;
   /** Какие материалы и сколько их нужно на крафт 1 предмета  */
   materials: { def: MaterialDef; req: number }[];
@@ -27,7 +29,7 @@ export interface CraftConfig {
   productsContainerSerial: Serial; //
   /** На сколько предметов брать реусрсов за раз */
   batchSize: number;
-  /** Рецепты в пордяке приоритета */
+  /** Рецепты в порядке приоритета */
   recipes: CraftRecipe[];
   /** Функция старта: описывает, как именно вызвать меню крафта */
   startCraftAction: (recipe: CraftRecipe) => void;
@@ -227,10 +229,45 @@ export class UniversalCrafter {
 
         const startSerial = menu.Serial();
 
+        // Идем с конца пути к началу
         for (let i = recipe.path.length - 1; i >= currentLevel; i--) {
-          menu.Select(recipe.path[i]);
+          const node = recipe.path[i];
+
+          if (typeof node === 'string') {
+            // Если это обычная строка - выбираем по тексту
+            menu.Select(node);
+          } else {
+            // Если это объект с графикой - ищем индекс!
+            let targetIndex = -1;
+            const count = menu.ItemsCount();
+
+            // 1. Принудительно делаем из нашей графики ('0x1415') десятичное число
+            const searchGraphicDec = parseInt(String(node.graphic), 16);
+
+            for (let j = 0; j < count; j++) {
+              // 2. Убеждаемся, что значение из меню тоже воспринимается TS как число
+              const menuItemGraphicDec = Number(menu.ItemGraphic(j));
+
+              // Теперь мы сравниваем number === number, TypeScript счастлив!
+              if (menuItemGraphicDec === searchGraphicDec) {
+                targetIndex = j;
+                break;
+              }
+            }
+
+            if (targetIndex !== -1) {
+              menu.Select(targetIndex);
+            } else {
+              Orion.Print(
+                `[ОШИБКА] В меню нет предмета с графикой ${node.graphic}`,
+              );
+              break;
+            }
+          }
+
           Orion.Wait(100);
 
+          // Проверяем, сменилось ли окно
           if (
             Orion.MenuCount() === 0 ||
             Orion.GetMenu('last')?.Serial() !== startSerial

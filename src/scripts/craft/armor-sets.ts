@@ -24,16 +24,16 @@ const MATERIALS: Record<string, MaterialDef> = {
   Copper: { graphic: toGraphic('0x1BE3'), color: '0x0000' },
   Steel: { graphic: toGraphic('0x1BEF'), color: '0x09F1' },
   Silver: { graphic: toGraphic('0x1BF5'), color: '0x0000' },
-  Gold: { graphic: toGraphic('0x1BE9'), color: '0x09B5'},
-  Shadow: { graphic: toGraphic('0x1BEF'), color: '0x0770'},
-  Bluesteel: { graphic: toGraphic('0x1BEF'), color: '0x0128'},
-  Rose: { graphic: toGraphic('0x1BEF'), color: '0x0665'},
-  Agapite: { graphic: toGraphic('0x1BEF'), color: '0x0400'},
-  Bloodrock: { graphic: toGraphic('0x1BEF'), color: '0x09CF'},
-  Verite: { graphic: toGraphic('0x1BEF'), color: '0x0BAA'},
-  Valorite: { graphic: toGraphic('0x1BEF'), color: '0x0515'},
-  Mytheril: { graphic: toGraphic('0x1BEF'), color: '0x052D'},
-  Blackrock: { graphic: toGraphic('0x1BEF'), color: '0x0455'},
+  Gold: { graphic: toGraphic('0x1BE9'), color: '0x09B5' },
+  Shadow: { graphic: toGraphic('0x1BEF'), color: '0x0770' },
+  Bluesteel: { graphic: toGraphic('0x1BEF'), color: '0x0128' },
+  Rose: { graphic: toGraphic('0x1BEF'), color: '0x0665' },
+  Agapite: { graphic: toGraphic('0x1BEF'), color: '0x0400' },
+  Bloodrock: { graphic: toGraphic('0x1BEF'), color: '0x09CF' },
+  Verite: { graphic: toGraphic('0x1BEF'), color: '0x0BAA' },
+  Valorite: { graphic: toGraphic('0x1BEF'), color: '0x0515' },
+  Mytheril: { graphic: toGraphic('0x1BEF'), color: '0x052D' },
+  Blackrock: { graphic: toGraphic('0x1BEF'), color: '0x0455' },
 };
 
 // ==========================================
@@ -50,7 +50,7 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
   return [
     {
       name: `${materialName} Plate Chest`,
-      path: ['Colored Armor', 7], // выбираем по индексу из-за одинаковых названи chest
+      path: ['Colored Armor', { graphic: toGraphic('0x1415') }],
       product: { graphic: toGraphic('0x1415'), color: 'any' },
       materials: [{ def: mat, req: 28 }],
     },

@@ -7,4 +7,6 @@ declare interface ClassicMenu {
   Close(): void;
   /** Возвращает серийник выбранного пункта меню */
   Serial(): Serial;
+  ItemGraphic(index: number): Graphic;
+  ItemsCount(): number;
 }
