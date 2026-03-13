@@ -5,8 +5,7 @@ import { checkLag, stopBot } from '@/lib/helpers';
 // НАСТРОЙКИ
 // ==========================================
 const CHEST_SERIAL = toSerial('0x403853AB');
-const TRASH_SERIAL = toSerial('0x403853A6');
-const TOOL_GRAPHIC = toGraphic('0x13E3');
+const TRASH_SERIAL = toSerial('0x40215610');
 const BATCH_SIZE = 3;
 
 // Описываем структуру одного материала
@@ -31,7 +30,7 @@ const MATERIALS: Record<string, MaterialDef> = {
 interface CraftRecipe {
   name: string;
   path: string[];
-  productGraphic: Graphic;
+  product: MaterialDef;
   materials: { def: MaterialDef; req: number }[]; // Связываем с определением материала
 }
 
@@ -39,7 +38,10 @@ const RECIPES: CraftRecipe[] = [
   {
     name: 'War Mace',
     path: ["executioner's axe", 'mace', 'War Mace'],
-    productGraphic: toGraphic('0x0909'),
+    product: {
+      graphic: toGraphic('0x13B3'),
+      color: toGraphic('0x0909'),
+    },
     materials: [
       { def: MATERIALS.Copper, req: 10 },
       { def: MATERIALS.OldCopper, req: 10 },
@@ -48,7 +50,10 @@ const RECIPES: CraftRecipe[] = [
   {
     name: 'Orcish Mace',
     path: ["executioner's axe", 'mace', 'Orcish Mace'],
-    productGraphic: toGraphic('0x0A7E'),
+    product: {
+      graphic: toGraphic('0x13B3'),
+      color: toGraphic('0x0A7E'),
+    },
     materials: [
       { def: MATERIALS.Bronze, req: 7 },
       { def: MATERIALS.Rusty, req: 15 },
@@ -57,7 +62,10 @@ const RECIPES: CraftRecipe[] = [
   {
     name: 'Sting',
     path: ["executioner's axe", 'kryss', 'Sting'],
-    productGraphic: toGraphic('0x0058'),
+    product: {
+      graphic: toGraphic('0x1400'),
+      color: toGraphic('0x0058'),
+    },
     materials: [
       { def: MATERIALS.Steel, req: 5 },
       { def: MATERIALS.Silver, req: 5 },
@@ -69,8 +77,8 @@ const RECIPES: CraftRecipe[] = [
 // ОСНОВНАЯ ЛОГИКА
 // ==========================================
 
-export function AutostartBlacksmith(): void {
-  Orion.Print('Запуск умного кузнеца...');
+export function Autostart(): void {
+  Orion.Print('Запуск кузнеца...');
   Orion.CancelWaitMenu();
 
   while (true) {
@@ -92,10 +100,9 @@ export function AutostartBlacksmith(): void {
     // 3. Куем BATCH_SIZE раз
     for (let i = 0; i < BATCH_SIZE; i++) {
       craftItem(recipeToCraft);
+      // 4. Выбрасываем готовое в мусорку
+      trashCraftedItems(recipeToCraft.product);
     }
-
-    // 4. Выбрасываем готовое в мусорку
-    trashCraftedItems(recipeToCraft.productGraphic);
   }
 }
 
@@ -187,7 +194,9 @@ function craftItem(recipe: CraftRecipe): void {
   while (Orion.Now() < timeout) {
     if (Orion.WaitForMenu(300)) {
       const menu = Orion.GetMenu('last');
-      if (!menu) continue;
+      if (!menu) {
+        continue;
+      }
 
       const startSerial = menu.Serial();
 
@@ -237,6 +246,7 @@ function craftItem(recipe: CraftRecipe): void {
       }
   }
 
+  trashCraftedItems(recipe.product);
 
   // Резерный вариант
   Orion.WaitJournal(
@@ -249,8 +259,8 @@ function craftItem(recipe: CraftRecipe): void {
 }
 
 /** Скидывает готовые предметы в мусорку */
-function trashCraftedItems(graphic: Graphic): void {
-  const items = Orion.FindType(graphic, 'any', 'backpack');
+function trashCraftedItems(item: MaterialDef): void {
+  const items = Orion.FindType(item.graphic, item.color, 'backpack');
   for (const item of items) {
     checkLag();
     Orion.MoveItem(item, 0, TRASH_SERIAL);
