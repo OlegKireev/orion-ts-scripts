@@ -32,6 +32,8 @@ export interface CraftConfig {
   /** Функция старта: описывает, как именно вызвать меню крафта */
   startCraftAction: (recipe: CraftRecipe) => void;
 
+  /** Режим работы (по умолчанию span) */
+  mode?: 'spam' | 'set';
   /** Текст о начале крафта предмета */
   startMessage?: string;
   /** Текст об окончании крафта предмета */
@@ -70,21 +72,22 @@ export class UniversalCrafter {
     Orion.Print('Запуск универсального крафтера...');
     Orion.CancelWaitMenu();
 
+    if (this.config.mode === 'set') {
+      this.runSetMode();
+    } else {
+      this.runSpamMode(); // Старый режим (например, для прокачки)
+    }
+  }
+
+  private runSpamMode(): void {
     while (true) {
       const recipeToCraft = this.findAvailableRecipe();
-
       if (!recipeToCraft) {
-        const message = 'Нет ресурсов ни на один предмет из списка. Остановка.';
-        Orion.Print(message);
-        Orion.PlayWav('Alarm');
-        sendTelegramMessage(message);
+        Orion.Print('Нет ресурсов. Остановка.');
         stopBot();
         return;
       }
-
-      Orion.Print(`Будем делать: ${recipeToCraft.name}`);
-      this.prepareMaterials(recipeToCraft);
-
+      this.prepareMaterials(recipeToCraft, this.config.batchSize);
       for (let i = 0; i < this.config.batchSize; i++) {
         this.craftItem(recipeToCraft);
         this.moveCraftedItems(recipeToCraft.product);
@@ -92,31 +95,83 @@ export class UniversalCrafter {
     }
   }
 
+  private runSetMode(): void {
+    for (let setIndex = 0; setIndex < this.config.batchSize; setIndex++) {
+      Orion.Print(
+        `Создаем комплект ${setIndex + 1} из ${this.config.batchSize}...`,
+      );
+
+      for (const recipe of this.config.recipes) {
+        let isSuccess = false;
+
+        while (!isSuccess) {
+          // Проверяем ресурсы ровно на 1 попытку
+          if (!this.hasResourcesFor(recipe, 1)) {
+            Orion.Print(`Нет ресурсов для ${recipe.name}. Остановка.`);
+            Orion.PlayWav('Alarm');
+            stopBot();
+            return;
+          }
+
+          this.prepareMaterials(recipe, 1);
+
+          // Запоминаем количество таких предметов в рюкзаке ДО ковки
+          const countBefore = Orion.Count(
+            recipe.product.graphic,
+            'any',
+            'backpack',
+          );
+
+          this.craftItem(recipe);
+
+          // Считаем ПОСЛЕ ковки
+          const countAfter = Orion.Count(
+            recipe.product.graphic,
+            'any',
+            'backpack',
+          );
+
+          if (countAfter > countBefore) {
+            isSuccess = true;
+            Orion.Print(`${recipe.name} успешно выкован!`);
+            this.moveCraftedItems(recipe.product); // Убираем готовую часть в сундук
+          } else {
+            Orion.Print(`Фейл при ковке ${recipe.name}. Пробуем еще раз...`);
+          }
+        }
+      }
+    }
+    Orion.Print(`Успешно выковано комплектов: ${this.config.batchSize}!`);
+    Orion.PlayWav('AutoPage');
+  }
+
+  private hasResourcesFor(recipe: CraftRecipe, amount: number): boolean {
+    for (const mat of recipe.materials) {
+      const chestAmount = Orion.Count(
+        mat.def.graphic,
+        mat.def.color,
+        this.config.resourcesContainerSerial,
+      );
+      if (chestAmount < mat.req * amount) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private findAvailableRecipe(): CraftRecipe | null {
     Orion.UseObject(this.config.resourcesContainerSerial);
     Orion.Wait(200);
 
     for (const recipe of this.config.recipes) {
-      let canCraft = true;
-
-      for (const mat of recipe.materials) {
-        const chestAmount = Orion.Count(
-          mat.def.graphic,
-          mat.def.color,
-          this.config.resourcesContainerSerial,
-        );
-        if (chestAmount < mat.req * this.config.batchSize) {
-          canCraft = false;
-          break;
-        }
+      if (this.hasResourcesFor(recipe, this.config.batchSize)) {
+        return recipe;
       }
-      if (canCraft) return recipe;
     }
     return null;
   }
 
-  private prepareMaterials(recipe: CraftRecipe): void {
-    // 1. Скидываем АБСОЛЮТНО ВСЕ профильные материалы из сумки в сундук
+  private prepareMaterials(recipe: CraftRecipe, amount: number): void {
     for (const matDef of this.allMaterials) {
       const allBackpackMats = Orion.FindType(
         matDef.graphic,
@@ -129,9 +184,8 @@ export class UniversalCrafter {
       }
     }
 
-    // 2. Берем только нужные
     for (const mat of recipe.materials) {
-      const requiredTotal = mat.req * this.config.batchSize;
+      const requiredTotal = mat.req * amount;
       let needToTake = requiredTotal;
 
       while (needToTake > 0) {
@@ -161,13 +215,11 @@ export class UniversalCrafter {
     checkLag();
     const start = Orion.Now();
 
-    // ВЫЗЫВАЕМ КАСТОМНЫЙ СТАРТЕР МЕНЮ ИЗ КОНФИГА
     this.config.startCraftAction(recipe);
 
     let timeout = Orion.Now() + 5000;
     let currentLevel = 0;
 
-    // Обход динамического меню
     while (Orion.Now() < timeout) {
       if (Orion.WaitForMenu(300)) {
         const menu = Orion.GetMenu('last');
@@ -195,7 +247,6 @@ export class UniversalCrafter {
 
     Orion.CancelWaitTarget();
 
-    // Ожидание финала
     const startPattern = this.config.startMessage || 'Производство отнимет';
     const timeMsg = Orion.WaitJournal(
       startPattern,
