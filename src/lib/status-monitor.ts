@@ -21,7 +21,13 @@ export function Monitor(): void {
     '0x0032DD44', // Postuh
   ]);
 
-  const seenPillars: Serial[] = [];
+  const knownPillars = toSerial([
+    '0x40101336',
+    '0x401EF113',
+    '0x401011B5'
+  ])
+
+  const seenPillars: Serial[] = knownPillars.slice();
   const PILLAR_GRAPHIC = toGraphic('0x0ED4');
 
   while (true) {
