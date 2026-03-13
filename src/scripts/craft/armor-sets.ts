@@ -11,10 +11,10 @@ import {
 // Изменяй эти значения перед запуском скрипта!
 // ==========================================
 const TARGET_SETS = 2; // Сколько полных комплектов сковать
-const TARGET_MATERIAL = 'Steel'; // Название инготов из словаря MATERIALS
+const TARGET_MATERIAL = 'Bronze'; // Название инготов из словаря MATERIALS
 
 const RESOURCE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Откуда брать инготы
-const PRODUCTS_CONTAINER_SERIAL = toSerial('0x40215610'); // Куда складывать готовую броню
+const PRODUCTS_CONTAINER_SERIAL = toSerial('0x403853A9'); // Куда складывать готовую броню
 
 // Справочник материалов
 const MATERIALS: Record<string, MaterialDef> = {
@@ -24,6 +24,16 @@ const MATERIALS: Record<string, MaterialDef> = {
   Copper: { graphic: toGraphic('0x1BE3'), color: '0x0000' },
   Steel: { graphic: toGraphic('0x1BEF'), color: '0x09F1' },
   Silver: { graphic: toGraphic('0x1BF5'), color: '0x0000' },
+  Gold: { graphic: toGraphic('0x1BE9'), color: '0x09B5'},
+  Shadow: { graphic: toGraphic('0x1BEF'), color: '0x0770'},
+  Bluesteel: { graphic: toGraphic('0x1BEF'), color: '0x0128'},
+  Rose: { graphic: toGraphic('0x1BEF'), color: '0x0665'},
+  Agapite: { graphic: toGraphic('0x1BEF'), color: '0x0400'},
+  Bloodrock: { graphic: toGraphic('0x1BEF'), color: '0x09CF'},
+  Verite: { graphic: toGraphic('0x1BEF'), color: '0x0BAA'},
+  Valorite: { graphic: toGraphic('0x1BEF'), color: '0x0515'},
+  Mytheril: { graphic: toGraphic('0x1BEF'), color: '0x052D'},
+  Blackrock: { graphic: toGraphic('0x1BEF'), color: '0x0455'},
 };
 
 // ==========================================
@@ -37,12 +47,13 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
     return [];
   }
 
-  // Цвет готовой брони обычно совпадает с цветом инготов.
-  // Если на шарде цвета отличаются, здесь можно добавить конвертер.
-  const armorColor = mat.color;
-
-  // ОБЯЗАТЕЛЬНО: Проверь точные названия меню (path) и количество руды (req) для твоего шарда!
   return [
+    {
+      name: `${materialName} Plate Chest`,
+      path: ['Colored Armor', 7], // выбираем по индексу из-за одинаковых названи chest
+      product: { graphic: toGraphic('0x1415'), color: 'any' },
+      materials: [{ def: mat, req: 28 }],
+    },
     {
       name: `${materialName} Plate Helmet`,
       path: ['Colored Armor', 'Helmet'],
@@ -72,12 +83,6 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
       path: ['Colored Armor', 'Leggings'],
       product: { graphic: toGraphic('0x1411'), color: 'any' },
       materials: [{ def: mat, req: 20 }],
-    },
-    {
-      name: `${materialName} Plate Chest`,
-      path: ['Colored Armor', 'Chest'],
-      product: { graphic: toGraphic('0x1415'), color: 'any' },
-      materials: [{ def: mat, req: 28 }],
     },
   ];
 }

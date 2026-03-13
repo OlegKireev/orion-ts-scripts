@@ -13,7 +13,7 @@ export interface CraftRecipe {
   /** Название предмета */
   name: string;
   /** Полный путь пунктов меню, например ["executioner's axe", 'mace', 'War Mace'] */
-  path: string[];
+  path: (string | number)[];
   /** Grapic и color предмета */
   product: MaterialDef;
   /** Какие материалы и сколько их нужно на крафт 1 предмета  */
