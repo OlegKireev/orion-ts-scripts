@@ -40,6 +40,7 @@ export function Autostart(): void {
 export { Eating } from '@/lib/eating';
 export { Monitor } from '@/lib/status-monitor';
 export { getGumpResponse, markTiles } from './mark-tiles';
+export { AutoResurrect } from '@/lib/resurrect';
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {

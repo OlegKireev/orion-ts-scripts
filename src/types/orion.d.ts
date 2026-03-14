@@ -280,6 +280,12 @@ declare namespace Orion {
   /** Возобновляет работу приостановленного скрипта. */
   function ResumeScript(scriptName: string): void;
 
+  /** Возвращает количество запущенных скриптов. */
+  function RunningScripts(scriptName: string): number;
+
+  /** Возвращает список запущенных скриптов. */
+  function GetScripts(mode: 'all' | 'started' | 'paused'): string[];
+
   /** Останавливает все макросы в клиенте. */
   function StopMacro(): void;
 

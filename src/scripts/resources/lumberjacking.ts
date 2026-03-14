@@ -257,6 +257,7 @@ export function Autostart(): void {
 
 export { Monitor } from '@/lib/status-monitor';
 export { Eating } from '@/lib/eating';
+export { AutoResurrect } from '@/lib/resurrect';
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {

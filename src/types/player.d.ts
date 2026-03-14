@@ -6,6 +6,10 @@ declare namespace Player {
   function Name(): string;
   /** Возвращает текущее количество жизней (HP). */
   function Hits(): number;
+  /** Возвращает текущую координату X персонажа. */
+  function X(): number;
+  /** Возвращает текущую координату Y персонажа. */
+  function Y(): number;
   /** Возвращает текущую координату Z (высоту) персонажа. */
   function Z(): number;
   /** Возвращает текущий вес в рюкзаке. */
