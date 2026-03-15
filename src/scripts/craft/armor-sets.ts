@@ -11,7 +11,8 @@ import {
 // Изменяй эти значения перед запуском скрипта!
 // ==========================================
 const TARGET_SETS = 2; // Сколько полных комплектов сковать
-const TARGET_MATERIAL = 'Bronze'; // Название инготов из словаря MATERIALS
+const TARGET_MATERIAL = 'Steel'; // Название инготов из словаря MATERIALS
+const TYPE: 'plate' | 'chain' = 'chain';
 
 const RESOURCE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Откуда брать инготы
 const PRODUCTS_CONTAINER_SERIAL = toSerial('0x403853A9'); // Куда складывать готовую броню
@@ -45,6 +46,41 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
   if (!mat) {
     Orion.Print(`[ОШИБКА] Материал ${materialName} не найден в словаре!`);
     return [];
+  }
+
+  if (TYPE === 'chain') {
+    return [
+      {
+        name: `${materialName} chainmail coif`,
+        path: ['Colored Armor', 'Chainmail Coif'],
+        product: { graphic: toGraphic('0x13BB'), color: 'any' },
+        materials: [{ def: mat, req: 10 }],
+      },
+      {
+        name: `${materialName} chainmail leggings`,
+        path: ['Colored Armor', 'Chainmail Leggings'],
+        product: { graphic: toGraphic('0x13BE'), color: 'any' },
+        materials: [{ def: mat, req: 18 }],
+      },
+      {
+        name: `${materialName} chainmail tunic`,
+        path: ['Colored Armor', 'Chainmail tunic'],
+        product: { graphic: toGraphic('0x13BF'), color: 'any' },
+        materials: [{ def: mat, req: 20 }],
+      },
+      {
+        name: `${materialName} ringmail gloves`,
+        path: ['Colored Armor', 'Ringmail Gloves'],
+        product: { graphic: toGraphic('0x13EB'), color: 'any' },
+        materials: [{ def: mat, req: 10 }],
+      },
+      {
+        name: `${materialName} ringmail sleeves`,
+        path: ['Colored Armor', 'Ringmail Sleeves'],
+        product: { graphic: toGraphic('0x13EE'), color: 'any' },
+        materials: [{ def: mat, req: 14 }],
+      },
+    ]
   }
 
   return [

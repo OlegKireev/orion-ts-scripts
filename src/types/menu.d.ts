@@ -9,4 +9,6 @@ declare interface ClassicMenu {
   Serial(): Serial;
   ItemGraphic(index: number): Graphic;
   ItemsCount(): number;
+  ItemName(index: number): string;
+  ItemID(index: number): number;
 }

@@ -201,7 +201,7 @@ export function SmeltOre(): void {
     checkLag();
     Orion.UseObject(forge[0]); // Orion.FindType возвращает массив серийников
     Orion.WaitTargetObject(ore);
-    Orion.Wait(800);
+    Orion.Wait(200);
   }
   Orion.Wait(1000);
 }

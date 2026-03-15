@@ -54,7 +54,7 @@ export class UniversalCrafter {
     this.config = config;
     this.endMessages =
       config.endMessage ||
-      'You put the|You failed|You have no|You have gainer|Ваша попытка провалилась';
+      'You put the|You failed|You have no|You have gainer|Ваша попытка провалилась|Вы успешно сделали';
 
     const uniqueMaterials: Record<string, MaterialDef> = {};
 
