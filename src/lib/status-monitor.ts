@@ -70,7 +70,6 @@ export function Monitor(): void {
 
     if (Player.Hits() <= 0) {
       sendTelegramMessage(`${Player.Name()}: Умер [${Orion.Time('hh:mm:ss')}]`);
-      Orion.PauseScript('all');
     }
 
     Orion.Ignore(friends);

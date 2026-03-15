@@ -1,15 +1,14 @@
 import { toGraphic } from '@lib/validators';
 
-// Графика трупа (corpse) в Ultima Online
 const CORPSE_GRAPHIC = toGraphic('0x2006');
-
-// TODO: Впиши сюда координаты тайла рядом с хилером или крестом
-const RES_X = 1234;
-const RES_Y = 5678;
+const RESSURECT_COORDS = {
+  x: 970,
+  y: 1769,
+}
 
 // Обязательно экспортируем функцию, чтобы Orion ее увидел
 export function AutoResurrect() {
-  Orion.Print('[AutoRes] Скрипт авто-воскрешения запущен...');
+  Orion.Print('[AutoResurrect] Скрипт авто-воскрешения запущен...');
 
   while (true) {
     if (Player.Dead()) {
@@ -21,7 +20,7 @@ export function AutoResurrect() {
 }
 
 function handleDeathSequence() {
-  Orion.Print('[AutoRes] 💀 Персонаж мертв. Начинаем спасательную операцию...');
+  Orion.Print('[AutoResurrect] 💀 Персонаж мертв. Начинаем спасательную операцию...');
 
   // 1. Собираем все ЗАПУЩЕННЫЕ скрипты с помощью правильного метода
   const runningScripts = Orion.GetScripts('started');
@@ -41,8 +40,8 @@ function handleDeathSequence() {
   const deathZ = Player.Z();
 
   // 3. Бежим к координатам воскрешения
-  Orion.Print('[AutoRes] 🏃 Бежим воскрешаться...');
-  Orion.WalkTo(RES_X, RES_Y, Player.Z(), 1, 255, true, true);
+  Orion.Print('[AutoResurrect] 🏃 Бежим воскрешаться...');
+  Orion.WalkTo(RESSURECT_COORDS.x, RESSURECT_COORDS.y, Player.Z(), 0, 255, true, true);
 
   // 4. Ждем, пока персонаж не станет живым
   // while (Player.Dead()) {
@@ -55,10 +54,10 @@ function handleDeathSequence() {
   // Orion.Wait(2000);
   // }
 
-  Orion.Print('[AutoRes] ✨ Воскресли! Возвращаемся за лутом...');
+  Orion.Print('[AutoResurrect] ✨ Воскресли! Возвращаемся за лутом...');
 
   // 5. Бежим обратно к месту смерти
-  Orion.WalkTo(deathX, deathY, deathZ, 1, 255, true, true);
+  Orion.WalkTo(deathX, deathY, deathZ, 0, 255, true, true);
 
   // 6. Ищем свой труп и лутаем всё содержимое (в радиусе 3 тайлов)
   const corpses = Orion.FindType(CORPSE_GRAPHIC, 'any', 'ground', 'fast', 3);
@@ -73,13 +72,13 @@ function handleDeathSequence() {
       Orion.MoveItem(item, 0, 'backpack');
       Orion.Wait(600);
     }
-    Orion.Print('[AutoRes] 🎒 Труп успешно залутан!');
+    Orion.Print('[AutoResurrect] 🎒 Труп успешно залутан!');
   } else {
-    Orion.Print('[AutoRes] ❌ Труп не найден :(');
+    Orion.Print('[AutoResurrect] ❌ Труп не найден :(');
   }
 
   // 7. Снимаем с паузы все ранее остановленные скрипты
-  Orion.Print('[AutoRes] ▶️ Возобновляем работу макросов...');
+  Orion.Print('[AutoResurrect] ▶️ Возобновляем работу макросов...');
   for (const scriptName of pausedScripts) {
     Orion.ResumeScript(scriptName);
   }

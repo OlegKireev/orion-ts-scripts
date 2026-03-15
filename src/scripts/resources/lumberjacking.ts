@@ -251,6 +251,7 @@ export function Autostart(): void {
   Orion.JournalIgnoreCase(true);
   Orion.Exec('Monitor', true);
   Orion.Exec('Eating', true);
+  Orion.Exec('AutoResurrect', true);
   checkLag();
   Lumberjacking(); // Вызываем напрямую
 }

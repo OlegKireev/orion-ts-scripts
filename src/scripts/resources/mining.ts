@@ -32,6 +32,7 @@ Orion.JournalIgnoreCase(true);
 export function Autostart(): void {
   Orion.Exec('Monitor', true);
   Orion.Exec('Eating', true);
+  Orion.Exec('AutoResurrect', true);
   Replenishment();
   checkLag();
   Orion.ResumeScript('all');
