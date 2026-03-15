@@ -208,6 +208,9 @@ declare namespace Orion {
   /** Отменяет ожидание классического меню. */
   function CancelWaitMenu(): void;
 
+   /** Закрыть меню. */
+   function CloseMenu(name: string): void;
+
   /**
    * Добавить "ловушку" на меню от сервера.
    * @param title Заголовок меню или часть заголовка меню.

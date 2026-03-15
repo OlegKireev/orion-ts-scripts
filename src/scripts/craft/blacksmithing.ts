@@ -32,15 +32,15 @@ const BlacksmithConfig: CraftConfig = {
       ],
     },
     {
-      name: 'Orcish Mace',
-      path: ["executioner's axe", 'mace', 'Orcish Mace'],
+      name: 'Morning Star',
+      path: ["executioner's axe", 'mace', 'Morning Star'],
       product: {
-        graphic: toGraphic('0x13B3'),
-        color: toGraphic('0x0A7E'),
+        graphic: toGraphic('0x0F5C'),
+        color: toGraphic('0x0400'),
       },
       materials: [
-        { def: MATERIALS.Bronze, req: 7 },
-        { def: MATERIALS.Rusty, req: 15 },
+        { def: MATERIALS.Silver, req: 10 },
+        { def: MATERIALS.Bronze, req: 10 },
       ],
     },
     {
@@ -53,6 +53,18 @@ const BlacksmithConfig: CraftConfig = {
       materials: [
         { def: MATERIALS.Steel, req: 5 },
         { def: MATERIALS.Silver, req: 5 },
+      ],
+    },
+    {
+      name: 'Orcish Mace',
+      path: ["executioner's axe", 'mace', 'Orcish Mace'],
+      product: {
+        graphic: toGraphic('0x13B3'),
+        color: toGraphic('0x0A7E'),
+      },
+      materials: [
+        { def: MATERIALS.Bronze, req: 7 },
+        { def: MATERIALS.Rusty, req: 15 },
       ],
     },
   ],
