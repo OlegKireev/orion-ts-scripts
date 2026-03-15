@@ -18,7 +18,7 @@ const LUMBER_RESTOCK: RestockItem[] = [
     name: 'hatchet',
     type: TOOL_TYPE,
     color: 'any',
-    max: 3,
+    max: 2,
     min: 1,
     box: 'self',
     x: -1,
@@ -286,7 +286,6 @@ export function Lumberjacking(): void {
     checkLag();
     Orion.WalkTo(HOME_COORDS.x, HOME_COORDS.y, Player.Z(), 0, 255, false, true);
     checkLag();
-    Orion.Say('BANK');
 
     const chestObj = Orion.FindObject(CHEST_SERIAL);
     if (!chestObj) {
