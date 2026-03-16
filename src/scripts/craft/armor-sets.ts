@@ -11,7 +11,7 @@ import {
 // Изменяй эти значения перед запуском скрипта!
 // ==========================================
 const TARGET_SETS = 2; // Сколько полных комплектов сковать
-const TARGET_MATERIAL = 'Steel'; // Название инготов из словаря MATERIALS
+const TARGET_MATERIAL = 'Bluesteel'; // Название инготов из словаря MATERIALS
 const TYPE: 'plate' | 'chain' = 'chain';
 
 const RESOURCE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Откуда брать инготы
@@ -86,7 +86,7 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
   return [
     {
       name: `${materialName} Plate Chest`,
-      path: ['Colored Armor', { graphic: toGraphic('0x1415') }],
+      path: ['Colored Armor', '6'],
       product: { graphic: toGraphic('0x1415'), color: 'any' },
       materials: [{ def: mat, req: 28 }],
     },
