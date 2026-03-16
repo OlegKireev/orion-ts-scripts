@@ -15,13 +15,17 @@ declare interface CustomGumpObject {
   ): void;
   AddText(x: number, y: number, color: number, text: string): void;
   AddButton(
-    buttonID: number,
+    serial: number,
     x: number,
     y: number,
-    normalGraphic: Graphic | string,
-    pressedGraphic: Graphic | string,
-    disabledGraphic: Graphic | string,
-    type: number,
+    graphic: Graphic,
+    graphicHover: Graphic,
+    graphicActive: Graphic,
+    color: Graphic,
+    /** 0 - переход на страницу, 1 - выбор в гампе (по умолчанию: 1) */
+    action?: 0 | 1,
+    /** Номер страницы для action=0 (по умолчанию: -1) */
+    toPage?: number,
   ): void;
   AddTilePic(
     x: number,

@@ -1,4 +1,7 @@
 // Orion вызывает эту функцию без аргументов,
+
+import { toGraphic } from '@/lib/validators';
+
 // а данные мы берем из глобального объекта CustomGumpResponse
 export function getGumpResponse(): void {
   const btnId = CustomGumpResponse.ReturnCode();
@@ -32,7 +35,15 @@ export function markTiles(): void {
   gump.AddText(70, 18, 0, 'What to mark?');
   gump.AddText(51, 48, 0, 'Trees');
   gump.AddText(154, 48, 0, 'Rocks');
-  gump.AddButton(0, 96, 134, '0x00F1', '0x00F2', '0x00F3', 0);
+  gump.AddButton(
+    0,
+    96,
+    134,
+    toGraphic('0x00F1'),
+    toGraphic('0x00F2'),
+    toGraphic('0x00F3'),
+    toGraphic('0x00F4'),
+  );
   gump.AddTilePic(50, 67, '0x0E58', 0, 1, '0x0035');
   gump.AddTilePic(152, 69, '0x177C', 0, 2, '0x0035');
   gump.Update();
