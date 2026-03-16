@@ -5,15 +5,12 @@ import {
   UniversalCrafter,
   CraftRecipe,
 } from '@lib/crafting-engine';
+import { checkLag } from '@/lib/helpers';
 
 // ==========================================
 // ⚙️ НАСТРОЙКИ ПЕРЕД СТАРТОМ
 // Изменяй эти значения перед запуском скрипта!
 // ==========================================
-const TARGET_SETS = 2; // Сколько полных комплектов сковать
-const TARGET_MATERIAL = 'Bluesteel'; // Название инготов из словаря MATERIALS
-const TYPE: 'plate' | 'chain' = 'chain';
-
 const RESOURCE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Откуда брать инготы
 const PRODUCTS_CONTAINER_SERIAL = toSerial('0x403853A9'); // Куда складывать готовую броню
 
@@ -37,6 +34,14 @@ const MATERIALS: Record<string, MaterialDef> = {
   Blackrock: { graphic: toGraphic('0x1BEF'), color: '0x0455' },
 };
 
+// Глобальное состояние.
+// В Orion оно сохранится в памяти, пока макрос не выгрузят.
+// Это удобно: при следующем запуске гамп запомнит твой прошлый выбор!
+let state = {
+  type: 'plate' as 'plate' | 'chain',
+  material: 'Bluesteel',
+  count: 1,
+};
 // ==========================================
 // ФАБРИКА РЕЦЕПТОВ (Генератор полного сета)
 // ==========================================
@@ -48,7 +53,7 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
     return [];
   }
 
-  if (TYPE === 'chain') {
+  if (state.type === 'chain') {
     return [
       {
         name: `${materialName} chainmail coif`,
@@ -126,8 +131,8 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
 // ==========================================
 // ЗАПУСК
 // ==========================================
-export function StartArmorCrafting(): void {
-  const recipes = getPlateSetRecipes(TARGET_MATERIAL);
+function StartArmorCrafting(): void {
+  const recipes = getPlateSetRecipes(state.material);
 
   if (recipes.length === 0) {
     return;
@@ -138,7 +143,7 @@ export function StartArmorCrafting(): void {
     productsContainerSerial: PRODUCTS_CONTAINER_SERIAL,
 
     mode: 'set',
-    batchSize: TARGET_SETS,
+    batchSize: state.count,
     recipes: recipes,
 
     startCraftAction: (recipe) => {
@@ -151,23 +156,7 @@ export function StartArmorCrafting(): void {
   crafter.run();
 }
 
-// Глобальное состояние.
-// В Orion оно сохранится в памяти, пока макрос не выгрузят.
-// Это удобно: при следующем запуске гамп запомнит твой прошлый выбор!
-let craftState = {
-  type: 'plate' as 'plate' | 'chain',
-  material: 'Copper',
-  count: 1,
-};
-
-const AVAILABLE_MATERIALS = [
-  'Rusty',
-  'OldCopper',
-  'Bronze',
-  'Copper',
-  'Steel',
-  'Silver',
-];
+const AVAILABLE_MATERIALS = Object.keys(MATERIALS);
 
 export function CraftMenu() {
   const gumpSerial = 777; // Уникальный ID нашего гампа
@@ -175,10 +164,9 @@ export function CraftMenu() {
 
   while (isRunning) {
     const w = 320;
-    const h = 280;
-    // Центрируем или ставим в удобное место
-    const x = Orion.ClientOptionGet('GameWindowX') + 100;
-    const y = Orion.ClientOptionGet('GameWindowY') + 100;
+    const h = 440;
+    const x = Orion.ClientOptionGet("GameWindowX") + 100;
+    const y = Orion.ClientOptionGet("GameWindowY") + 100;
 
     const gump = Orion.CreateCustomGump(gumpSerial);
     gump.Clear();
@@ -186,165 +174,116 @@ export function CraftMenu() {
     gump.SetY(y);
     gump.SetNoClose(false);
     gump.SetNoMove(false);
-
-    // При клике на кнопку гамп закрывается, срабатывает коллбек,
-    // мы меняем стейт и цикл сразу же рисует его заново с новыми данными!
     gump.SetCloseOnButtonClick(true);
-    gump.SetCallback('CraftGumpCallback');
+    gump.SetCallback("CraftGumpCallback");
 
     // Фон гампа
-    gump.AddResizepic(0, 0, '0x0A28', w, h);
-    gump.AddText(80, 20, 1153, 'Настройки Крафта Брони');
+    gump.AddResizepic(0, 0, "0x0A28", w, h);
+    gump.AddText(80, 20, 1153, "Крафт сетов брони");
 
     // --- СЕКЦИЯ 1: ТИП БРОНИ ---
-    gump.AddText(20, 60, 0, 'Тип:');
+    gump.AddText(20, 60, 0, "Тип:");
 
-    const plateColor = craftState.type === 'plate' ? 63 : 0; // 63 - зеленый цвет для выбранного
-    gump.AddButton(
-      101,
-      60,
-      64,
-      toGraphic('0x0845'),
-      toGraphic('0x0846'),
-      toGraphic('0x0847'),
-      toGraphic('0x0848'),
-    );
-    gump.AddText(80, 60, plateColor, 'Plate');
+    const plateColor = state.type === 'plate' ? 63 : 0;
+    gump.AddButton(101, 60, 69, toGraphic("0x0845"), toGraphic("0x0846"), toGraphic("0x0845"), toGraphic('0x0000'));
+    gump.AddText(80, 65, plateColor, "Plate");
+    gump.AddTilePic(120, 60, toGraphic('0x1415'), 0, 101, '');
 
-    const chainColor = craftState.type === 'chain' ? 63 : 0;
-    gump.AddButton(
-      101,
-      60,
-      64,
-      toGraphic('0x0845'),
-      toGraphic('0x0846'),
-      toGraphic('0x0847'),
-      toGraphic('0x0848'),
-    );
-    gump.AddText(160, 60, chainColor, 'Chain');
+    const chainColor = state.type === 'chain' ? 63 : 0;
+    gump.AddButton(102, 185, 69, toGraphic("0x0845"), toGraphic("0x0846"), toGraphic("0x0845"), toGraphic('0x0000'));
+    gump.AddText(205, 65, chainColor, "Chain");
+    gump.AddTilePic(240, 60, toGraphic('0x13BF'), 0, 102, '');
 
     // --- СЕКЦИЯ 2: МАТЕРИАЛ ---
-    gump.AddText(20, 100, 0, 'Материал:');
+    gump.AddText(20, 105, 0, "Материал:");
 
     AVAILABLE_MATERIALS.forEach((mat, index) => {
-      const col = index % 2; // В две колонки
-      const row = Math.floor(index / 2);
-      const matX = 100 + col * 100;
-      const matY = 100 + row * 25;
+        const col = index % 2; // В две колонки
+        const row = Math.floor(index / 2);
+        const matX = 20 + (col * 140);
+        const matY = 130 + (row * 25);
 
-      const matColor = craftState.material === mat ? 63 : 0;
+        const matColor = state.material === mat ? 63 : 0;
 
-      // ID кнопок материалов начинаются с 200
-      gump.AddButton(
-        200 + index,
-        matX - 20,
-        matY + 4,
-        toGraphic('0x0845'),
-        toGraphic('0x0846'),
-        toGraphic('0x0847'),
-        toGraphic('0x0848'),
-      );
-      gump.AddText(matX, matY, matColor, mat);
+        gump.AddButton(200 + index, matX, matY + 4, toGraphic("0x0845"), toGraphic("0x0846"), toGraphic("0x0845"), toGraphic('0x0000'));
+        gump.AddText(matX + 20, matY, matColor, mat);
     });
 
     // --- СЕКЦИЯ 3: КОЛИЧЕСТВО ---
-    gump.AddText(20, 190, 0, `Сделать сетов:  ${craftState.count} шт.`);
-    // Минус (код 301) и Плюс (код 302)
-    gump.AddButton(
-      301,
-      190,
-      194,
-      toGraphic('0x0845'),
-      toGraphic('0x0846'),
-      toGraphic('0x0847'),
-      toGraphic('0x0848'),
-    ); // Кнопка со стрелочкой вниз/минус
-    gump.AddButton(
-      302,
-      215,
-      194,
-      toGraphic('0x0845'),
-      toGraphic('0x0846'),
-      toGraphic('0x0847'),
-      toGraphic('0x0848'),
-    ); // Кнопка со стрелочкой вверх/плюс
+    gump.AddText(20, 340, 0, `Кол-во сетов:  ${state.count} шт.`);
+
+    gump.AddButton(301, 200, 344, toGraphic("0x0845"), toGraphic("0x0846"), toGraphic("0x0845"), toGraphic('0x0000'));
+    gump.AddText(220, 340, 0, "-1");
+
+    gump.AddButton(302, 250, 344, toGraphic("0x0845"), toGraphic("0x0846"), toGraphic("0x0845"), toGraphic('0x0000'));
+    gump.AddText(270, 340, 0, "+1");
 
     // --- СЕКЦИЯ 4: УПРАВЛЕНИЕ ---
-    gump.AddButton(
-      999,
-      50,
-      230,
-      toGraphic('0x0845'),
-      toGraphic('0x0846'),
-      toGraphic('0x0847'),
-      toGraphic('0x0848'),
-    ); // START (OK)
-    gump.AddButton(
-      0,
-      180,
-      230,
-      toGraphic('0x0845'),
-      toGraphic('0x0846'),
-      toGraphic('0x0847'),
-      toGraphic('0x0848'),
-    ); // CANCEL
+    gump.AddButton(0, 40, 385, toGraphic("0x0845"), toGraphic("0x0846"), toGraphic("0x0845"), toGraphic('0x0000'));
+    gump.AddText(60, 381, 0, "Отмена");
+
+    gump.AddButton(999, 180, 385, toGraphic("0x0845"), toGraphic("0x0846"), toGraphic("0x0845"), toGraphic('0x0000'));
+    gump.AddText(200, 381, 63, "Ковать");
 
     gump.Update();
 
-    // Сбрасываем переменную ожидания перед входом в цикл
-    Shared.AddVar('craftGumpCode', -1);
+    Orion.Wait(100);
 
-    // Ждем реакции пользователя (пока гамп существует и переменная не изменилась)
-    while (
-      Orion.GumpExists('custom', gumpSerial) &&
-      Shared.GetVar('craftGumpCode') === -1
-    ) {
-      Orion.Wait(50);
+    // Записываем 0. Если игрок закроет окно крестиком/ПКМ, останется 0 (Отмена)
+    Shared.AddVar("craftGumpCode", -1);
+
+    // Ждем ТОЛЬКО закрытия гампа
+    while (Orion.GumpExists("custom", gumpSerial) && Shared.GetVar("craftGumpCode") === -1) {
+        Orion.Wait(50);
     }
 
-    const code = Shared.GetVar('craftGumpCode');
+    // ВАЖНО: Даем Ориону еще 50мс, чтобы коллбек точно успел отработать и перезаписать переменную
+    Orion.Wait(50);
+
+    let code = Shared.GetVar("craftGumpCode");
+
+    if (code === -1) {
+      code = 0;
+    }
 
     // Обрабатываем результат
     switch (code) {
       case 101:
-        craftState.type = 'plate';
+        state.type = 'plate';
         break;
       case 102:
-        craftState.type = 'chain';
+        state.type = 'chain';
         break;
 
-      // Обработка материалов (от 200 до 200 + длина массива)
-      case 200:
-      case 201:
-      case 202:
-      case 203:
-      case 204:
-      case 205:
+      // Блок материалов (Обязательно оборачиваем в { } чтобы не было ошибки области видимости)
+      case 200: case 201: case 202: case 203: case 204: case 205: case 206: case 207: case 208: case 209: case 210: case 211: case 212: case 213: case 214: case 215: case 216: {
         const matIndex = code - 200;
-        craftState.material = AVAILABLE_MATERIALS[matIndex];
+        state.material = AVAILABLE_MATERIALS[matIndex];
         break;
+      }
 
       case 301:
-        if (craftState.count > 1) craftState.count--;
+        if (state.count > 1) state.count--;
         break;
       case 302:
-        craftState.count++;
+        state.count++;
         break;
 
       case 999: // Нажали START
-        Orion.Print(
-          `[Запуск]: Ковка ${craftState.count} сетов ${craftState.type} из ${craftState.material}`,
-        );
+        Orion.Print(`[Запуск]: Кую ${state.count} сетов ${state.type} из ${state.material}`);
+        StartArmorCrafting();
         isRunning = false;
         break;
 
-      default: // Нажали Cancel (0) или закрыли гамп ПКМ
-        Orion.Print('Настройка крафта отменена.');
+      case 0:
+      default:
+        Orion.Print("Настройка крафта отменена.");
         isRunning = false;
         break;
     }
   }
 }
+
 
 /**
  * Этот коллбек вызывается самим Орионом при нажатии любой кнопки в нашем кастомном гампе.
@@ -353,4 +292,11 @@ export function CraftMenu() {
 export function CraftGumpCallback() {
   const code = CustomGumpResponse.ReturnCode();
   Shared.AddVar('craftGumpCode', code);
+}
+
+export function Autostart() {
+  checkLag();
+  if (!Orion.ScriptRunning('CraftMenu')) {
+    Orion.Exec('CraftMenu', true);
+  }
 }
