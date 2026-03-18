@@ -19,10 +19,6 @@ const REAGENTS = {
 };
 
 export function Magery() {
-  // --------------------
-  // Открываем сумки на старте
-  // --------------------
-  Orion.Say('bank');
   Orion.UseObject(CONFIG.CHEST);
   Orion.Wait(200);
   Orion.UseObject(CONFIG.REAGENTS_BAG);
@@ -52,19 +48,32 @@ export function Magery() {
     );
     const hasCure = hasEnoughReagents(REAGENTS.Garlic, REAGENTS.Ginseng);
 
+    let spell = '';
+    let mana = 0;
+    let delay = 0;
+
+    // 2. Выбираем, что кастовать
     if (hasNightSight) {
-      tryCast('Night Sight', 4, 2000);
+      spell = 'Night Sight';
+      mana = 4;
+      delay = 2000;
     } else if (hasCure) {
-      tryCast('Cure', 4, 1500);
+      spell = 'Cure';
+      mana = 4;
+      delay = 1500;
     } else {
-      tryCast('Poison', 9, 2700);
+      spell = 'Poison';
+      mana = 9;
+      delay = 2700;
     }
 
-    Orion.WaitJournal(
-      'You are at peace',
-      Orion.Now(),
-      Orion.Now() + CONFIG.PEACE_TIMEOUT,
-    );
+    // 3. Кастуем или медитируем
+    if (Player.Mana() >= mana) {
+      Orion.Cast(spell, 'self');
+      Orion.Wait(delay); // Ждем откат скилла и идем на новый круг цикла
+    } else {
+      meditateToFull(); // Маны нет — уходим в медитацию
+    }
   }
 }
 
@@ -97,26 +106,29 @@ function restockReagents(reagents: Graphic[]) {
   }
 }
 
-/** Пытается скастовать спелл, если маны мало — медитирует */
-function tryCast(spellName: string, manaCost: number, waitTime: number) {
-  if (Player.Mana() >= manaCost) {
-    Orion.Cast(spellName, 'self');
-    Orion.Wait(waitTime);
-  } else {
-    meditateToFull();
-  }
-}
-
 /** Медитирует до полного столба маны */
 function meditateToFull() {
   while (Player.Mana() < Player.MaxMana()) {
+    Orion.ClearJournal();
     Orion.UseSkill('Meditation');
-    // Ждем фейла или успеха медитации
-    Orion.WaitJournal(
-      'You lose your concentration|You are at peace',
-      Orion.Now(),
-      Orion.Now() + 4000,
-    );
-    Orion.Wait(100);
+
+    // Запускаем внутренний таймер ожидания (чтобы не зависнуть навсегда)
+    const timeEnd = Orion.Now() + 12000;
+
+    while (Orion.Now() < timeEnd) {
+      // Если медитация прошла успешно и мы достигли "мира"
+      if (Orion.InJournal('You are at peace')) {
+        Orion.Wait(500); // Небольшая пауза для стабильности
+        return; // Выходим из функции, возвращаемся к кастам
+      }
+
+      // Если сбили концентрацию — прерываем ожидание и юзаем скилл заново
+      if (Orion.InJournal('You lose your concentration')) {
+        Orion.Wait(500);
+        break; // Выход из внутреннего цикла `while`, чтобы снова нажать Meditation
+      }
+
+      Orion.Wait(100);
+    }
   }
 }
