@@ -208,8 +208,8 @@ declare namespace Orion {
   /** Отменяет ожидание классического меню. */
   function CancelWaitMenu(): void;
 
-   /** Закрыть меню. */
-   function CloseMenu(name: string): void;
+  /** Закрыть меню. */
+  function CloseMenu(name: string): void;
 
   /**
    * Добавить "ловушку" на меню от сервера.
@@ -378,4 +378,22 @@ declare namespace Orion {
    * @param text Текст сообщения.
    */
   function Say(text: string): void;
+
+  /**
+   * Переключить боевой режим
+   * @param state 0 - выкл., 1 - вкл., 2 - переключить текущее состояние
+   */
+  function WarMode(state?: number): void;
+
+  /**
+   * Произнести заклинание
+   * @param spellName Название заклинания
+   * @param target Серийник цели
+   * @param relativeTargetDistance Расстояние от цели
+   *  */
+  function Cast(
+    spellName: string,
+    target?: Serial,
+    relativeTargetDistance?: number,
+  ): void;
 }

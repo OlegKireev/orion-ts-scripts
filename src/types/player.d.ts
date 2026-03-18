@@ -18,4 +18,10 @@ declare namespace Player {
   function MaxWeight(): number;
   /** Возвращает true, если персонаж умер. */
   function Dead(): boolean;
+  /** Проверка на режим боя */
+  function WarMode(): boolean;
+  /** Получить количество маны игрока */
+  function Mana(): number;
+  /** Получить максимальное количество маны */
+  function MaxMana(): number;
 }
