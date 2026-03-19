@@ -28,7 +28,7 @@ function handleDeathSequence() {
 
   for (const scriptName of runningScripts) {
     // Не ставим на паузу сами себя
-    if (scriptName !== 'AutoResurrect') {
+    if (scriptName !== 'AutoResurrect' && scriptName !== 'Monitor') {
       Orion.PauseScript(scriptName);
       pausedScripts.push(scriptName);
     }
