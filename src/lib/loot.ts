@@ -53,9 +53,9 @@ const CONFIG = {
   knifeGraphics: toGraphic('0x0F51|0x0F52|0x13F6|0x0EC4|0x0EC2'),
   corpseGraphic: toGraphic('0x2006'),
   radius: 3,
-  carveDelay: 600,
-  lootDelay: 600,
-  equipDelay: 800,
+  carveDelay: 100,
+  lootDelay: 1,
+  equipDelay: 100,
 };
 
 export function CarveAndLoot(itemLists: string[]) {
@@ -125,6 +125,4 @@ export function CarveAndLoot(itemLists: string[]) {
       }
     }
   }
-
-  Orion.Print('Резка и лут завершены!');
 }
