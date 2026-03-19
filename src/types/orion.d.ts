@@ -226,6 +226,9 @@ declare namespace Orion {
   /** Отменяет ожидание классического меню. */
   function CancelWaitMenu(): void;
 
+  /** Отменить текущий таргет в клиенте (если он есть). */
+  function CancelTarget(): void;
+
   /** Закрыть меню. */
   function CloseMenu(name: string): void;
 
@@ -336,7 +339,7 @@ declare namespace Orion {
    * @param color Цвет текста.
    * @param text Выводимый текст.
    */
-  function CharPrint(serial: string, color: number, text: string): void;
+  function CharPrint(serial: string, color: number, text: string | number): void;
 
   /** Проигрывает звуковой файл (wav) из папки Orion. */
   function PlayWav(filename: string): void;
@@ -414,4 +417,13 @@ declare namespace Orion {
     target?: Serial,
     relativeTargetDistance?: number,
   ): void;
+
+  /**
+   * Посчитать дистанцию до объекта/точки.
+   * @param object серийние объекта до которого считать дистанцию
+   * @param x координата X до которой считать дистанцию
+   * @param y координата Y до которой считать дистанцию
+   */
+  function GetDistance(object: Serial): number;
+  function GetDistance(x: number, y: number): number;
 }
