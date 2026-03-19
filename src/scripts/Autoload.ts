@@ -26,8 +26,8 @@ export function CloseAllMenus() {
 
 export function BandageSelf() {
   Orion.Say('.bs');
-	Orion.WarMode(1);
-	Orion.WarMode(0);
+  Orion.WarMode(1);
+  Orion.WarMode(0);
 }
 
 export function ObserveHits() {
@@ -35,26 +35,26 @@ export function ObserveHits() {
   Orion.CharPrint('self', 1159, lastHits);
 
   while (true) {
-      var currentHits = Player.Hits();
+    var currentHits = Player.Hits();
 
-      if (currentHits != lastHits && currentHits - 1 !== lastHits) {
-          var diff = currentHits - lastHits;
+    if (currentHits != lastHits && currentHits - 1 !== lastHits) {
+      var diff = currentHits - lastHits;
 
-          if (diff > 0) {
-              Orion.CharPrint('self', 63, currentHits + " (+" + diff + ")");
-          } else {
-              Orion.CharPrint('self', 38, currentHits + " (" + diff + ")");
-          }
-
-          lastHits = currentHits;
+      if (diff > 0) {
+        Orion.CharPrint('self', 63, currentHits + ' (+' + diff + ')');
+      } else {
+        Orion.CharPrint('self', 38, currentHits + ' (' + diff + ')');
       }
 
-      if (Orion.InJournal('barely')) {
-          Orion.CharPrint('self', 33, "Бинт не вошел");
-          Orion.ClearJournal();
-      }
+      lastHits = currentHits;
+    }
 
-      Orion.Wait(100);
+    if (Orion.InJournal('barely')) {
+      Orion.CharPrint('self', 33, 'Бинт не вошел');
+      Orion.ClearJournal();
+    }
+
+    Orion.Wait(100);
   }
 }
 
@@ -63,7 +63,7 @@ export function TrackingPlayers() {
 }
 
 export function TrackingMonsters() {
-	tracking('Monsters');
+  tracking('Monsters');
 }
 
 export function TrackingAnimals() {
@@ -88,4 +88,46 @@ export function Recall() {
   const rune = runes[0];
 
   Orion.Cast('Recall', rune);
+}
+
+export function PaintAndCutClothes() {
+  const CORPSE_GRAPHIC = toGraphic('0x2006');
+  const DYING_TUB_GRAPHIC = toGraphic('0x0FAB');
+  const SCISSORS_GRAPHIC = toGraphic('0x0F9E');
+
+  const corpses = Orion.FindType(CORPSE_GRAPHIC, 'any', 'ground', 'item', 3);
+
+  if (!corpses || corpses.length === 0) {
+    Orion.Print('Трупов поблизости не найдено.');
+    return;
+  }
+
+  for (const corpse of corpses) {
+    Orion.OpenContainer(corpse);
+    Orion.Wait(100);
+
+    const items = Orion.FindType('any', 'any', corpse);
+
+    if (!items || items.length === 0) {
+      continue;
+    }
+
+    for (const item of items) {
+      // 1. Применяем Dying Tub
+      // Кидаем появившийся прицел на указанный объект
+      Orion.WaitTargetObject(item);
+      // Используем предмет по его типу
+      Orion.UseType(DYING_TUB_GRAPHIC);
+      Orion.Wait(10); // Пауза на отработку таргета (зависит от твоего пинга)
+
+      // 2. Применяем Scissors
+      Orion.WaitTargetObject(item);
+      Orion.UseType(SCISSORS_GRAPHIC);
+      Orion.Wait(10); // Пауза на отработку таргета
+    }
+
+    Orion.Ignore(corpse);
+  }
+
+  Orion.Print('Обработка трупов завершена.');
 }
