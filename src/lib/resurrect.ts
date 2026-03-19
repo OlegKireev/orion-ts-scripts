@@ -1,4 +1,5 @@
 import { toGraphic } from '@lib/validators';
+import { sendTelegramMessage } from './telegram';
 
 const CORPSE_GRAPHIC = toGraphic('0x2006');
 const RESSURECT_COORDS = {
@@ -22,13 +23,15 @@ export function AutoResurrect() {
 function handleDeathSequence() {
   Orion.Print('[AutoResurrect] 💀 Персонаж мертв. Начинаем спасательную операцию...');
 
+  sendTelegramMessage(`${Player.Name()}: Умер [${Orion.Time('hh:mm:ss')}]`);
+
   // 1. Собираем все ЗАПУЩЕННЫЕ скрипты с помощью правильного метода
   const runningScripts = Orion.GetScripts('started');
   const pausedScripts: string[] = [];
 
   for (const scriptName of runningScripts) {
     // Не ставим на паузу сами себя
-    if (scriptName !== 'AutoResurrect' && scriptName !== 'Monitor') {
+    if (scriptName !== 'AutoResurrect') {
       Orion.PauseScript(scriptName);
       pausedScripts.push(scriptName);
     }
