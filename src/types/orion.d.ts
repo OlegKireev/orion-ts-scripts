@@ -140,6 +140,24 @@ declare namespace Orion {
    */
   function FindObject(serial: Serial): GameObject | null;
 
+  /**
+   * Поиск предметов по списку поиска.
+   * @param listName имя списка поиска
+   * @param container где искать предметы
+   * @param flags
+   * @param distance
+   * @param notoriety
+   * @param recurse
+   */
+  function FindList(
+    listName: string,
+    container?: Serial,
+    flags?: string,
+    distance?: number,
+    notoriety?: string,
+    recurse?: boolean,
+  ): Serial[];
+
   /** Подсчитывает количество предметов указанного типа. */
   function Count(type: Graphic, color?: string, container?: Serial): number;
 
