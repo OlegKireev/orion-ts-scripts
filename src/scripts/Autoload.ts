@@ -77,3 +77,15 @@ export function Find() {
 export function CutCorpse() {
   CarveAndLoot(['Resources', 'Miscellaneous']);
 }
+
+export function Recall() {
+  const runes = Orion.FindType(toGraphic('0x1F14'), '0x0000', 'backpack');
+
+  if (!runes.length) {
+    return;
+  }
+
+  const rune = runes[0];
+
+  Orion.Cast('Recall', rune);
+}
