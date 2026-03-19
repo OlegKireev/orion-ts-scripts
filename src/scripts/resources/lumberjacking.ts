@@ -12,6 +12,7 @@ const CHEST_SERIAL = toSerial('0x403853A1');
 const HOME_COORDS: Point2D = { x: 898, y: 1874 };
 const WEIGHT_LIMIT_RESERVE = 100; // минус от максимального веса для возврата
 const TOOL_TYPE = toGraphic('0x0F43|0x0F44');
+const FOOD_TYPE = toGraphic('0x097B|0x09F2');
 
 const LUMBER_RESTOCK: RestockItem[] = [
   {
@@ -20,6 +21,16 @@ const LUMBER_RESTOCK: RestockItem[] = [
     color: 'any',
     max: 2,
     min: 1,
+    box: 'self',
+    x: -1,
+    y: -1,
+  },
+  {
+    name: 'food',
+    type: FOOD_TYPE,
+    color: 'any',
+    max: 10,
+    min: 5,
     box: 'self',
     x: -1,
     y: -1,
