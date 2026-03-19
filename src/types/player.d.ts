@@ -24,4 +24,6 @@ declare namespace Player {
   function Mana(): number;
   /** Получить максимальное количество маны */
   function MaxMana(): number;
+  /** Проверка на скрытость игрока. */
+  function Hidden(): boolean;
 }
