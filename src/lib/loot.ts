@@ -9,7 +9,14 @@ export function loot(itemLists: string[]): void {
   const DELAY = 1;
   const CORPSE_GRAPHIC = toGraphic('0x2006');
 
-  Orion.Print('Поиск трупов...');
+  const itemsType = itemLists.join('|');
+
+  function lootItems(items: Serial[]) {
+    for (const itemId of items) {
+      Orion.MoveItem(itemId, 0, 'backpack');
+      Orion.Wait(DELAY);
+    }
+  }
 
   const corpses = Orion.FindType(
     CORPSE_GRAPHIC,
@@ -19,33 +26,25 @@ export function loot(itemLists: string[]): void {
     LOOT_RANGE,
   );
 
-  if (!corpses || !corpses.length) {
-    Orion.Print('Трупы не найдены');
-    return;
-  }
-
-  Orion.Print(`Найдено трупов: ${corpses.length}`);
-
   for (const corpseId of corpses) {
     Orion.UseObject(corpseId);
     Orion.Wait(DELAY);
 
-    const items = Orion.FindList(itemLists.join('|'), corpseId);
+    const items = Orion.FindList(itemsType, corpseId);
 
     if (!items || !items.length) {
-      Orion.Print('Предметы не найдены');
       continue;
     }
 
-    Orion.Print(`Найдено предметов: ${items.length}`);
-
-    for (const itemId of items) {
-      Orion.MoveItem(itemId, 0, 'backpack');
-
-      Orion.Wait(DELAY);
-    }
+    lootItems(items);
 
     Orion.Ignore(corpseId);
     Orion.Wait(DELAY);
+  }
+
+  const groundItems = Orion.FindList(itemsType, 'ground', '', LOOT_RANGE);
+
+  if (groundItems.length) {
+    lootItems(groundItems);
   }
 }
