@@ -1,4 +1,4 @@
-import { CarveAndLoot, loot } from '@/lib/loot';
+import { carveAndLoot, loot } from '@/lib/loot';
 import { tracking } from '@/lib/tracking';
 import { toGraphic } from '@/lib/validators';
 
@@ -71,11 +71,11 @@ export function TrackingAnimals() {
 }
 
 export function Find() {
-  FindGraphic(toGraphic('0x0000'));
+  findGraphic(toGraphic('0x0000'));
 }
 
 export function CutCorpse() {
-  CarveAndLoot(['Resources', 'Miscellaneous']);
+  carveAndLoot(['Resources', 'Miscellaneous']);
 }
 
 export function Recall() {

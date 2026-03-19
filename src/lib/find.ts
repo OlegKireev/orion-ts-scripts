@@ -1,4 +1,4 @@
-function FindGraphic(graphic: Graphic, radius: number = 20) {
+function findGraphic(graphic: Graphic, radius: number = 20) {
   Orion.Print('Поиска объекта ' + graphic);
 
   while (true) {

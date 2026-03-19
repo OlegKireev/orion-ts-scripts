@@ -58,7 +58,7 @@ const CONFIG = {
   equipDelay: 100,
 };
 
-export function CarveAndLoot(itemLists: string[]) {
+export function carveAndLoot(itemLists: string[]) {
   Orion.Print('Запускаем резку и лут по списку...');
   const itemsType = itemLists.join('|');
 
