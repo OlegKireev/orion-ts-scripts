@@ -1,4 +1,4 @@
-import { loot } from '@/lib/loot';
+import { CarveAndLoot, loot } from '@/lib/loot';
 import { tracking } from '@/lib/tracking';
 import { toGraphic } from '@/lib/validators';
 
@@ -58,18 +58,22 @@ export function ObserveHits() {
   }
 }
 
-export function trackingPlayers() {
+export function TrackingPlayers() {
   tracking('Players');
 }
 
-export function trackingMonsters() {
+export function TrackingMonsters() {
 	tracking('Monsters');
 }
 
-export function trackingAnimals() {
+export function TrackingAnimals() {
   tracking('Animals');
 }
 
-export function find() {
+export function Find() {
   FindGraphic(toGraphic('0x0000'));
+}
+
+export function CutCorpse() {
+  CarveAndLoot(['Resources', 'Miscellaneous']);
 }

@@ -426,4 +426,10 @@ declare namespace Orion {
    */
   function GetDistance(object: Serial): number;
   function GetDistance(x: number, y: number): number;
+
+  /**
+   * Получить игровой объект в указанном слое.
+   * @param layer слой для поиска
+   */
+  function ObjAtLayer(layer: 'RightHand' | 'LeftHand', container?: Serial): GameObject | null;
 }
