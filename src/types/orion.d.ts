@@ -299,7 +299,7 @@ declare namespace Orion {
   ): void;
 
   /** Приостанавливает скрипт ("all" для всех, кроме текущего). */
-  function PauseScript(scriptName: string): void;
+  function PauseScript(scriptName: string, exceptScripts?: string): void;
 
   /** Возобновляет работу приостановленного скрипта. */
   function ResumeScript(scriptName: string): void;
@@ -339,7 +339,11 @@ declare namespace Orion {
    * @param color Цвет текста.
    * @param text Выводимый текст.
    */
-  function CharPrint(serial: string, color: number, text: string | number): void;
+  function CharPrint(
+    serial: string,
+    color: number,
+    text: string | number,
+  ): void;
 
   /** Проигрывает звуковой файл (wav) из папки Orion. */
   function PlayWav(filename: string): void;
@@ -431,5 +435,8 @@ declare namespace Orion {
    * Получить игровой объект в указанном слое.
    * @param layer слой для поиска
    */
-  function ObjAtLayer(layer: 'RightHand' | 'LeftHand', container?: Serial): GameObject | null;
+  function ObjAtLayer(
+    layer: 'RightHand' | 'LeftHand',
+    container?: Serial,
+  ): GameObject | null;
 }

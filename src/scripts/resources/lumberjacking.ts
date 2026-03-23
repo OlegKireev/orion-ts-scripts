@@ -309,8 +309,8 @@ export function Lumberjacking(): void {
     checkLag();
     Orion.WalkTo(chestObj.X(), chestObj.Y(), chestObj.Z(), 1, 255, true, true);
 
-    dropItems(LUMBER_DROP, 'backpack', CHEST_SERIAL);
-    restockItems(LUMBER_RESTOCK, CHEST_SERIAL, 'backpack');
+    DropLogs();
+    Replenishment();
 
     // Запускаем цикл рубки
     Hack();
@@ -383,8 +383,9 @@ function Hack(): void {
           true,
           true,
         );
-        dropItems(LUMBER_DROP, 'backpack', CHEST_SERIAL);
-        restockItems(LUMBER_RESTOCK, CHEST_SERIAL, 'backpack');
+        DropLogs();
+        Replenishment();
+
         checkLag();
 
         // Возвращаемся к дереву
@@ -415,4 +416,17 @@ function Hack(): void {
 
     Orion.Wait(1400);
   }
+}
+
+export function DropLogs() {
+  dropItems(LUMBER_DROP, 'backpack', CHEST_SERIAL);
+}
+
+export function Replenishment() {
+  restockItems(LUMBER_RESTOCK, CHEST_SERIAL, 'backpack');
+}
+
+export function Finish(): void {
+  Orion.PauseScript('all');
+  DropLogs();
 }

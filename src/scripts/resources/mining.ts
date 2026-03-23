@@ -316,3 +316,9 @@ export function ReturnToMine(): void {
     Orion.Exec('Mining', true);
   }
 }
+
+export function Finish(): void {
+  Orion.PauseScript('all');
+  SmeltOre();
+  DropIngots();
+}
