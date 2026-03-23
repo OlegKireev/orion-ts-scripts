@@ -215,10 +215,10 @@ export function SmeltOre(): void {
     return;
   }
 
-  const ores = Orion.FindType(ORE_TYPE, '!0x0000', 'backpack');
+  const ores = Orion.FindType(ORE_TYPE, 'any', 'backpack');
   for (const ore of ores) {
     checkLag();
-    Orion.UseObject(forge[0]); // Orion.FindType возвращает массив серийников
+    Orion.UseObject(forge[0]);
     Orion.WaitTargetObject(ore);
     Orion.Wait(200);
   }
