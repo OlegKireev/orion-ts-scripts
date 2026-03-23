@@ -94,8 +94,12 @@ export function PaintAndCutClothes() {
   const CORPSE_GRAPHIC = toGraphic('0x2006');
   const DYING_TUB_GRAPHIC = toGraphic('0x0FAB');
   const SCISSORS_GRAPHIC = toGraphic('0x0F9E');
+  const CLOTHS_LIST = 'Clothes';
 
   const corpses = Orion.FindType(CORPSE_GRAPHIC, 'any', 'ground', 'item', 3);
+
+  const backpackContainer = Orion.GetSerial('backpack');
+  const lootedItems: Serial[] = [];
 
   if (!corpses || corpses.length === 0) {
     Orion.Print('Трупов поблизости не найдено.');
@@ -106,28 +110,34 @@ export function PaintAndCutClothes() {
     Orion.OpenContainer(corpse);
     Orion.Wait(100);
 
-    const items = Orion.FindType('any', 'any', corpse);
+    const items = Orion.FindList(CLOTHS_LIST, corpse);
 
     if (!items || items.length === 0) {
       continue;
     }
 
     for (const item of items) {
-      // 1. Применяем Dying Tub
-      // Кидаем появившийся прицел на указанный объект
-      Orion.WaitTargetObject(item);
-      // Используем предмет по его типу
-      Orion.UseType(DYING_TUB_GRAPHIC);
-      Orion.Wait(10); // Пауза на отработку таргета (зависит от твоего пинга)
-
-      // 2. Применяем Scissors
-      Orion.WaitTargetObject(item);
-      Orion.UseType(SCISSORS_GRAPHIC);
-      Orion.Wait(10); // Пауза на отработку таргета
+      Orion.MoveItem(item, 0, 'backpack');
+      Orion.Wait(1);
+      lootedItems.push(item);
     }
-
-    Orion.Ignore(corpse);
   }
 
-  Orion.Print('Обработка трупов завершена.');
+  Orion.Wait(100);
+
+  if (lootedItems.length > 0) {
+    for (const item of lootedItems) {
+      if (Orion.GetContainer(item) === backpackContainer) {
+        Orion.WaitTargetObject(item);
+        Orion.UseType(DYING_TUB_GRAPHIC);
+        Orion.Wait(100);
+
+        Orion.WaitTargetObject(item);
+        Orion.UseType(SCISSORS_GRAPHIC);
+        Orion.Wait(100);
+      }
+    }
+  }
+
+  LootPvm();
 }
