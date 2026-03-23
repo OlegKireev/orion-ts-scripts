@@ -8,29 +8,21 @@ import {
 const MATERIALS: Record<string, MaterialDef> = {
   Rusty: { graphic: toGraphic('0x1BEF'), color: '0x09EB' },
   OldCopper: { graphic: toGraphic('0x1BEF'), color: '0x09E8' },
+  DullCopper: { graphic: toGraphic('0x1BEF'), color: '0x060A' },
   Bronze: { graphic: toGraphic('0x1BEF'), color: '0x06D6' },
   Copper: { graphic: toGraphic('0x1BE3'), color: '0x0000' },
   Steel: { graphic: toGraphic('0x1BEF'), color: '0x09F1' },
   Silver: { graphic: toGraphic('0x1BF5'), color: '0x0000' },
-};
+  Gold: { graphic: toGraphic('0x1BE9'), color: '0x09B5'},
+  Shadow: { graphic: toGraphic('0x1BEF'), color: '0x0770'},
+  BlueSteel: { graphic: toGraphic('0x1BEF'), color: '0x0128' },
+} as const;
 
 const BlacksmithConfig: CraftConfig = {
   resourcesContainerSerial: toSerial('0x403853AB'),
   productsContainerSerial: toSerial('0x40215610'),
   batchSize: 3,
   recipes: [
-    {
-      name: 'War Mace',
-      path: ["executioner's axe", 'mace', 'War Mace'],
-      product: {
-        graphic: toGraphic('0x13B3'),
-        color: toGraphic('0x0909'),
-      },
-      materials: [
-        { def: MATERIALS.Copper, req: 10 },
-        { def: MATERIALS.OldCopper, req: 10 },
-      ],
-    },
     {
       name: 'Morning Star',
       path: ["executioner's axe", 'mace', 'Morning Star'],
@@ -44,15 +36,48 @@ const BlacksmithConfig: CraftConfig = {
       ],
     },
     {
-      name: 'Sting',
-      path: ["executioner's axe", 'kryss', 'Sting'],
+      name: "Shadow Chest (wooman)",
+      path: ['Shadow armor', 'Shadow chest'],
       product: {
-        graphic: toGraphic('0x1400'),
-        color: toGraphic('0x0058'),
+        graphic: toGraphic('0x1C04'),
+        color: toGraphic('0x0770'),
       },
       materials: [
-        { def: MATERIALS.Steel, req: 5 },
-        { def: MATERIALS.Silver, req: 5 },
+        { def: MATERIALS.Shadow, req: 20,}
+      ]
+    },
+    {
+      name: "Gold Chest (wooman)",
+      path: ['Golden armor', 'Golden chest'],
+      product: {
+        graphic: toGraphic('0x1C04'),
+        color: toGraphic('0x09B5'),
+      },
+      materials: [
+        { def: MATERIALS.Gold, req: 20,}
+      ]
+    },
+    {
+      name: "Dull Copper Chest (wooman)",
+      path: ['Dull copper armor', 'Dull copper chest'],
+      product: {
+        graphic: toGraphic('0x1C04'),
+        color: toGraphic('0x060A'),
+      },
+      materials: [
+        { def: MATERIALS.DullCopper, req: 20,}
+      ]
+    },
+    {
+      name: 'War Mace',
+      path: ["executioner's axe", 'mace', 'War Mace'],
+      product: {
+        graphic: toGraphic('0x13B3'),
+        color: toGraphic('0x0909'),
+      },
+      materials: [
+        { def: MATERIALS.Copper, req: 10 },
+        { def: MATERIALS.OldCopper, req: 10 },
       ],
     },
     {
