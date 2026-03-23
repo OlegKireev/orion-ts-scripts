@@ -6,6 +6,7 @@ import {
   restockItems,
 } from '@/lib/container';
 import { checkLag, stopBot } from '@/lib/helpers';
+import { hiding } from '@/lib/hidding';
 
 // --- Настройки ---
 const CHEST_SERIAL = toSerial('0x403853A1');
@@ -330,7 +331,7 @@ function Hack(): void {
     checkLag();
     setBadTiles();
 
-    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, true, true)) {
+    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, false)) {
       Orion.Print(`Can't walk to ${tile.x} ${tile.y}`);
       Orion.Wait(100);
       continue;
@@ -341,6 +342,8 @@ function Hack(): void {
     do {
       Orion.Wait(1);
       checkLag();
+
+      hiding();
 
       const start = Orion.Now();
       const delay = 10000;

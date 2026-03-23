@@ -1,6 +1,7 @@
 import { checkLag, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 import { restockItems } from '@/lib/container';
+import { hiding } from '@/lib/hidding';
 
 // --- Настройки шахтера ---
 const MOVE_DELAY = 100;
@@ -118,16 +119,17 @@ export function Dig(): void {
   const tiles = getCaveTiles();
   if (!tiles) return;
 
-  for (const tile of tiles as any) {
-    // Приведение типа, так как getCaveTiles логически в оригинале возвращал массив точек
+  for (const tile of tiles) {
     checkLag();
     setBadTiles();
 
-    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 0, 255, true, true)) {
+    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 0, 255, false)) {
       Orion.Print(`Can't walk to ${tile.x} ${tile.y}`);
       Orion.Wait(100);
       continue;
     }
+
+    hiding();
 
     for (let x = -2; x <= 2; x++) {
       for (let y = -2; y <= 2; y++) {

@@ -89,17 +89,17 @@ declare namespace Orion {
    * @param distance Допустимая дистанция до цели (0 - точно в клетку).
    * @param timeout Таймаут на шаг (обычно 255).
    * @param run Бежать ли (true) или идти шагом (false).
-   * @param hidden Учитывать ли скрытность при движении.
+   * @param openDoor Открывать ли двери.
    * @returns true, если успешно дошли, иначе false.
    */
   function WalkTo(
     x: number,
     y: number,
     z: number,
-    distance: number,
-    timeout: number,
-    run: boolean,
-    hidden?: boolean,
+    distance?: number,
+    timeout?: number,
+    run?: boolean,
+    openDoor?: boolean,
   ): boolean;
 
   /** Устанавливает клетку как непроходимую для поиска пути. */
