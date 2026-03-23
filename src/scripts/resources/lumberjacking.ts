@@ -296,20 +296,6 @@ function getTreeTiles(): Point2D[] | null {
 export function Lumberjacking(): void {
   while (true) {
     checkLag();
-    Orion.WalkTo(HOME_COORDS.x, HOME_COORDS.y, Player.Z(), 0, 255, false, true);
-    checkLag();
-
-    const chestObj = Orion.FindObject(CHEST_SERIAL);
-    if (!chestObj) {
-      Orion.CharPrint('self', 0x0021, "Can't find chest");
-      Orion.PlayWav('Alarm');
-      stopBot();
-      return; // Остановка выполнения, если stopBot() не выбрасывает ошибку
-    }
-
-    checkLag();
-    Orion.WalkTo(chestObj.X(), chestObj.Y(), chestObj.Z(), 1, 255, true, true);
-
     DropLogs();
     Replenishment();
 
@@ -331,7 +317,7 @@ function Hack(): void {
     checkLag();
     setBadTiles();
 
-    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, false)) {
+    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, true)) {
       Orion.Print(`Can't walk to ${tile.x} ${tile.y}`);
       Orion.Wait(100);
       continue;
@@ -357,38 +343,8 @@ function Hack(): void {
       ) {
         Orion.CancelWaitTarget(); // Обязательно снимаем таргет перед уходом
         checkLag();
-        Orion.Print('WALK TO HOME');
-        Orion.WalkTo(
-          HOME_COORDS.x,
-          HOME_COORDS.y,
-          Player.Z(),
-          0,
-          255,
-          true,
-          true,
-        );
-
-        const chestObj = Orion.FindObject(CHEST_SERIAL);
-        if (!chestObj) {
-          Orion.CharPrint('self', 0x0021, "Can't find chest");
-          Orion.PlayWav('Alarm');
-          stopBot();
-          return;
-        }
-
-        checkLag();
-        Orion.WalkTo(
-          chestObj.X(),
-          chestObj.Y(),
-          chestObj.Z(),
-          1,
-          255,
-          true,
-          true,
-        );
         DropLogs();
         Replenishment();
-
         checkLag();
 
         // Возвращаемся к дереву
@@ -422,6 +378,18 @@ function Hack(): void {
 }
 
 export function DropLogs() {
+  Orion.WalkTo(HOME_COORDS.x, HOME_COORDS.y, Player.Z(), 0, 255, false, true);
+  checkLag();
+  const chestObj = Orion.FindObject(CHEST_SERIAL);
+  if (!chestObj) {
+    Orion.CharPrint('self', 0x0021, "Can't find chest");
+    Orion.PlayWav('Alarm');
+    stopBot();
+    return; // Остановка выполнения, если stopBot() не выбрасывает ошибку
+  }
+
+  checkLag();
+  Orion.WalkTo(chestObj.X(), chestObj.Y(), chestObj.Z(), 1, 255, true, true);
   dropItems(LUMBER_DROP, 'backpack', CHEST_SERIAL);
 }
 
@@ -430,6 +398,7 @@ export function Replenishment() {
 }
 
 export function Finish(): void {
-  stopBot();
+  stopBot('Finish|DropLogs');
+	Orion.Wait(100);
   DropLogs();
 }

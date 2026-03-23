@@ -320,7 +320,8 @@ export function ReturnToMine(): void {
 }
 
 export function Finish(): void {
-  stopBot();
+  stopBot('Finish|SmeltOre|DropIngots');
+	Orion.Wait(100);
   SmeltOre();
   DropIngots();
 }
