@@ -14,6 +14,7 @@ export function Monitor(): void {
     '0x003EB2F6', // Vue
     '0x003B3EDB', // Logi
     '0x00396D32', // Ing
+    '0x00232598', // JustBear
 
     '0x003F0E14', // WanZan
     '0x003F0C05', // Beaver
