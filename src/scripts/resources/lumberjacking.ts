@@ -430,6 +430,6 @@ export function Replenishment() {
 }
 
 export function Finish(): void {
-  Orion.PauseScript('all');
+  stopBot();
   DropLogs();
 }

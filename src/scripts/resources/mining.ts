@@ -320,7 +320,7 @@ export function ReturnToMine(): void {
 }
 
 export function Finish(): void {
-  Orion.PauseScript('all');
+  stopBot();
   SmeltOre();
   DropIngots();
 }
