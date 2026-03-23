@@ -32,7 +32,7 @@ Orion.JournalIgnoreCase(true);
 export function Autostart(): void {
   Orion.Exec('Monitor', true);
   Orion.Exec('Eating', true);
-  Orion.Exec('AutoResurrect', true);
+  Orion.Exec('Resurrect', true);
   Replenishment();
   checkLag();
   Orion.ResumeScript('all');
@@ -41,7 +41,7 @@ export function Autostart(): void {
 export { Eating } from '@/lib/eating';
 export { Monitor } from '@/lib/status-monitor';
 export { getGumpResponse, markTiles } from './mark-tiles';
-export { AutoResurrect } from '@/lib/resurrect';
+export { Resurrect } from '@/lib/resurrect';
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {

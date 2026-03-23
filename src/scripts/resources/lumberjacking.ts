@@ -262,14 +262,14 @@ export function Autostart(): void {
   Orion.JournalIgnoreCase(true);
   Orion.Exec('Monitor', true);
   Orion.Exec('Eating', true);
-  Orion.Exec('AutoResurrect', true);
+  Orion.Exec('Resurrect', true);
   checkLag();
   Lumberjacking(); // Вызываем напрямую
 }
 
 export { Monitor } from '@/lib/status-monitor';
 export { Eating } from '@/lib/eating';
-export { AutoResurrect } from '@/lib/resurrect';
+export { Resurrect } from '@/lib/resurrect';
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {
