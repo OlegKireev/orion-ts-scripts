@@ -6,6 +6,8 @@ declare namespace Player {
   function Name(): string;
   /** Возвращает текущее количество жизней (HP). */
   function Hits(): number;
+  /** Возвращает максимальных количество жизней (HP). */
+  function MaxHits(): number;
   /** Возвращает текущую координату X персонажа. */
   function X(): number;
   /** Возвращает текущую координату Y персонажа. */
