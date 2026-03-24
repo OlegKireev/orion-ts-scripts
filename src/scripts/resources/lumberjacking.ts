@@ -317,7 +317,7 @@ function Hack(): void {
     checkLag();
     setBadTiles();
 
-    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, true)) {
+    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, false)) {
       Orion.Print(`Can't walk to ${tile.x} ${tile.y}`);
       Orion.Wait(100);
       continue;
