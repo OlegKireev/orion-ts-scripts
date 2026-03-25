@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": ".build-cache",
+    "rootDir": "src",
+    "declaration": false,
+    "sourceMap": false
+  }
+}
