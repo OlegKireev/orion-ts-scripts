@@ -1,10 +1,11 @@
 import { toGraphic, toSerial } from '@lib/validators';
 import { checkLag } from '@/lib/helpers';
-import { handleDeathSequence } from '@/lib/resurrect';
 
 const KILLER_SERIAL = toSerial('0x003D096F');
 const CORPSE_GRAPHIC = toGraphic('0x2006');
 const CORPSE_SEARCH_RADIUS = 5;
+
+const RESURRECT_COORDS = { x: 970, y: 1769 };
 const SAFE_DISTANCE = 2; // Не подходить к убийце ближе этого расстояния
 
 // Тренировка Forensic Evaluation: создание трупов для последующего изучения.
@@ -44,7 +45,7 @@ export function ForensicCorpses(): void {
     dieToKiller();
 
     // 3. Бежим на ресалку и воскресаемся
-    handleDeathSequence();
+    resurrect();
 
     // 4. Возвращаемся к начальной позиции (не вплотную к убийце)
     returnToStart(startX, startY, startZ);
@@ -84,6 +85,7 @@ function dieToKiller(): void {
   Orion.WarMode(1);
   Orion.Wait(200);
   Orion.Attack(KILLER_SERIAL);
+  Orion.Wait(500);
 
   // Ждём смерти
   Orion.Print('Ждём смерти от убийцы...');
@@ -93,6 +95,44 @@ function dieToKiller(): void {
 
   Orion.WarMode(0);
   Orion.Print('Персонаж убит.');
+}
+
+function resurrect(): void {
+  Orion.Print('Бежим на ресалку...');
+  checkLag();
+  Orion.WalkTo(
+    RESURRECT_COORDS.x,
+    RESURRECT_COORDS.y,
+    Player.Z(),
+    0,
+    255,
+    true,
+    true,
+  );
+
+  // Ходим по точке ресалки пока не воскреснем
+  var attempts = 0;
+  while (Player.Dead()) {
+    Orion.WalkTo(
+      RESURRECT_COORDS.x,
+      RESURRECT_COORDS.y,
+      Player.Z(),
+      0,
+      255,
+      true,
+      true,
+    );
+    Orion.Wait(1000);
+    attempts++;
+    if (attempts > 30) {
+      Orion.Print('Не удалось воскреснуть за 30 попыток!');
+      break;
+    }
+  }
+
+  if (!Player.Dead()) {
+    Orion.Print('Воскресли!');
+  }
 }
 
 function returnToStart(x: number, y: number, z: number): void {
