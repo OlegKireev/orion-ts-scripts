@@ -98,6 +98,16 @@ const BlacksmithConfig: CraftConfig = {
     const primaryMaterial = recipe.materials[0].def;
     Orion.UseType(primaryMaterial.graphic, primaryMaterial.color, 'backpack');
   },
+
+  // Тренировка скилла во время ожидания крафта
+  onCraftWait(availableMs) {
+    if (availableMs > 3500) {
+      Orion.WaitTargetObject('self');
+      Orion.UseSkill('Anatomy');
+      Orion.Wait(3000);
+      Orion.CancelWaitTarget();
+    }
+  },
 };
 
 export function Autoload() {

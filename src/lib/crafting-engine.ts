@@ -40,6 +40,8 @@ export interface CraftConfig {
   startMessage?: string;
   /** Текст об окончании крафта предмета */
   endMessage?: string;
+  /** Коллбэк, вызываемый во время ожидания крафта. availableMs — оставшееся время ожидания в мс */
+  onCraftWait?: (availableMs: number) => void;
 }
 
 // ==========================================
@@ -297,22 +299,56 @@ export class UniversalCrafter {
       if (match) {
         const seconds = parseInt(match[1], 10);
         Orion.Print(`Жду ${seconds} секунд...`);
-        const maxWaitingTime = Orion.Now() + seconds * 1000 + 20000;
+        const craftEndTime = Orion.Now() + seconds * 1000;
+        const maxWaitingTime = craftEndTime + 20000;
 
-        Orion.WaitJournal(
-          this.endMessages,
-          Orion.Now(),
-          maxWaitingTime,
-          'sys|my',
-        );
+        this.waitForCraftResult(craftEndTime, maxWaitingTime);
         Orion.Wait(100);
         return;
       }
     }
 
     // Резервный вариант
-    Orion.WaitJournal(this.endMessages, start, start + 10000, 'sys|my');
+    this.waitForCraftResult(start + 10000, start + 10000);
     Orion.Wait(100);
+  }
+
+  private waitForCraftResult(
+    craftEndTime: number,
+    maxWaitingTime: number,
+  ): void {
+    if (this.config.onCraftWait) {
+      // Поллинг: проверяем журнал короткими интервалами, между ними тренируемся
+      const pollStart = Orion.Now();
+      while (Orion.Now() < maxWaitingTime) {
+        const remaining = craftEndTime - Orion.Now();
+        if (remaining > 0) {
+          this.config.onCraftWait(remaining);
+        }
+        // После каждого действия тренировки проверяем, не пришёл ли результат крафта
+        if (Orion.InJournal(this.endMessages, 'sys|my')) {
+          break;
+        }
+        Orion.Wait(100);
+      }
+      // Если результат так и не пришёл за время поллинга — ждём оставшееся
+      if (!Orion.InJournal(this.endMessages, 'sys|my')) {
+        Orion.WaitJournal(
+          this.endMessages,
+          pollStart,
+          maxWaitingTime,
+          'sys|my',
+        );
+      }
+    } else {
+      // Без коллбэка — старое поведение
+      Orion.WaitJournal(
+        this.endMessages,
+        Orion.Now(),
+        maxWaitingTime,
+        'sys|my',
+      );
+    }
   }
 
   private moveCraftedItems(item: MaterialDef): void {
