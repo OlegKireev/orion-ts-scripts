@@ -25,15 +25,16 @@ const pathAliasPlugin = {
   },
 };
 
-/** Strips trailing export { ... } blocks from .oajs output files */
-const removeExportsPlugin = {
-  name: 'remove-exports',
+/** Cleans up .oajs output: removes module banner comments and trailing export blocks */
+const cleanOutputPlugin = {
+  name: 'clean-output',
   setup(build) {
     build.onEnd((result) => {
       if (result.errors.length > 0) return;
       for (const filePath of Object.keys(result.metafile?.outputs || {})) {
         if (filePath.endsWith('.oajs')) {
           let code = fs.readFileSync(filePath, 'utf-8');
+          code = code.replace(/^\/\/ \.build-cache\/.*\n/gm, '');
           code = code.replace(/export\s*\{[^}]*\};?\s*$/g, '');
           fs.writeFileSync(filePath, code);
         }
@@ -76,7 +77,7 @@ function getBuildOptions(entryPoints) {
       'process.env.TG_CHAT_ID': JSON.stringify(process.env.TG_CHAT_ID || ''),
       'process.env.TG_THREAD_ID': JSON.stringify(process.env.TG_THREAD_ID || ''),
     },
-    plugins: [pathAliasPlugin, removeExportsPlugin],
+    plugins: [pathAliasPlugin, cleanOutputPlugin],
   };
 }
 
