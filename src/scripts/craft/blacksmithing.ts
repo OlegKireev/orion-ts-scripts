@@ -94,12 +94,9 @@ const BlacksmithConfig: CraftConfig = {
   },
 
   // Тренировка скилла во время ожидания крафта
-  onCraftWait(availableMs) {
-    if (availableMs < 5500) {
-      return;
-    }
-
+  onCraftWait() {
     const BANDAGE_GRAPHIC = toGraphic('0x0E21');
+    const BLOODY_BANDAGES_GRAPHIC = toGraphic('0x0E20');
     const BANDAGE_CHEST = toSerial('0x403853AB');
     const BANDAGE_RESTOCK_COUNT = 10;
 
@@ -115,6 +112,12 @@ const BlacksmithConfig: CraftConfig = {
         Orion.FindType(BANDAGE_GRAPHIC, 'any', BANDAGE_CHEST)[0],
         Math.min(BANDAGE_RESTOCK_COUNT, bandagesInChest),
         'backpack',
+      );
+      Orion.Wait(100);
+      Orion.MoveItem(
+        Orion.FindType(BLOODY_BANDAGES_GRAPHIC, 'any', 'backpack')[0],
+        0,
+        BANDAGE_CHEST,
       );
       Orion.Wait(300);
     }
