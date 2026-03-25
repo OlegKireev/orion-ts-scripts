@@ -83,8 +83,7 @@ function dieToKiller(): void {
   // Включаем боевой режим и бьём
   Orion.WarMode(1);
   Orion.Wait(200);
-  Orion.Click(KILLER_SERIAL);
-  Orion.Wait(500);
+  Orion.Attack(KILLER_SERIAL);
 
   // Ждём смерти
   Orion.Print('Ждём смерти от убийцы...');

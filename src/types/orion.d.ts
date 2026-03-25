@@ -439,4 +439,10 @@ declare namespace Orion {
     layer: 'RightHand' | 'LeftHand',
     container?: Serial,
   ): GameObject | null;
+
+  /**
+   * Атаковать объект.
+   * @param target цель для атаки
+   */
+  function Attack(target: Serial): void;
 }
