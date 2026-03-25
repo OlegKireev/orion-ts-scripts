@@ -23,18 +23,17 @@ export function Resurrect() {
 
   while (true) {
     if (Player.Dead()) {
+      sendTelegramMessage(`${Player.Name()}: Умер [${Orion.Time('hh:mm:ss')}]`);
       handleDeathSequence();
     }
     Orion.Wait(1000);
   }
 }
 
-function handleDeathSequence() {
+export function handleDeathSequence() {
   Orion.Print(
     '[Resurrect] 💀 Персонаж мертв. Начинаем спасательную операцию...',
   );
-
-  sendTelegramMessage(`${Player.Name()}: Умер [${Orion.Time('hh:mm:ss')}]`);
 
   const runningScripts = Orion.GetScripts('started');
   const pausedScripts: string[] = [];
