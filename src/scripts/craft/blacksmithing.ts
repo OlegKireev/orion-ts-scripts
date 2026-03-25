@@ -95,12 +95,34 @@ const BlacksmithConfig: CraftConfig = {
 
   // Тренировка скилла во время ожидания крафта
   onCraftWait(availableMs) {
-    if (availableMs > 5500) {
-      Orion.UseSkill('Animal Lore', 'self');
-      Orion.Wait(2000);
-      Orion.Say('.bs');
-      Orion.Wait(3500);
+    if (availableMs < 5500) {
+      return;
     }
+
+    const BANDAGE_GRAPHIC = toGraphic('0x0E21');
+    const BANDAGE_CHEST = toSerial('0x403853AB');
+    const BANDAGE_RESTOCK_COUNT = 10;
+
+    // Проверяем бинты в бекпаке
+    const bandagesInBackpack = Orion.Count(BANDAGE_GRAPHIC, 'any', 'backpack');
+    if (bandagesInBackpack === 0) {
+      // Пробуем достать из сундука
+      var bandagesInChest = Orion.Count(BANDAGE_GRAPHIC, 'any', BANDAGE_CHEST);
+      if (bandagesInChest === 0) {
+        return;
+      }
+      Orion.MoveItem(
+        Orion.FindType(BANDAGE_GRAPHIC, 'any', BANDAGE_CHEST)[0],
+        Math.min(BANDAGE_RESTOCK_COUNT, bandagesInChest),
+        'backpack',
+      );
+      Orion.Wait(300);
+    }
+
+    Orion.UseSkill('Animal Lore', 'self');
+    Orion.Wait(2000);
+    Orion.Say('.bs');
+    Orion.Wait(3500);
   },
 };
 
