@@ -1,10 +1,12 @@
+import { sendTelegramMessage } from '@/lib/telegram';
 import { toGraphic } from '@lib/validators';
 
 const FIRE_FIELD_GRAPHICS = toGraphic('0x398C|0x3996');
 const HEAL_COOLDOWN_MS = 5000; // Задержка между командами .bs, чтобы не спамить сервер
 const CAST_DELAY_MS = 3000; // Примерное время каста (подстрой под свой физл/каст спид)
+const STEP_OFFSET = 3; // Количество шагов в каждую сторону
 
-export function TrainResist() {
+export function ResistingSpells() {
   Orion.Print('Запускаем прокачку Magic Resistance...');
 
   let lastHealTime = 0;
@@ -30,7 +32,7 @@ export function TrainResist() {
     }
 
     // Проверка на критическое ХП (меньше 20%)
-    if (hpPercent < 20 && !isCritical) {
+    if (hpPercent < 35 && !isCritical) {
       Orion.Print('Критическое HP! Останавливаемся для отхила...');
       isCritical = true;
     }
@@ -58,8 +60,18 @@ export function TrainResist() {
     ); //
 
     if (fireFields.length === 0) {
-      Orion.Print('Кастуем Fire Field под себя...');
-      Orion.WaitTargetObject('self');
+      if (Player.X() !== startX || Player.Y() !== startY) {
+        Orion.WalkTo(startX, startY, startY, 0, 255, false);
+        Orion.Wait(500);
+        continue;
+      }
+
+      if (hpPercent < 100) {
+        Orion.Wait(1000);
+        continue;
+      }
+      Orion.Print('Полное здоровье. Кастуем Fire Field под себя...');
+      Orion.WaitTargetTileRelative('any', 0, 0, 0);
       Orion.Cast('Fire Field');
       Orion.Wait(CAST_DELAY_MS); // Ждем пока скастуется
       continue;
@@ -67,7 +79,7 @@ export function TrainResist() {
 
     // --- 3. ХОЖДЕНИЕ ПО ПОЛЮ ---
     // Определяем целевую координату по оси X
-    const targetX = stepForward ? startX + 1 : startX;
+    const targetX = stepForward ? startX + STEP_OFFSET : startX - STEP_OFFSET;
 
     // Если мы еще не на целевой клетке — делаем шаг
     if (Player.X() !== targetX) {
@@ -84,4 +96,5 @@ export function TrainResist() {
   }
 
   Orion.Print('Персонаж мертв. Макрос остановлен.');
+  sendTelegramMessage(`${Player.Name()}: Умер`)
 }
