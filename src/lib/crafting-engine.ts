@@ -317,37 +317,32 @@ export class UniversalCrafter {
     craftEndTime: number,
     maxWaitingTime: number,
   ): void {
+    const waitStart = Orion.Now();
     if (this.config.onCraftWait) {
       // Поллинг: проверяем журнал короткими интервалами, между ними тренируемся
-      const pollStart = Orion.Now();
       while (Orion.Now() < maxWaitingTime) {
         const remaining = craftEndTime - Orion.Now();
         if (remaining > 0) {
           this.config.onCraftWait(remaining);
         }
         // После каждого действия тренировки проверяем, не пришёл ли результат крафта
-        if (Orion.InJournal(this.endMessages, 'sys|my')) {
+        if (Orion.InJournal(this.endMessages, 'sys|my', '', '', waitStart)) {
           break;
         }
         Orion.Wait(100);
       }
       // Если результат так и не пришёл за время поллинга — ждём оставшееся
-      if (!Orion.InJournal(this.endMessages, 'sys|my')) {
+      if (!Orion.InJournal(this.endMessages, 'sys|my', '', '', waitStart)) {
         Orion.WaitJournal(
           this.endMessages,
-          pollStart,
+          waitStart,
           maxWaitingTime,
           'sys|my',
         );
       }
     } else {
       // Без коллбэка — старое поведение
-      Orion.WaitJournal(
-        this.endMessages,
-        Orion.Now(),
-        maxWaitingTime,
-        'sys|my',
-      );
+      Orion.WaitJournal(this.endMessages, waitStart, maxWaitingTime, 'sys|my');
     }
   }
 

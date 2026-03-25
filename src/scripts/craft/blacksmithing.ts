@@ -13,8 +13,8 @@ const MATERIALS: Record<string, MaterialDef> = {
   Copper: { graphic: toGraphic('0x1BE3'), color: '0x0000' },
   Steel: { graphic: toGraphic('0x1BEF'), color: '0x09F1' },
   Silver: { graphic: toGraphic('0x1BF5'), color: '0x0000' },
-  Gold: { graphic: toGraphic('0x1BE9'), color: '0x09B5'},
-  Shadow: { graphic: toGraphic('0x1BEF'), color: '0x0770'},
+  Gold: { graphic: toGraphic('0x1BE9'), color: '0x09B5' },
+  Shadow: { graphic: toGraphic('0x1BEF'), color: '0x0770' },
   BlueSteel: { graphic: toGraphic('0x1BEF'), color: '0x0128' },
 } as const;
 
@@ -36,37 +36,31 @@ const BlacksmithConfig: CraftConfig = {
       ],
     },
     {
-      name: "Shadow Chest (wooman)",
+      name: 'Shadow Chest (wooman)',
       path: ['Shadow armor', 'Shadow chest'],
       product: {
         graphic: toGraphic('0x1C04'),
         color: toGraphic('0x0770'),
       },
-      materials: [
-        { def: MATERIALS.Shadow, req: 20,}
-      ]
+      materials: [{ def: MATERIALS.Shadow, req: 20 }],
     },
     {
-      name: "Gold Chest (wooman)",
+      name: 'Gold Chest (wooman)',
       path: ['Golden armor', 'Golden chest'],
       product: {
         graphic: toGraphic('0x1C04'),
         color: toGraphic('0x09B5'),
       },
-      materials: [
-        { def: MATERIALS.Gold, req: 20,}
-      ]
+      materials: [{ def: MATERIALS.Gold, req: 20 }],
     },
     {
-      name: "Dull Copper Chest (wooman)",
+      name: 'Dull Copper Chest (wooman)',
       path: ['Dull copper armor', 'Dull copper chest'],
       product: {
         graphic: toGraphic('0x1C04'),
         color: toGraphic('0x060A'),
       },
-      materials: [
-        { def: MATERIALS.DullCopper, req: 20,}
-      ]
+      materials: [{ def: MATERIALS.DullCopper, req: 20 }],
     },
     {
       name: 'War Mace',
@@ -101,11 +95,11 @@ const BlacksmithConfig: CraftConfig = {
 
   // Тренировка скилла во время ожидания крафта
   onCraftWait(availableMs) {
-    if (availableMs > 3500) {
-      Orion.WaitTargetObject('self');
-      Orion.UseSkill('Anatomy');
-      Orion.Wait(3000);
-      Orion.CancelWaitTarget();
+    if (availableMs > 5500) {
+      Orion.UseSkill('Animal Lore', 'self');
+      Orion.Wait(2000);
+      Orion.Say('.bs');
+      Orion.Wait(3500);
     }
   },
 };
