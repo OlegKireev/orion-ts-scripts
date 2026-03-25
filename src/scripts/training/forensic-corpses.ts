@@ -5,7 +5,7 @@ const KILLER_SERIAL = toSerial('0x003D096F');
 const CORPSE_GRAPHIC = toGraphic('0x2006');
 const CORPSE_SEARCH_RADIUS = 5;
 
-const RESURRECT_COORDS = { x: 970, y: 1769 };
+const RESURRECT_COORDS = { x: 969, y: 1769 };
 const SAFE_DISTANCE = 2; // Не подходить к убийце ближе этого расстояния
 
 // Тренировка Forensic Evaluation: создание трупов для последующего изучения.
