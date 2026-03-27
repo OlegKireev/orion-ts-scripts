@@ -136,6 +136,21 @@ declare namespace Orion {
   ): Serial[];
 
   /**
+   * Добавить алиас объекта.
+   * @param status имя алиаса объекта
+   * @param serial серийный номер объекта. Значение по умолчанию: вызов прицела для ручного указания объекта в клиенте;
+   */
+  function AddObject(
+    status:
+      | 'lasttarget'
+      | 'harmtarget'
+      | 'helptarget'
+      | 'lastattack'
+      | 'newtargetsystem'
+      | 'laststatus',
+    serial?: Serial,
+  ): void;
+  /**
    * Находит конкретный объект по его серийнику и возвращает интерфейс GameObject.
    */
   function FindObject(serial: Serial): GameObject | null;
@@ -216,6 +231,9 @@ declare namespace Orion {
 
   /** Сбрасывает лист игнорирования. */
   function ResetIgnoreList(): void;
+
+  /** Сбросить состояние Ignored со всех объектов. */
+  function IgnoreReset(): void;
 
   /** Отменяет ожидание таргета. */
   function CancelWaitTarget(): void;

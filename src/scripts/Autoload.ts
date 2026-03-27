@@ -141,3 +141,44 @@ export function PaintAndCutClothes() {
 
   LootPvm();
 }
+
+export function TargetNext() {
+  Orion.WarMode(0);
+
+  function findEnemies() {
+    return Orion.FindType(
+      'any',
+      'any',
+      'ground',
+      'near|live',
+      18,
+      'gray|criminal|orange|red|innocent|blue',
+    );
+  }
+
+  Orion.Ignore('self');
+  let targets = findEnemies();
+
+  // Если целей нет (всех уже перебрали и они в игноре), сбрасываем лист и ищем заново
+  if (!targets || targets.length === 0) {
+    Orion.IgnoreReset();
+    Orion.Ignore('self');
+    targets = findEnemies();
+  }
+
+  // Если после всех проверок мы кого-то нашли
+  if (targets && targets.length > 0) {
+    const targetSerial = targets[0];
+    const object = Orion.FindObject(targetSerial);
+
+    if (object) {
+      Orion.Print(`Цель: ${object.Name()}`);
+    }
+
+    // Запоминаем цель и кидаем в игнор для следующего нажатия кнопки
+    Orion.AddObject('lasttarget', targetSerial);
+    Orion.Ignore(targetSerial); // Добавляем серийник в игнор
+  } else {
+    Orion.Print('Вокруг никого нет!');
+  }
+}
