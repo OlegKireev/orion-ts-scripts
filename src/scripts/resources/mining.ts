@@ -151,6 +151,10 @@ export function Dig(): void {
 
           Orion.WaitTargetTileRelative('cave', x, y, 0);
 
+          // if (Orion.SkillValue('Mining') >= 399) {
+          // 	Orion.SetSkillStatus('Mining', 'Lock');
+          // 	Orion.PlayWav('alarm');
+          // }
           if (
             Player.Weight() >= Player.MaxWeight() - WEIGHT_LIMIT ||
             !Orion.UseType(TOOL_TYPE)
@@ -217,7 +221,7 @@ export function SmeltOre(): void {
     return;
   }
 
-  const ores = Orion.FindType(ORE_TYPE, 'any', 'backpack');
+  const ores = Orion.FindType(ORE_TYPE, '!0x0000', 'backpack');
   for (const ore of ores) {
     checkLag();
     Orion.UseObject(forge[0]);

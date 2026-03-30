@@ -507,4 +507,21 @@ declare namespace Orion {
    * @param listName имя списка поиска;
    */
   function GetFindList(listName: string): FindList;
+
+  /**
+   * Получить значение умения.
+   * @param skill название или порядковый номер умения;
+   * Возвращаются реальные целочисленные значения, например 56.2 вернется как 562, а 100.0 - как 1000.
+   */
+  function SkillValue(skill: SkillName): number;
+
+  /**
+   * Установить состояние роста умения.
+   * @param skill название или порядковый номер умения
+   * @param status новое состояние
+   */
+  function SetSkillStatus(
+    skill: SkillName,
+    status: 'Up' | 'Down' | 'Lock',
+  ): void;
 }
