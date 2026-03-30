@@ -7,8 +7,8 @@ import { hiding } from '@/lib/hidding';
 const MOVE_DELAY = 100;
 const WEIGHT_LIMIT = 30; // запас веса до максимума
 
-const FORGE_COORDS: Point2D = { x: 888, y: 1874 };
-const CONTAINER_COORDS: Point2D = { x: 890, y: 1875 };
+const FORGE_COORDS: Point2D = { x: 897, y: 1876 };
+const CONTAINER_COORDS: Point2D = { x: 895, y: 1876 };
 const MINE_COORDS: Point2D = { x: 772, y: 1697 };
 
 const ORE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Контейнер для инготов
@@ -321,7 +321,7 @@ export function ReturnToMine(): void {
 
 export function Finish(): void {
   stopBot('Finish|SmeltOre|DropIngots');
-	Orion.Wait(100);
+  Orion.Wait(100);
   SmeltOre();
   DropIngots();
 }

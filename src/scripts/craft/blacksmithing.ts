@@ -20,7 +20,7 @@ const MATERIALS: Record<string, MaterialDef> = {
 
 const BlacksmithConfig: CraftConfig = {
   resourcesContainerSerial: toSerial('0x403853AB'),
-  productsContainerSerial: toSerial('0x40215610'),
+  productsContainerSerial: toSerial('0x403F39FE'),
   batchSize: 3,
   recipes: [
     {
