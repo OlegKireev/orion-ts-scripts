@@ -36,24 +36,6 @@ const BlacksmithConfig: CraftConfig = {
       ],
     },
     {
-      name: 'Shadow Chest (wooman)',
-      path: ['Shadow armor', 'Shadow chest'],
-      product: {
-        graphic: toGraphic('0x1C04'),
-        color: toGraphic('0x0770'),
-      },
-      materials: [{ def: MATERIALS.Shadow, req: 20 }],
-    },
-    {
-      name: 'Gold Chest (wooman)',
-      path: ['Golden armor', 'Golden chest'],
-      product: {
-        graphic: toGraphic('0x1C04'),
-        color: toGraphic('0x09B5'),
-      },
-      materials: [{ def: MATERIALS.Gold, req: 20 }],
-    },
-    {
       name: 'Dull Copper Chest (wooman)',
       path: ['Dull copper armor', 'Dull copper chest'],
       product: {
@@ -73,6 +55,24 @@ const BlacksmithConfig: CraftConfig = {
         { def: MATERIALS.Copper, req: 10 },
         { def: MATERIALS.OldCopper, req: 10 },
       ],
+    },
+    {
+      name: 'Shadow Chest (wooman)',
+      path: ['Shadow armor', 'Shadow chest'],
+      product: {
+        graphic: toGraphic('0x1C04'),
+        color: toGraphic('0x0770'),
+      },
+      materials: [{ def: MATERIALS.Shadow, req: 20 }],
+    },
+    {
+      name: 'Gold Chest (wooman)',
+      path: ['Golden armor', 'Golden chest'],
+      product: {
+        graphic: toGraphic('0x1C04'),
+        color: toGraphic('0x09B5'),
+      },
+      materials: [{ def: MATERIALS.Gold, req: 20 }],
     },
     {
       name: 'Orcish Mace',
