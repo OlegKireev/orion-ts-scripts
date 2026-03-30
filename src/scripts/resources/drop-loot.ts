@@ -15,7 +15,13 @@ function ClickAllItems() {
 
 // Расфасовка
 export function Sorting() {
-  var ROOT_CHEST = toSerial('0x4037662D'); //основная сумка
+  const ROOT_CHEST = toSerial('0x4037662D'); //основная сумка
+
+  const chestObject = Orion.FindObject(ROOT_CHEST);
+
+  if (chestObject) {
+    Orion.WalkTo(chestObject.X(), chestObject.Y(), chestObject.Z(), 2);
+  }
 
   Orion.UseObject(baglootpvp);
   Orion.Wait(500);
