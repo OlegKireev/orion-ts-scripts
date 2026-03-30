@@ -14,4 +14,8 @@ declare interface GameObject {
   Y(): number;
   /** Координата Z (высота). */
   Z(): number;
+  /** Получить количество объекта. */
+  Count(): number;
+  /** Получить серийник контейнера */
+  Container(): Serial;
 }

@@ -136,6 +136,26 @@ declare namespace Orion {
   ): Serial[];
 
   /**
+   * Ищет объекты по типу. Возвращает массив серийников найденных объектов.
+   * @param graphic Графика (тип) объекта.
+   * @param color Цвет (по умолчанию 'any').
+   * @param container Контейнер, где искать (например, 'backpack', 'ground').
+   * @param flags Флаги поиска (например, 'human', 'item').
+   * @param distance Дистанция поиска (если на земле).
+   * @param noto Цвет репутации (notoriety), например 'gray|red|blue'.
+   * @param recursive Искать ли рекурсивно во всех вложенных контейнерах (по умолчанию false).
+   */
+  function FindTypeEx(
+    type: Graphic,
+    color?: string,
+    container?: Serial,
+    flags?: string,
+    distance?: number | string,
+    noto?: string,
+    recursive?: boolean,
+  ): GameObject[];
+
+  /**
    * Добавить алиас объекта.
    * @param status имя алиаса объекта
    * @param serial серийный номер объекта. Значение по умолчанию: вызов прицела для ручного указания объекта в клиенте;
@@ -174,7 +194,13 @@ declare namespace Orion {
   ): Serial[];
 
   /** Подсчитывает количество предметов указанного типа. */
-  function Count(type: Graphic, color?: string, container?: Serial): number;
+  function Count(
+    type: Graphic,
+    color?: string,
+    container?: Serial,
+    distance?: string,
+    recurse?: boolean,
+  ): number;
 
   /**
    * Использует предмет по его типу (графике).
@@ -200,8 +226,8 @@ declare namespace Orion {
    */
   function MoveItem(
     serial: Serial,
-    count: number,
-    container: Serial,
+    count?: number,
+    container?: Serial,
     x?: number,
     y?: number,
     z?: number,
@@ -463,4 +489,22 @@ declare namespace Orion {
    * @param target цель для атаки
    */
   function Attack(target: Serial): void;
+
+  /**
+   * Проверка вхождения текста в строку.
+   * @param text текст для проверки
+   * @param pattern текст для поиска, несколько текстов может быть разделено |;
+   * @param ignoreCase булевое, true если нужно игнорировать регистр при поиске; Значение по умолчанию: true;
+   */
+  function Contains(
+    text: string,
+    pattern: string,
+    ignoreCase?: boolean,
+  ): boolean;
+
+  /**
+   * Получить/создать объект списка поиска.
+   * @param listName имя списка поиска;
+   */
+  function GetFindList(listName: string): FindList;
 }

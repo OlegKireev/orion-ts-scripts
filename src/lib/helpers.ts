@@ -1,3 +1,5 @@
+import { toGraphic } from './validators';
+
 const LAG_DELAY = 60000;
 
 export function checkLag(): void {
@@ -21,4 +23,46 @@ export function stopBot(exclusion: string = ''): void {
   Orion.CancelWaitTarget();
   Orion.ClearTimers();
   Orion.Terminate('all', exclusion);
+}
+
+export function OpenNestedBags(container?: Serial) {
+  const CONTAINER_GRAPHICS = toGraphic('0x0E7D|0x09AA|0x0E75|0x0E76|0x09B0'); //сумки
+
+  const rootContainer = container || Orion.GetSerial('backpack');
+
+  const queue: Serial[] = [rootContainer];
+  const openedBags: Record<string, boolean> = {};
+  openedBags[rootContainer] = true;
+
+  let totalOpened = 0;
+
+  while (queue.length > 0) {
+    const currentContainer = queue.shift();
+    if (!currentContainer) {
+      continue;
+    }
+
+    Orion.OpenContainer(currentContainer);
+    Orion.Wait(10);
+    totalOpened += 1;
+
+    const foundBags = Orion.FindType(
+      CONTAINER_GRAPHICS,
+      'any',
+      currentContainer,
+    );
+
+    if (foundBags && foundBags.length > 0) {
+      for (let i = 0; i < foundBags.length; i++) {
+        const bag = foundBags[i];
+
+        if (!openedBags[bag]) {
+          openedBags[bag] = true;
+          queue.push(bag);
+        }
+      }
+    }
+  }
+
+  Orion.Print('Все сумки открыты.');
 }

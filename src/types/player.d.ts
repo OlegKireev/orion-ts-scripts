@@ -28,4 +28,8 @@ declare namespace Player {
   function MaxMana(): number;
   /** Проверка на скрытость игрока. */
   function Hidden(): boolean;
+  /** Получить титул игрока. */
+  function Title(): string;
+  /** Получить серийник игрока */
+  function Serial(): Serial;
 }
