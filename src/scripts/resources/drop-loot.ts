@@ -447,59 +447,63 @@ export function Restock() {
   if (list) {
     const requiredItems = list.Items();
 
-    requiredItems.forEach((reqItem) => {
-      if (!reqItem) {
-        return;
-      }
+    // Кешируем данные из QObject'ов, чтобы избежать обращения к удалённым объектам
+    const cachedItems = requiredItems
+      .filter((reqItem) => !!reqItem)
+      .map((reqItem) => ({
+        graphic: reqItem.Graphic(),
+        color: reqItem.Color(),
+        count: reqItem.Count(),
+        comment: reqItem.Comment(),
+      }));
+
+    cachedItems.forEach((req) => {
       let neededAmount =
-        reqItem.Count() -
-        Orion.Count(reqItem.Graphic(), reqItem.Color(), 'backpack', '', true);
+        req.count -
+        Orion.Count(req.graphic, req.color, 'backpack', '', true);
       if (neededAmount > 0) {
-        Orion.FindTypeEx('any', 'any', 'ground', '', '', '', true)
-          .filter((container) => {
-            return container.Serial() != Player.Serial();
-          })
-          .forEach((outside) => {
+        const containers = Orion.FindTypeEx('any', 'any', 'ground', '', '', '', true);
+        const containerSerials = containers
+          .filter((container) => container.Serial() != Player.Serial())
+          .map((container) => container.Serial());
+
+        containerSerials.forEach((containerSerial) => {
+          Orion.ResetIgnoreList();
+          const found = Orion.FindTypeEx(
+            req.graphic,
+            req.color,
+            containerSerial,
+            '',
+            2,
+            '',
+            true,
+          );
+          // Кешируем серийники найденных предметов
+          const itemSerials = found.map((item) => item.Serial());
+
+          itemSerials.forEach((itemSerial) => {
             Orion.ResetIgnoreList();
-            Orion.FindTypeEx(
-              reqItem.Graphic(),
-              reqItem.Color(),
-              outside.Serial(),
-              '',
-              2,
-              '',
-              true,
-            ).forEach((item) => {
-              Orion.ResetIgnoreList();
-              neededAmount =
-                reqItem.Count() -
-                Orion.Count(
-                  reqItem.Graphic(),
-                  reqItem.Color(),
-                  'backpack',
-                  '',
-                  true,
-                );
-              if (item.Container() != Player.Serial() && neededAmount > 0) {
-                Orion.MoveItem(item.Serial(), neededAmount);
-                Orion.Wait(100);
-              }
-            });
+            neededAmount =
+              req.count -
+              Orion.Count(req.graphic, req.color, 'backpack', '', true);
+            const obj = Orion.FindObject(itemSerial);
+            if (obj && obj.Container() != Player.Serial() && neededAmount > 0) {
+              Orion.MoveItem(itemSerial, neededAmount);
+              Orion.Wait(100);
+            }
           });
+        });
       }
-      Orion.Print(
-        'Got ' + reqItem.Comment() + ' ' + reqItem.Count() + ' to unload',
-      );
+      Orion.Print('Got ' + req.comment + ' ' + req.count + ' to unload');
     });
 
     Orion.Print('Пополнился ресами');
     Orion.Wait(1000);
-    // Auto_beckeck();
 
-    const successful = requiredItems.every((item) => {
+    const successful = cachedItems.every((req) => {
       return (
-        item.Count() -
-          Orion.Count(item.Graphic(), item.Color(), 'backpack', '', true) <=
+        req.count -
+          Orion.Count(req.graphic, req.color, 'backpack', '', true) <=
         0
       );
     });
