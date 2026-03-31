@@ -4,7 +4,7 @@ import { checkLag } from './helpers';
  * Функция проверки и ухода в хайд
  */
 export function hiding(): void {
-  const HIDING_DELAY = 4000;
+  const HIDING_DELAY = 6500;
 
   if (Player.Hidden()) {
     return;
