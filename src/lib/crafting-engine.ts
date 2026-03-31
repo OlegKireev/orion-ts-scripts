@@ -299,8 +299,10 @@ export class UniversalCrafter {
       if (match) {
         const seconds = parseInt(match[1], 10);
         Orion.Print(`Жду ${seconds} секунд...`);
-        const craftEndTime = Orion.Now() + seconds * 1000;
-        const maxWaitingTime = craftEndTime + 20000;
+        const craftDuration = seconds * 1000;
+        const craftEndTime = Orion.Now() + craftDuration;
+        const serverDelayFactor = craftDuration * 0.3; // 30% от времени на сервере
+        const maxWaitingTime = craftEndTime + serverDelayFactor;
 
         this.waitForCraftResult(craftEndTime, maxWaitingTime);
         Orion.Wait(100);
