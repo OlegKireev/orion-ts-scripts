@@ -150,8 +150,8 @@ export function TargetNext() {
       'any',
       'any',
       'ground',
-      'near|live',
-      18,
+      'near|live|ignorefriends',
+      15,
       'gray|criminal|orange|red|innocent|blue',
     );
   }
