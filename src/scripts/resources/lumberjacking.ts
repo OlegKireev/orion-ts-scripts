@@ -12,6 +12,7 @@ import { hiding } from '@/lib/hidding';
 const CHEST_SERIAL = toSerial('0x403853A1');
 const HOME_COORDS: Point2D = { x: 898, y: 1874 };
 const WEIGHT_LIMIT_RESERVE = 100; // минус от максимального веса для возврата
+const WALK_STUCK_TIMEOUT = 5000; // таймаут застревания при ходьбе (мс)
 const TOOL_TYPE = toGraphic('0x0F43|0x0F44');
 const FOOD_TYPE = toGraphic('0x097B|0x09F2');
 
@@ -304,6 +305,38 @@ export function Lumberjacking(): void {
   }
 }
 
+/** Идёт к точке с проверкой застревания. Возвращает true если дошёл. */
+function walkToSafe(
+  x: number,
+  y: number,
+  distance: number,
+  run: boolean,
+): boolean {
+  const startX = Player.X();
+  const startY = Player.Y();
+  const deadline = Orion.Now() + WALK_STUCK_TIMEOUT;
+
+  // Запускаем движение
+  const result = Orion.WalkTo(x, y, Player.Z(), distance, 255, run, true);
+
+  if (result) return true;
+
+  // WalkTo вернул false — проверяем, застряли ли мы
+  if (Player.X() === startX && Player.Y() === startY) {
+    Orion.CharPrint('self', 38, 'Застрял! Пропускаю точку');
+    return false;
+  }
+
+  // Сдвинулись, но не дошли — даём ещё время
+  while (Orion.Now() < deadline) {
+    if (Orion.GetDistance(x, y) <= distance) return true;
+    Orion.Wait(200);
+  }
+
+  Orion.CharPrint('self', 38, 'Не могу дойти, пропускаю');
+  return false;
+}
+
 function Hack(): void {
   const endMsg = 'You hack at the tree|put the log';
   const stopMsg =
@@ -317,7 +350,7 @@ function Hack(): void {
     checkLag();
     setBadTiles();
 
-    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, false)) {
+    if (!walkToSafe(tile.x, tile.y, 1, false)) {
       Orion.Print(`Can't walk to ${tile.x} ${tile.y}`);
       Orion.Wait(100);
       continue;
@@ -348,7 +381,7 @@ function Hack(): void {
         checkLag();
 
         // Возвращаемся к дереву
-        if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 1, 255, true, true)) {
+        if (!walkToSafe(tile.x, tile.y, 1, true)) {
           Orion.Print(`Can't walk back to ${tile.x} ${tile.y}`);
           break; // Прерываем рубку текущего дерева и идем к следующему
         }
