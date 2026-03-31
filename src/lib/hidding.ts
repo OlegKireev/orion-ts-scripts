@@ -13,6 +13,8 @@ export function hiding(): void {
   while (!Player.Hidden()) {
     const start = Orion.Now();
     checkLag();
+    Orion.WarMode(0);
+    Orion.Wait(10);
     Orion.UseSkill('Hiding');
 
     while (!Player.Hidden() && Orion.Now() < start + HIDING_DELAY) {
