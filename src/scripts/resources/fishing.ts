@@ -24,6 +24,13 @@ for (var dx = -6; dx <= 6; dx++) {
   }
 }
 
+export function Autostart(): void {
+  Orion.Exec('Monitor', true);
+  Orion.Exec('Fishing', true);
+  checkLag();
+  Orion.ResumeScript('all');
+}
+
 function pickupFromGround(graphic: Graphic): void {
   const items = Orion.FindType(graphic, 'any', 'ground');
   for (let i = 0; i < items.length; i++) {
