@@ -1,31 +1,34 @@
+import { checkLag } from '@/lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 
-var POLE_TYPE = toGraphic('0x0dbf'); // удочка
-var FISH_GRAPHIC = toGraphic('0x0dd8|0x0dd9|0x0dd6|0x0dd7'); // типы рыбы (без стейков)
-var DAGGER_GRAPHIC = toGraphic('0x0f51|0x0f52'); // кинжалы для разделки
-var STEAK_GRAPHIC = toGraphic('0x097a'); // стейки после разделки
-var BLACK_PEARL_GRAPHIC = toGraphic('0x0f7a'); // Black Pearls
-var TRUNK_SERIAL = toSerial('0x40649840'); // трюм
-var BAG_IN_TRUNK = toSerial('0x4036c020'); // сумка внутри трюма
+const POLE_TYPE = toGraphic('0x0dbf'); // удочка
+const FISH_GRAPHIC = toGraphic('0x0dd8|0x0dd9|0x0dd6|0x0dd7'); // типы рыбы (без стейков)
+const DAGGER_GRAPHIC = toGraphic('0x0f51|0x0f52'); // кинжалы для разделки
+const STEAK_GRAPHIC = toGraphic('0x097a'); // стейки после разделки
+const BLACK_PEARL_GRAPHIC = toGraphic('0x0f7a'); // Black Pearls
+const TRUNK_SERIAL = toSerial('0x40649840'); // трюм
+const BAG_IN_TRUNK = toSerial('0x4036c020'); // сумка внутри трюма
 
-var SUCCESS_MESSAGE = 'You pull out|You fish up';
-var FISH_RESULT_MESSAGE = 'fish|fail|nothing|skill is to low|Try';
-var MOVE_DURATION = 20000; // 20 секунд движение
-var MOVES = ['Right', 'Right', 'Right', 'Left'];
+const KEEP_SAME_TILE_MESSAGES =
+  'You fish a while|You pull out|You fish up|another action';
+const FISH_RESULT_MESSAGE =
+  'You fish a while|You pull out|You fish up|Try fishing|There are no fish|You cant do that|another action';
+const MOVE_DURATION = 20000; // 20 секунд движение
+const MOVES = ['Right', 'Right', 'Right', 'Left'];
 
-// формируем тайлы 7x7 вокруг персонажа
-var TILES: [number, number][] = [];
-for (var dx = -3; dx <= 3; dx++) {
-  for (var dy = -3; dy <= 3; dy++) {
+// формируем тайлы 13x13 вокруг персонажа
+const TILES: [number, number][] = [];
+for (var dx = -6; dx <= 6; dx++) {
+  for (var dy = -6; dy <= 6; dy++) {
     TILES.push([dx, dy]);
   }
 }
 
 function pickupFromGround(graphic: Graphic): void {
-  var items = Orion.FindType(graphic, 'any', 'ground');
-  for (var i = 0; i < items.length; i++) {
-    var obj = Orion.FindObject(items[i]);
-    if (obj && !obj.Locked()) {
+  const items = Orion.FindType(graphic, 'any', 'ground');
+  for (let i = 0; i < items.length; i++) {
+    const object = Orion.FindObject(items[i]);
+    if (object && !object.Locked()) {
       Orion.MoveItem(items[i], 0, 'backpack');
       Orion.Wait(200);
     }
@@ -33,55 +36,81 @@ function pickupFromGround(graphic: Graphic): void {
 }
 
 function storeToTrunk(graphic: Graphic): void {
-  var items = Orion.FindType(graphic, 'any', 'backpack');
-  for (var i = 0; i < items.length; i++) {
+  const items = Orion.FindType(graphic, 'any', 'backpack');
+  for (let i = 0; i < items.length; i++) {
     Orion.MoveItem(items[i], 0, BAG_IN_TRUNK);
     Orion.Wait(200);
   }
 }
 
 function cutFish(): void {
-  var fishes = Orion.FindType(FISH_GRAPHIC, 'any', 'backpack');
-  for (var i = 0; i < fishes.length; i++) {
-    var daggers = Orion.FindType(DAGGER_GRAPHIC, 'any', 'self');
-    if (!daggers.length) {
-      Orion.Print('Нет кинжала для разделки!');
-      return;
-    }
-    Orion.UseObject(daggers[0]);
-    Orion.WaitForTarget(2000);
-    Orion.TargetObject(fishes[i]);
-    Orion.Wait(300);
+  const fishes = Orion.FindType(FISH_GRAPHIC, 'any', 'backpack');
+
+  const rightHandItem = Orion.ObjAtLayer('RightHand');
+  const leftHandItem = Orion.ObjAtLayer('LeftHand');
+
+  const rightHandSerial = rightHandItem ? rightHandItem.Serial() : null;
+  const leftHandSerial = leftHandItem ? leftHandItem.Serial() : null;
+
+  const daggers = Orion.FindType(DAGGER_GRAPHIC, 'any', 'backpack');
+  if (!daggers || daggers.length === 0) {
+    Orion.Print('Ошибка: Нож не найден в рюкзаке!');
+    return;
+  }
+  const dagger = daggers[0];
+
+  for (let i = 0; i < fishes.length; i++) {
+    const fish = fishes[i];
+
+    Orion.WaitTargetObject(fish);
+    Orion.UseObject(dagger);
+    Orion.Wait(100);
+  }
+
+  if (rightHandSerial) {
+    Orion.UseObject(rightHandSerial);
+    Orion.Wait(100);
+  }
+  if (leftHandSerial) {
+    Orion.UseObject(leftHandSerial);
+    Orion.Wait(100);
   }
 }
 
 function fishTiles(): void {
-  for (var t = 0; t < TILES.length; t++) {
+  for (let i = 0; i < TILES.length; i++) {
     // Проверяем удочку перед каждым тайлом
-    var rods = Orion.FindType(POLE_TYPE, 'any', 'self');
+    const rods = Orion.FindType(POLE_TYPE, 'any', 'self');
+
     if (!rods.length) {
       Orion.Print('Нет удочки! Ждём 5 секунд...');
       Orion.Wait(5000);
       return;
     }
 
-    var keepFishing = true;
+    const x = TILES[i][0];
+    const y = TILES[i][1];
+
+    let keepFishing = true;
     while (keepFishing) {
       Orion.CancelWaitTarget();
+      checkLag();
+
+      Orion.Print(`Ловлю в [${x}, ${y}]`);
+
+      const start = Orion.Now();
+
+      Orion.WaitTargetTileRelative('water', x, y, 0);
       Orion.UseObject(rods[0]);
-      if (Orion.WaitForTarget(2000)) {
-        Orion.TargetTileRelative('any', TILES[t][0], TILES[t][1], 0);
-      }
 
-      var start = Orion.Now();
       Orion.WaitJournal(FISH_RESULT_MESSAGE, start, start + 5000, 'any');
-      Orion.Wait(1000);
 
-      if (Orion.InJournal(SUCCESS_MESSAGE, 'my|sys', 0, 'any', start)) {
-        Orion.Print(
-          'Рыба поймана на тайле [' + TILES[t][0] + ',' + TILES[t][1] + ']',
-        );
+      if (Orion.InJournal(KEEP_SAME_TILE_MESSAGES, 'my|sys', 0, 'any', start)) {
+        Orion.Print(`Продолжаю ловить [${x}, ${y}]`);
       } else {
+        Orion.Print('Перехожу к следующему тайлу');
+        pickupFromGround(FISH_GRAPHIC);
+        Orion.Wait(2000);
         keepFishing = false;
       }
     }
@@ -95,8 +124,8 @@ export function collectAndStoreLoot(): void {
   pickupFromGround(BLACK_PEARL_GRAPHIC);
 
   // Перенести в трюм
-  var trunkObj = Orion.FindObject(TRUNK_SERIAL);
-  if (!trunkObj) return;
+  const trunkObject = Orion.FindObject(TRUNK_SERIAL);
+  if (!trunkObject) return;
 
   Orion.UseObject(TRUNK_SERIAL);
   Orion.Wait(500);
@@ -112,9 +141,10 @@ export function Fishing(): void {
   fishTiles();
 
   while (true) {
-    for (var i = 0; i < MOVES.length; i++) {
-      var command = MOVES[i];
-      var duration = command === 'Left' ? MOVE_DURATION * 3 : MOVE_DURATION;
+    for (let i = 0; i < MOVES.length; i++) {
+      const command = MOVES[i];
+      const duration =
+        command === 'Left' ? MOVE_DURATION * MOVES.length : MOVE_DURATION;
 
       Orion.Print('Плывём ' + command);
       Orion.Say(command);
