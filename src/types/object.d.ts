@@ -18,4 +18,6 @@ declare interface GameObject {
   Count(): number;
   /** Получить серийник контейнера */
   Container(): Serial;
+  /** Провера на прилоченность объекта */
+  Locked(): boolean;
 }

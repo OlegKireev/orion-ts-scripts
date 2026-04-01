@@ -1,306 +1,186 @@
-import { checkLag, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
-import { restockItems } from '@/lib/container';
 
-// --- Настройки рыбака ---
-const MOVE_DELAY = 100;
-const WEIGHT_LIMIT = 30; // запас веса до максимума
-const CAST_TIMEOUT = 15000; // таймаут ожидания улова
+function SimpleFishing() {
+  var POLE_TYPE = toGraphic('0x0dbf'); // удочка
+  var SUCCESS_MESSAGE = 'You pull out|You fish up'; // сообщения об успешной рыбалке
+  var MOVE_DURATION = 20000; // 20 секунд движение Right
 
-const FISH_CONTAINER_SERIAL = toSerial('0x403853AB'); // Контейнер для рыбы
-const RESOURCES_CONTAINER = toSerial('0x403853AA'); // Контейнер с ресурсами
-
-const POLE_TYPE = toGraphic('0x0DBF|0x0DC0'); // Удочка
-const FISH_STEAK_TYPE = toGraphic('0x097A'); // Рыбные стейки
-const FISH_TYPE = toGraphic(
-  '0x09CC|0x09CD|0x09CE|0x09CF|0x0DD6|0x0DD7',
-); // Сырая рыба разных видов
-const SHOES_TYPE = toGraphic('0x170D|0x170E'); // Обувь (мусор)
-const BONES_TYPE = toGraphic('0x0ECA|0x0ECB'); // Кости (мусор)
-
-// Глобальная настройка журнала при загрузке скрипта
-Orion.JournalIgnoreCase(true);
-
-// ==========================================
-// МАРШРУТ
-// ==========================================
-
-/** Точки на берегу, откуда ловим */
-const SHORE_ROUTE: Point2D[] = [
-  { x: 897, y: 1876 },
-  { x: 900, y: 1876 },
-  { x: 903, y: 1876 },
-];
-
-/**
- * Тайлы воды относительно позиции персонажа для заброса.
- * Каждая точка маршрута ловит по этим относительным координатам.
- */
-const WATER_OFFSETS: Point2D[] = [
-  { x: 0, y: -4 },
-  { x: 1, y: -4 },
-  { x: -1, y: -4 },
-  { x: 2, y: -3 },
-  { x: -2, y: -3 },
-  { x: 0, y: -3 },
-  { x: 3, y: -2 },
-  { x: -3, y: -2 },
-];
-
-// ==========================================
-// ЭКСПОРТИРУЕМЫЕ ФУНКЦИИ (ТОЧКИ ВХОДА ORION)
-// ==========================================
-
-export function Autostart(): void {
-  Orion.Exec('Monitor', true);
-  Orion.Exec('Eating', true);
-  Orion.Exec('Resurrect', true);
-  Replenishment();
-  checkLag();
-  Orion.ResumeScript('all');
-}
-
-export { Eating } from '@/lib/eating';
-export { Monitor } from '@/lib/status-monitor';
-export { Resurrect } from '@/lib/resurrect';
-
-// ==========================================
-// ОСНОВНОЙ ЦИКЛ РЫБАЛКИ
-// ==========================================
-
-export function Fish(): void {
-  for (var i = 0; i < SHORE_ROUTE.length; i++) {
-    var spot = SHORE_ROUTE[i];
-    checkLag();
-
-    if (!Orion.WalkTo(spot.x, spot.y, Player.Z(), 0, 255, false)) {
-      Orion.Print('Не могу дойти до ' + spot.x + ' ' + spot.y);
-      Orion.Wait(100);
-      continue;
-    }
-
-    fishAtSpot();
-  }
-}
-
-export function Fishing(): void {
-  while (true) {
-    Orion.Exec('Fish', true);
-    while (Orion.ScriptRunning('Fish')) {
-      Orion.Wait(100);
+  // формируем тайлы 7x7 вокруг персонажа
+  const tiles: [number, number][] = [];
+  for (var dx = -3; dx <= 3; dx++) {
+    for (var dy = -3; dy <= 3; dy++) {
+      tiles.push([dx, dy]);
     }
   }
-}
 
-// ==========================================
-// ЛОГИКА РЫБАЛКИ В ТОЧКЕ
-// ==========================================
-
-function fishAtSpot(): void {
-  for (var i = 0; i < WATER_OFFSETS.length; i++) {
-    var offset = WATER_OFFSETS[i];
-
-    if (
-      !Orion.ValidateTargetTileRelative('water', offset.x, offset.y)
-    ) {
-      continue;
+  // функция облова тайлов
+  function fishTiles() {
+    var rods = Orion.FindType(POLE_TYPE, 'any', 'self');
+    if (!rods.length) {
+      Orion.Print('Нет удочки! Ждём 5 секунд...');
+      Orion.Wait(5000);
+      return;
     }
 
-    var tileEmpty = false;
+    for (var t = 0; t < tiles.length; t++) {
+      var keepFishing = true;
+      while (keepFishing) {
+        try {
+          Orion.CancelWaitTarget();
+          Orion.UseObject(rods[0]);
+          if (Orion.WaitForTarget(2000)) {
+            Orion.TargetTileRelative('any', tiles[t][0], tiles[t][1], 0);
+          }
 
-    while (!tileEmpty) {
-      Orion.Wait(1);
-      checkLag();
+          var start = Orion.Now();
+          // ждём событие рыбалки до 5 секунд
+          while (
+            !Orion.InJournal(
+              'fish|fail|nothing|skill is to low|Try',
+              'any',
+              0,
+              'any',
+              start,
+            )
+          ) {
+            Orion.Wait(1000);
+            if (Orion.Now() - start > 5000) break;
+          }
 
-      // Проверяем перевес
-      if (Player.Weight() >= Player.MaxWeight() - WEIGHT_LIMIT) {
-        handleOverweight();
+          Orion.Wait(1000);
 
-        // Возвращаемся к текущей точке
-        var currentSpot = getCurrentSpot();
-        if (
-          currentSpot &&
-          !Orion.WalkTo(
-            currentSpot.x,
-            currentSpot.y,
-            Player.Z(),
-            0,
-            255,
-            true,
-            true,
-          )
-        ) {
-          Orion.Print('Не могу вернуться к точке рыбалки');
-          return;
+          if (Orion.InJournal(SUCCESS_MESSAGE, 'my|sys', 0, 'any', start)) {
+            Orion.Print(
+              'Рыба поймана на тайле [' + tiles[t][0] + ',' + tiles[t][1] + ']',
+            );
+            keepFishing = true; // продолжаем ловить на этом тайле
+          } else {
+            keepFishing = false; // переходим к следующему тайлу
+          }
+        } catch (e) {
+          keepFishing = false; // при ошибке — следующий тайл
         }
       }
+    }
+  }
 
-      // Проверяем наличие удочки
-      if (!Orion.FindType(POLE_TYPE, 'any', 'backpack').length) {
-        Orion.CharPrint('self', 0x0021, 'Нет удочки!');
-        Orion.PlayWav('Alarm');
-        stopBot();
-        return;
+  Orion.Print('Начинаем рыбалку на стартовой позиции');
+  fishTiles(); // первая облова
+
+  // бесконечный цикл Right → Right → Right → Left
+  while (true) {
+    var moves = ['Right', 'Right', 'Right', 'Left'];
+    for (var i = 0; i < moves.length; i++) {
+      var command = moves[i];
+      var duration = command === 'Left' ? MOVE_DURATION * 3 : MOVE_DURATION;
+
+      Orion.Print('Плывём ' + command);
+      Orion.Say(command);
+      Orion.Wait(duration);
+      Orion.Say('Stop');
+      Orion.Print('Стоп, начинаем облова тайлов');
+      pickupProcessAndStoreAllSteaksAndPearls();
+      fishTiles();
+    }
+  }
+}
+
+var FISH_GRAPHICS = [
+  toGraphic('0x0dd8'),
+  toGraphic('0x0dd9'),
+  toGraphic('0x0dd6'),
+  toGraphic('0x0dd7'),
+  toGraphic('0x097a'),
+]; // типы рыбы и стейки
+var DAGGER_GRAPHIC = [toGraphic('0x0f51'), toGraphic('0x0f52')]; // кинжалы для рыбы
+var STEAK_GRAPHIC = toGraphic('0x097a'); // стейки после разделки
+var TRUNK_SERIAL = toSerial('0x40649840'); // трюм
+var BAG_IN_TRUNK = toSerial('0x4036c020'); // сумка внутри трюма
+var BLACK_PEARL_GRAPHIC = toGraphic('0x0f7a'); // Black Pearls
+
+function pickupProcessAndStoreAllSteaksAndPearls() {
+  try {
+    // --- Поднять рыбу с пола и обработать кинжалом ---
+    for (var i = 0; i < FISH_GRAPHICS.length; i++) {
+      var fishes = Orion.FindType(FISH_GRAPHICS[i], 'any', 'ground');
+      if (fishes && fishes.length) {
+        for (var j = 0; j < fishes.length; j++) {
+          try {
+            var fishObj = Orion.FindObject(fishes[j]);
+            if (fishObj && !fishObj.Locked()) {
+              Orion.MoveItem(fishes[j], 0, 'backpack');
+              Orion.Wait(200);
+              Orion.Print('Поднята рыба: 0x' + FISH_GRAPHICS[i].toString());
+
+              // --- Разделка рыбы кинжалом ---
+              for (var k = 0; k < DAGGER_GRAPHIC.length; k++) {
+                var dag = Orion.FindType(DAGGER_GRAPHIC[k], 'any', 'self');
+                if (dag && dag.length) {
+                  Orion.UseObject(dag[0]);
+                  Orion.WaitForTarget(2000);
+                  Orion.TargetObject(fishes[j]);
+                  Orion.Wait(300);
+                  Orion.Print(
+                    'Обработана рыба кинжалом: 0x' +
+                      DAGGER_GRAPHIC[k].toString(),
+                  );
+                  break;
+                }
+              }
+            }
+          } catch (errMove) {
+            Orion.Print('Ошибка при подъёме/обработке рыбы: ' + errMove);
+          }
+        }
       }
-
-      var start = Orion.Now();
-      Orion.WaitTargetTileRelative('water', offset.x, offset.y, 0);
-      Orion.UseType(POLE_TYPE);
-
-      // Ждем результат заброса
-      tileEmpty = waitForFishResult(start);
     }
-  }
-}
 
-// ==========================================
-// ОЖИДАНИЕ РЕЗУЛЬТАТА ЗАБРОСА
-// ==========================================
-
-function waitForFishResult(start: number): boolean {
-  var successMsg =
-    'You pull out|You fish up';
-  var emptyMsg =
-    'There are no fish here|The fish aren\'t biting here|You need to be closer to the water';
-  var failMsg =
-    'You pull out an old shoe|You pull out some old bones|That is too far away';
-
-  var allMsg = successMsg + '|' + emptyMsg + '|' + failMsg;
-
-  while (
-    !Orion.InJournal(allMsg, 'my|sys', 0, 'any', start) &&
-    Orion.Now() < start + CAST_TIMEOUT
-  ) {
-    Orion.Wait(100);
-  }
-
-  // Тайл пуст — переходим к следующему
-  if (Orion.InJournal(emptyMsg, 'my|sys', 0, 'any', start)) {
-    return true;
-  }
-
-  // Вытащили мусор — выбрасываем
-  if (Orion.InJournal(failMsg, 'my|sys', 0, 'any', start)) {
-    dropTrash();
-    return false;
-  }
-
-  // Поймали рыбу — продолжаем в этом тайле
-  if (Orion.InJournal(successMsg, 'my|sys', 0, 'any', start)) {
-    return false;
-  }
-
-  // Таймаут — пробуем дальше
-  return false;
-}
-
-// ==========================================
-// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-// ==========================================
-
-/** Текущий спот (ближайший из маршрута) */
-function getCurrentSpot(): Point2D | null {
-  var closest = SHORE_ROUTE[0];
-  var minDist = Orion.GetDistance(closest.x, closest.y);
-
-  for (var i = 1; i < SHORE_ROUTE.length; i++) {
-    var dist = Orion.GetDistance(SHORE_ROUTE[i].x, SHORE_ROUTE[i].y);
-    if (dist < minDist) {
-      minDist = dist;
-      closest = SHORE_ROUTE[i];
+    // --- Поднять Black Pearls с пола (не режем) ---
+    var pearls = Orion.FindType(BLACK_PEARL_GRAPHIC, 'any', 'ground');
+    if (pearls && pearls.length) {
+      for (var p = 0; p < pearls.length; p++) {
+        var pearlObj = Orion.FindObject(pearls[p]);
+        if (pearlObj && !pearlObj.Locked()) {
+          Orion.MoveItem(pearls[p], 0, 'backpack');
+          Orion.Wait(200);
+          Orion.Print(
+            'Подняты Black Pearls: 0x' + BLACK_PEARL_GRAPHIC.toString(),
+          );
+        }
+      }
     }
+
+    // --- Перенос всех стейков и Black Pearls в сумку внутри трюма ---
+    var bagObj = Orion.FindObject(TRUNK_SERIAL);
+    if (bagObj) {
+      // открываем трюм и сумку, если не найдена
+      Orion.UseObject(TRUNK_SERIAL);
+      Orion.Wait(500);
+      Orion.UseObject(BAG_IN_TRUNK);
+      Orion.Wait(500);
+      // переносим стейки
+      var steaks = Orion.FindType(STEAK_GRAPHIC, 'any', 'backpack');
+      if (steaks && steaks.length) {
+        for (var s = 0; s < steaks.length; s++) {
+          Orion.MoveItem(steaks[s], 0, BAG_IN_TRUNK);
+          Orion.Wait(200);
+          Orion.Print('Перенесён стейк в сумку: 0x' + STEAK_GRAPHIC.toString());
+        }
+      }
+      // переносим Black Pearls
+      var pearlsInBag = Orion.FindType(BLACK_PEARL_GRAPHIC, 'any', 'backpack');
+      if (pearlsInBag && pearlsInBag.length) {
+        for (var pb = 0; pb < pearlsInBag.length; pb++) {
+          Orion.MoveItem(pearlsInBag[pb], 0, BAG_IN_TRUNK);
+          Orion.Wait(200);
+          Orion.Print(
+            'Перенесены Black Pearls в сумку: 0x' +
+              BLACK_PEARL_GRAPHIC.toString(),
+          );
+        }
+      }
+    }
+  } catch (err) {
+    Orion.Print('Ошибка в функции подъёма и переноса: ' + err);
   }
-
-  return closest;
-}
-
-/** Выбросить мусор из рюкзака */
-function dropTrash(): void {
-  var shoes = Orion.FindType(SHOES_TYPE, 'any', 'backpack');
-  for (var i = 0; i < shoes.length; i++) {
-    Orion.DropHere(shoes[i]);
-    Orion.Wait(MOVE_DELAY);
-  }
-
-  var bones = Orion.FindType(BONES_TYPE, 'any', 'backpack');
-  for (var i = 0; i < bones.length; i++) {
-    Orion.DropHere(bones[i]);
-    Orion.Wait(MOVE_DELAY);
-  }
-}
-
-/** Обработка перевеса: сбросить рыбу в контейнер */
-function handleOverweight(): void {
-  DropFish();
-  Replenishment();
-}
-
-/** Сбросить улов в контейнер */
-export function DropFish(): void {
-  Orion.Print('Иду сбрасывать рыбу');
-
-  var chestObj = Orion.FindObject(FISH_CONTAINER_SERIAL);
-
-  if (!chestObj) {
-    Orion.CharPrint('self', 0x0021, 'Контейнер для рыбы не найден!');
-    Orion.PlayWav('Alarm');
-    stopBot();
-    return;
-  }
-
-  Orion.WalkTo(chestObj.X(), chestObj.Y(), Player.Z(), 1, 255, true);
-  checkLag();
-  Orion.Wait(500);
-
-  // Сбрасываем сырую рыбу
-  var fish = Orion.FindType(FISH_TYPE, 'any', 'backpack');
-  for (var i = 0; i < fish.length; i++) {
-    checkLag();
-    Orion.MoveItem(fish[i], 0, FISH_CONTAINER_SERIAL);
-    Orion.Wait(MOVE_DELAY);
-  }
-
-  // Сбрасываем рыбные стейки
-  var steaks = Orion.FindType(FISH_STEAK_TYPE, 'any', 'backpack');
-  for (var i = 0; i < steaks.length; i++) {
-    checkLag();
-    Orion.MoveItem(steaks[i], 0, FISH_CONTAINER_SERIAL);
-    Orion.Wait(MOVE_DELAY);
-  }
-}
-
-/** Пополнение ресурсов (удочки) */
-export function Replenishment(): void {
-  var resourceContainer = Orion.FindObject(RESOURCES_CONTAINER);
-
-  Orion.WalkTo(
-    resourceContainer ? resourceContainer.X() : Player.X(),
-    resourceContainer ? resourceContainer.Y() : Player.Y(),
-    Player.Z(),
-    1,
-    255,
-    true,
-  );
-
-  restockItems(
-    [
-      {
-        name: 'fishing pole',
-        type: POLE_TYPE,
-        color: 'any',
-        max: 2,
-        min: 1,
-        box: 'self',
-        x: -1,
-        y: -1,
-      },
-    ],
-    RESOURCES_CONTAINER,
-  );
-}
-
-export function Finish(): void {
-  stopBot('Finish|DropFish');
-  Orion.Wait(100);
-  DropFish();
 }

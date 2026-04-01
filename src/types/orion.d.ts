@@ -21,6 +21,12 @@ declare namespace Orion {
   function Wait(delay: number): void;
 
   /**
+   * Ожидание получения таргета от сервера.
+   * @param delay максимальное время ожидания в миллисекундах. По умолчанию 1000
+   */
+  function WaitForTarget(delay?: number): boolean;
+
+  /**
    * Включает или выключает игнорирование регистра при поиске сообщений в журнале.
    */
   function JournalIgnoreCase(state: boolean): void;
@@ -272,6 +278,21 @@ declare namespace Orion {
 
   /** Отменить текущий таргет в клиенте (если он есть). */
   function CancelTarget(): void;
+
+  /** Навести прицел на землю, относительно персонажа */
+  function TargetTileRelative(
+    tileFlags: string,
+    x?: number,
+    y?: number,
+    z?: number,
+  ): void;
+
+  /**
+   * Навести прицел на объект
+   * @param serial серийник объекта
+   * @param relativeTargetDistance дистанция для указания прицелом на притку относительно персонажа. По умолчанию 0
+   */
+  function TargetObject(serial: Serial, relativeTargetDistance?: number): void;
 
   /** Закрыть меню. */
   function CloseMenu(name: string): void;
