@@ -70,6 +70,7 @@ function getBuildOptions(entryPoints) {
     outExtension: { '.js': '.oajs' },
     format: 'esm',
     target: 'es5',
+    charset: 'utf8',
     treeShaking: true,
     metafile: true,
     define: {
