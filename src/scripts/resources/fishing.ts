@@ -1,6 +1,6 @@
 import { toGraphic, toSerial } from '@/lib/validators';
 
-function SimpleFishing() {
+export function SimpleFishing() {
   var POLE_TYPE = toGraphic('0x0dbf'); // удочка
   var SUCCESS_MESSAGE = 'You pull out|You fish up'; // сообщения об успешной рыбалке
   var MOVE_DURATION = 20000; // 20 секунд движение Right
@@ -25,40 +25,36 @@ function SimpleFishing() {
     for (var t = 0; t < tiles.length; t++) {
       var keepFishing = true;
       while (keepFishing) {
-        try {
-          Orion.CancelWaitTarget();
-          Orion.UseObject(rods[0]);
-          if (Orion.WaitForTarget(2000)) {
-            Orion.TargetTileRelative('any', tiles[t][0], tiles[t][1], 0);
-          }
+        Orion.CancelWaitTarget();
+        Orion.UseObject(rods[0]);
+        if (Orion.WaitForTarget(2000)) {
+          Orion.TargetTileRelative('any', tiles[t][0], tiles[t][1], 0);
+        }
 
-          var start = Orion.Now();
-          // ждём событие рыбалки до 5 секунд
-          while (
-            !Orion.InJournal(
-              'fish|fail|nothing|skill is to low|Try',
-              'any',
-              0,
-              'any',
-              start,
-            )
-          ) {
-            Orion.Wait(1000);
-            if (Orion.Now() - start > 5000) break;
-          }
-
+        var start = Orion.Now();
+        // ждём событие рыбалки до 5 секунд
+        while (
+          !Orion.InJournal(
+            'fish|fail|nothing|skill is to low|Try',
+            'any',
+            0,
+            'any',
+            start,
+          )
+        ) {
           Orion.Wait(1000);
+          if (Orion.Now() - start > 5000) break;
+        }
 
-          if (Orion.InJournal(SUCCESS_MESSAGE, 'my|sys', 0, 'any', start)) {
-            Orion.Print(
-              'Рыба поймана на тайле [' + tiles[t][0] + ',' + tiles[t][1] + ']',
-            );
-            keepFishing = true; // продолжаем ловить на этом тайле
-          } else {
-            keepFishing = false; // переходим к следующему тайлу
-          }
-        } catch (e) {
-          keepFishing = false; // при ошибке — следующий тайл
+        Orion.Wait(1000);
+
+        if (Orion.InJournal(SUCCESS_MESSAGE, 'my|sys', 0, 'any', start)) {
+          Orion.Print(
+            'Рыба поймана на тайле [' + tiles[t][0] + ',' + tiles[t][1] + ']',
+          );
+          keepFishing = true; // продолжаем ловить на этом тайле
+        } else {
+          keepFishing = false; // переходим к следующему тайлу
         }
       }
     }
@@ -98,89 +94,81 @@ var TRUNK_SERIAL = toSerial('0x40649840'); // трюм
 var BAG_IN_TRUNK = toSerial('0x4036c020'); // сумка внутри трюма
 var BLACK_PEARL_GRAPHIC = toGraphic('0x0f7a'); // Black Pearls
 
-function pickupProcessAndStoreAllSteaksAndPearls() {
-  try {
-    // --- Поднять рыбу с пола и обработать кинжалом ---
-    for (var i = 0; i < FISH_GRAPHICS.length; i++) {
-      var fishes = Orion.FindType(FISH_GRAPHICS[i], 'any', 'ground');
-      if (fishes && fishes.length) {
-        for (var j = 0; j < fishes.length; j++) {
-          try {
-            var fishObj = Orion.FindObject(fishes[j]);
-            if (fishObj && !fishObj.Locked()) {
-              Orion.MoveItem(fishes[j], 0, 'backpack');
-              Orion.Wait(200);
-              Orion.Print('Поднята рыба: 0x' + FISH_GRAPHICS[i].toString());
+export function pickupProcessAndStoreAllSteaksAndPearls() {
+  // --- Поднять рыбу с пола и обработать кинжалом ---
+  for (var i = 0; i < FISH_GRAPHICS.length; i++) {
+    var fishes = Orion.FindType(FISH_GRAPHICS[i], 'any', 'ground');
+    if (fishes && fishes.length) {
+      for (var j = 0; j < fishes.length; j++) {
+        var fishObj = Orion.FindObject(fishes[j]);
+        if (fishObj && !fishObj.Locked()) {
+          Orion.MoveItem(fishes[j], 0, 'backpack');
+          Orion.Wait(200);
+          Orion.Print('Поднята рыба: 0x' + FISH_GRAPHICS[i].toString());
 
-              // --- Разделка рыбы кинжалом ---
-              for (var k = 0; k < DAGGER_GRAPHIC.length; k++) {
-                var dag = Orion.FindType(DAGGER_GRAPHIC[k], 'any', 'self');
-                if (dag && dag.length) {
-                  Orion.UseObject(dag[0]);
-                  Orion.WaitForTarget(2000);
-                  Orion.TargetObject(fishes[j]);
-                  Orion.Wait(300);
-                  Orion.Print(
-                    'Обработана рыба кинжалом: 0x' +
-                      DAGGER_GRAPHIC[k].toString(),
-                  );
-                  break;
-                }
-              }
+          // --- Разделка рыбы кинжалом ---
+          for (var k = 0; k < DAGGER_GRAPHIC.length; k++) {
+            var dag = Orion.FindType(DAGGER_GRAPHIC[k], 'any', 'self');
+            if (dag && dag.length) {
+              Orion.UseObject(dag[0]);
+              Orion.WaitForTarget(2000);
+              Orion.TargetObject(fishes[j]);
+              Orion.Wait(300);
+              Orion.Print(
+                'Обработана рыба кинжалом: 0x' +
+                  DAGGER_GRAPHIC[k].toString(),
+              );
+              break;
             }
-          } catch (errMove) {
-            Orion.Print('Ошибка при подъёме/обработке рыбы: ' + errMove);
           }
         }
       }
     }
+  }
 
-    // --- Поднять Black Pearls с пола (не режем) ---
-    var pearls = Orion.FindType(BLACK_PEARL_GRAPHIC, 'any', 'ground');
-    if (pearls && pearls.length) {
-      for (var p = 0; p < pearls.length; p++) {
-        var pearlObj = Orion.FindObject(pearls[p]);
-        if (pearlObj && !pearlObj.Locked()) {
-          Orion.MoveItem(pearls[p], 0, 'backpack');
-          Orion.Wait(200);
-          Orion.Print(
-            'Подняты Black Pearls: 0x' + BLACK_PEARL_GRAPHIC.toString(),
-          );
-        }
+  // --- Поднять Black Pearls с пола (не режем) ---
+  var pearls = Orion.FindType(BLACK_PEARL_GRAPHIC, 'any', 'ground');
+  if (pearls && pearls.length) {
+    for (var p = 0; p < pearls.length; p++) {
+      var pearlObj = Orion.FindObject(pearls[p]);
+      if (pearlObj && !pearlObj.Locked()) {
+        Orion.MoveItem(pearls[p], 0, 'backpack');
+        Orion.Wait(200);
+        Orion.Print(
+          'Подняты Black Pearls: 0x' + BLACK_PEARL_GRAPHIC.toString(),
+        );
       }
     }
+  }
 
-    // --- Перенос всех стейков и Black Pearls в сумку внутри трюма ---
-    var bagObj = Orion.FindObject(TRUNK_SERIAL);
-    if (bagObj) {
-      // открываем трюм и сумку, если не найдена
-      Orion.UseObject(TRUNK_SERIAL);
-      Orion.Wait(500);
-      Orion.UseObject(BAG_IN_TRUNK);
-      Orion.Wait(500);
-      // переносим стейки
-      var steaks = Orion.FindType(STEAK_GRAPHIC, 'any', 'backpack');
-      if (steaks && steaks.length) {
-        for (var s = 0; s < steaks.length; s++) {
-          Orion.MoveItem(steaks[s], 0, BAG_IN_TRUNK);
-          Orion.Wait(200);
-          Orion.Print('Перенесён стейк в сумку: 0x' + STEAK_GRAPHIC.toString());
-        }
-      }
-      // переносим Black Pearls
-      var pearlsInBag = Orion.FindType(BLACK_PEARL_GRAPHIC, 'any', 'backpack');
-      if (pearlsInBag && pearlsInBag.length) {
-        for (var pb = 0; pb < pearlsInBag.length; pb++) {
-          Orion.MoveItem(pearlsInBag[pb], 0, BAG_IN_TRUNK);
-          Orion.Wait(200);
-          Orion.Print(
-            'Перенесены Black Pearls в сумку: 0x' +
-              BLACK_PEARL_GRAPHIC.toString(),
-          );
-        }
+  // --- Перенос всех стейков и Black Pearls в сумку внутри трюма ---
+  var bagObj = Orion.FindObject(TRUNK_SERIAL);
+  if (bagObj) {
+    // открываем трюм и сумку, если не найдена
+    Orion.UseObject(TRUNK_SERIAL);
+    Orion.Wait(500);
+    Orion.UseObject(BAG_IN_TRUNK);
+    Orion.Wait(500);
+    // переносим стейки
+    var steaks = Orion.FindType(STEAK_GRAPHIC, 'any', 'backpack');
+    if (steaks && steaks.length) {
+      for (var s = 0; s < steaks.length; s++) {
+        Orion.MoveItem(steaks[s], 0, BAG_IN_TRUNK);
+        Orion.Wait(200);
+        Orion.Print('Перенесён стейк в сумку: 0x' + STEAK_GRAPHIC.toString());
       }
     }
-  } catch (err) {
-    Orion.Print('Ошибка в функции подъёма и переноса: ' + err);
+    // переносим Black Pearls
+    var pearlsInBag = Orion.FindType(BLACK_PEARL_GRAPHIC, 'any', 'backpack');
+    if (pearlsInBag && pearlsInBag.length) {
+      for (var pb = 0; pb < pearlsInBag.length; pb++) {
+        Orion.MoveItem(pearlsInBag[pb], 0, BAG_IN_TRUNK);
+        Orion.Wait(200);
+        Orion.Print(
+          'Перенесены Black Pearls в сумку: 0x' +
+            BLACK_PEARL_GRAPHIC.toString(),
+        );
+      }
+    }
   }
 }
