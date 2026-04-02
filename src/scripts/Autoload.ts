@@ -205,3 +205,5 @@ export function TargetNext() {
     Orion.Print('Вокруг никого нет!');
   }
 }
+
+export { combatExpUtilization } from '@/lib/exp';

@@ -217,6 +217,15 @@ declare namespace Orion {
   /** Использует объект (двойной клик) по его серийнику. */
   function UseObject(serial: Serial): void;
 
+  /** Поиск и использование предмета по типу и цвету (при необходимости) с земли. */
+  function UseFromGround(
+    graphic: Graphic,
+    color?: string,
+    distance?: string,
+    flags?: string,
+    ignoreLists?: string,
+  ): boolean;
+
   /** Открывает контейнер по серийнику (аналог UseObject, но именно для контейнеров). */
   function OpenContainer(serial: Serial): void;
 
@@ -269,6 +278,29 @@ declare namespace Orion {
 
   /** Отменяет ожидание таргета. */
   function CancelWaitTarget(): void;
+
+  /**
+   * Получить гамп из памяти ассистента.
+   * @param index индекс гампа, начинается с 0.
+   * @param serial серийный номер гампа.
+   * @param id идентификатор гампа.
+   */
+  function GetGump(index: number | 'last'): GumpObject | null;
+  function GetGump(serial: Serial, id: string): GumpObject | null;
+
+  /**
+   * Создать ловушку на гамп.
+   * @param index код ответа гампа. 'cancel' создаст запрос отмены гампа;
+   */
+  function CreateGumpHook(index: string | number): GumpHookObject | null;
+
+  /**
+   * Ожидание прихода гампа от сервера.
+   * @param delay максимальное время ожидания прихода гампа, в миллисекундах. По умолчанию: 1000;
+   * @param waitNewGump true если нужно дождаться нового гампа (если указано false - сработает если последний гамп не был закрыт); По умолчанию: false;
+   * @returns true если получен новый гамп.
+   */
+  function WaitForGump(delay?: number, waitNewGump?: boolean): boolean;
 
   /** Отменяет ожидание гампа (меню). */
   function CancelWaitGump(): void;
@@ -325,7 +357,7 @@ declare namespace Orion {
    * @param type Тип гампа (обычно 'generic' или 'custom').
    * @param serial Серийник гампа (или 'any').
    */
-  function CloseGump(type: GumpType, serial: Serial): void;
+  function CloseGump(type: GumpType, serial?: Serial): void;
 
   /** Кидает появившийся прицел на указанный объект. */
   function WaitTargetObject(serial: Serial): void;
@@ -396,7 +428,7 @@ declare namespace Orion {
   // ==========================================
 
   /** Печатает системное сообщение в клиенте. */
-  function Print(text: string): void;
+  function Print(text: string | number): void;
 
   /**
    * Печатает текст над объектом (или персонажем).

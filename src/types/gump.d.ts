@@ -1,3 +1,10 @@
+declare interface GumpHookObject {}
+
+declare interface GumpObject {
+  Replayed(): boolean;
+  Select(hook: GumpHookObject): boolean;
+}
+
 declare interface CustomGumpObject {
   SetNoClose(state: boolean): void;
   SetNoMove(state: boolean): void;

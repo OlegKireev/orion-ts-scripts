@@ -8,6 +8,12 @@ declare namespace Player {
   function Hits(): number;
   /** Возвращает максимальных количество жизней (HP). */
   function MaxHits(): number;
+  /** Получить силу игрока */
+  function Str(): number;
+  /** Получить ловкость игрока */
+  function Dex(): number;
+  /** Получить интелект игрока */
+  function Int(): number;
   /** Возвращает текущую координату X персонажа. */
   function X(): number;
   /** Возвращает текущую координату Y персонажа. */
