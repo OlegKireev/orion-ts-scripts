@@ -97,7 +97,7 @@ const BlacksmithConfig: CraftConfig = {
   onCraftWait() {
     const BANDAGE_GRAPHIC = toGraphic('0x0E21');
     const BLOODY_BANDAGES_GRAPHIC = toGraphic('0x0E20');
-    const BANDAGE_CHEST = toSerial('0x403853AB');
+    const BANDAGE_CHEST = toSerial('0x403853A7');
     const BANDAGE_RESTOCK_COUNT = 10;
 
     // Проверяем бинты в бекпаке
