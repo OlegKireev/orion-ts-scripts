@@ -51,6 +51,7 @@ export function loot(itemLists: string[]): void {
 
 const CONFIG = {
   knifeGraphics: toGraphic('0x0F51|0x0F52|0x13F6|0x0EC4|0x0EC2'),
+  bladedWeaponGraphics: toGraphic('0x0F4B'),
   corpseGraphic: toGraphic('0x2006'),
   radius: 3,
   carveDelay: 100,
@@ -62,20 +63,30 @@ export function carveAndLoot(itemLists: string[]) {
   Orion.Print('Запускаем резку и лут по списку...');
   const itemsType = itemLists.join('|');
 
-  // 1. Запоминаем текущее оружие
+  // 1. Проверяем, есть ли в правой руке bladed-оружие, которым можно резать
   const rightHandItem = Orion.ObjAtLayer('RightHand');
-  const leftHandItem = Orion.ObjAtLayer('LeftHand');
+  const canCarveWithWeapon =
+    rightHandItem &&
+    CONFIG.bladedWeaponGraphics.indexOf(rightHandItem.Graphic()) !== -1;
 
+  let carveSerial: Serial;
+
+  if (canCarveWithWeapon) {
+    carveSerial = rightHandItem.Serial();
+  } else {
+    // Ищем нож в рюкзаке
+    const knives = Orion.FindType(CONFIG.knifeGraphics, 'any', 'backpack');
+    if (!knives || knives.length === 0) {
+      Orion.Print('Ошибка: Нож не найден в рюкзаке!');
+      return;
+    }
+    carveSerial = knives[0];
+  }
+
+  // 2. Запоминаем экипировку (нужно восстановить только если режем ножом)
+  const leftHandItem = Orion.ObjAtLayer('LeftHand');
   const rightHandSerial = rightHandItem ? rightHandItem.Serial() : null;
   const leftHandSerial = leftHandItem ? leftHandItem.Serial() : null;
-
-  // 2. Ищем нож в рюкзаке
-  const knives = Orion.FindType(CONFIG.knifeGraphics, 'any', 'backpack');
-  if (!knives || knives.length === 0) {
-    Orion.Print('Ошибка: Нож не найден в рюкзаке!');
-    return;
-  }
-  const knifeSerial = knives[0];
 
   // 3. Ищем трупы на земле в заданном радиусе
   const corpses = Orion.FindType(
@@ -83,7 +94,7 @@ export function carveAndLoot(itemLists: string[]) {
     'any',
     'ground',
     'item',
-    CONFIG.radius
+    CONFIG.radius,
   );
 
   if (!corpses || corpses.length === 0) {
@@ -96,18 +107,20 @@ export function carveAndLoot(itemLists: string[]) {
     const corpseSerial = corpses[i];
 
     Orion.WaitTargetObject(corpseSerial);
-    Orion.UseObject(knifeSerial);
+    Orion.UseObject(carveSerial);
     Orion.Wait(CONFIG.carveDelay);
   }
 
-  // 5. Одеваем старое оружие обратно
-  if (rightHandSerial) {
-    Orion.UseObject(rightHandSerial);
-    Orion.Wait(CONFIG.equipDelay);
-  }
-  if (leftHandSerial) {
-    Orion.UseObject(leftHandSerial);
-    Orion.Wait(CONFIG.equipDelay);
+  // 5. Восстанавливаем экипировку (только если резали ножом из рюкзака)
+  if (!canCarveWithWeapon) {
+    if (rightHandSerial) {
+      Orion.UseObject(rightHandSerial);
+      Orion.Wait(CONFIG.equipDelay);
+    }
+    if (leftHandSerial) {
+      Orion.UseObject(leftHandSerial);
+      Orion.Wait(CONFIG.equipDelay);
+    }
   }
 
   // 6. Лутаем порезанные трупы используя список Find
