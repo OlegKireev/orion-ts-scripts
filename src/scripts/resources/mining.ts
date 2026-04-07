@@ -16,6 +16,7 @@ const RESOURCES_CONTAINER = toSerial('0x403853AA'); // Контейнер с р�
 
 const TOOL_TYPE = toGraphic('0x0E85|0x0E86');
 const ORE_TYPE = toGraphic('0x19B7|0x19B8|0x19B9|0x19BA');
+const IRON_ORE_TYPE = toGraphic('0x19B7');
 const FOOD_TYPE = toGraphic('0x097B|0x09F2');
 
 const INGOT_TYPE = toGraphic('0x1BEF|0x1BE3|0x1BF5|0x1BE9|0x1BEF');
@@ -228,6 +229,14 @@ export function SmeltOre(): void {
     Orion.WaitTargetObject(ore);
     Orion.Wait(200);
   }
+
+  const ironOre = Orion.FindType(IRON_ORE_TYPE, '0x0000', 'backpack');
+  for (const ore of ironOre) {
+    checkLag();
+    Orion.UseObject(ore);
+    Orion.Wait(200);
+  }
+
   Orion.Wait(1000);
 }
 
