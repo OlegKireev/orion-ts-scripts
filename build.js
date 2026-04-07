@@ -36,6 +36,8 @@ const cleanOutputPlugin = {
           let code = fs.readFileSync(filePath, 'utf-8');
           code = code.replace(/^\/\/ \.build-cache\/.*\n/gm, '');
           code = code.replace(/export\s*\{[^}]*\};?\s*$/g, '');
+          // esbuild всегда сокращает числа в научную нотацию (20000 → 2e4), но мы их заменяем обратно
+          code = code.replace(/\b(\d+(?:\.\d+)?)e(\d+)\b/g, (match) => String(Number(match)));
           fs.writeFileSync(filePath, code);
         }
       }
