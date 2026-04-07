@@ -142,6 +142,29 @@ export function PaintAndCutClothes() {
   LootPvm();
 }
 
+export function FollowTarget() {
+  const target = Orion.GetSerial('lasttarget');
+
+  if (!target || target === '0x00000000') {
+    Orion.Print('Нет текущей цели!');
+    return;
+  }
+
+  Orion.Print('Следую за целью...');
+
+  while (true) {
+    const obj = Orion.FindObject(target);
+
+    if (!obj) {
+      Orion.Print('Цель потеряна!');
+      break;
+    }
+
+    Orion.WalkTo(obj.X(), obj.Y(), obj.Z(), 1, 255, true, true);
+    Orion.Wait(200);
+  }
+}
+
 export function TargetNext() {
   Orion.WarMode(0);
 
