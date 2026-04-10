@@ -34,52 +34,54 @@ export function Sorting() {
   ClickAllItems();
   Orion.Wait(1000);
 
-  var bag1 = toSerial('0x4009e3bf'); //мешок для Gold Point
-  var bag2 = toSerial('0x4038539f'); //мешок для Regs
-  var bag3 = toSerial('0x4038539a'); //мешок для Bottle
-  var bag4 = toSerial('0x403853a1'); //мешок для  arrow и bolt
+  // Containers
+  const gold = toSerial('0x4009e3bf'); //мешок для Gold Point
+  const reagents = toSerial('0x4038539f'); //мешок для Regs
+  const alchemy = toSerial('0x4038539a'); //мешок для Bottle
+  const arrows = toSerial('0x403853a1'); //мешок для  arrow и bolt
 
-  var bag6 = toSerial('0x40227428'); //мешок для Treasure Map (lvl 1)
-  var bag7 = toSerial('0x4029e361'); //мешок для Treasure Map (lvl 2)
-  var bag8 = toSerial('0x404552e0'); //мешок для Treasure Map (lvl 3)
-  var bag9 = toSerial('0x401ca2c9'); //мешок для Treasure Map (lvl 4)
-  var bag10 = toSerial('0x40350958'); //мешок для Treasure Map (lvl 5)
+  const map1 = toSerial('0x40227428'); //мешок для Treasure Map (lvl 1)
+  const map2 = toSerial('0x4029e361'); //мешок для Treasure Map (lvl 2)
+  const map3 = toSerial('0x404552e0'); //мешок для Treasure Map (lvl 3)
+  const map4 = toSerial('0x401ca2c9'); //мешок для Treasure Map (lvl 4)
+  const map5 = toSerial('0x40350958'); //мешок для Treasure Map (lvl 5)
+  const map6 = toSerial('0x40618B06'); //мешок для Treasure Map (lvl 6)
 
-  var bag11 = toSerial('0x404552c1'); //мешок для Seed of Wisdom
-  var bag12 = toSerial('0x40217b81'); //мешок для Seed of Light
-  var bag13 = toSerial('0x40292165'); //мешок для Seed of Darkness
-  var bag14 = toSerial('0x4014b5d9'); //мешок для Seed of Fire
-  var bag15 = toSerial('0x40191bd6'); //мешок для Seed of Mind
-  var bag16 = toSerial('0x4016e547'); //мешок для Seed of Nature
+  const seedOfWisdom = toSerial('0x404552c1'); //мешок для Seed of Wisdom
+  const seedOfLight = toSerial('0x40217b81'); //мешок для Seed of Light
+  const seedOfDarkness = toSerial('0x40292165'); //мешок для Seed of Darkness
+  const seedOfFire = toSerial('0x4014b5d9'); //мешок для Seed of Fire
+  const seedOfMind = toSerial('0x405504F6'); //мешок для Seed of Mind
+  const seedOfNature = toSerial('0x4016e547'); //мешок для Seed of Nature
 
-  var bag18 = toSerial('0x401e94f0'); //мешок для Balron Skin
-  var bag19 = toSerial('0x402a6b92'); //мешок для Balron Skin
-  var bag20 = toSerial('0x4022d013'); //мешок для Mindusa Queen Skin
-  var bag21 = toSerial('0x401b23ef'); //мешок для Mindusa Queen Skin
-  var bag22 = toSerial('0x40604d0b'); //мешок для Salamander King Skin
-  var bag23 = toSerial('0x402d1453'); //мешок для Salamander King Skin
-  var bag24 = toSerial('0x4015da6a'); //мешок для Wyrm Skin
-  var bag25 = toSerial('0x403d11fe'); //мешок для Wyrm Skin
-  var bag26 = toSerial('0x4036c018'); //мешок для Daemon Skin
-  var bag27 = toSerial('0x4036c021'); //мешок для Wyvern Skin
-  var bag28 = toSerial('0x4036c01a'); //мешок для Mindusa Skin
-  var bag29 = toSerial('0x4036c01d'); //мешок для Salamander Skin
+  const balronRobe = toSerial('0x401e94f0'); //мешок для Balron Skin
+  const balronCloak = toSerial('0x402a6b92'); //мешок для Balron Skin
+  const mindusaQueenRobe = toSerial('0x4022d013'); //мешок для Mindusa Queen Skin
+  const mindusaQueenCloak = toSerial('0x401b23ef'); //мешок для Mindusa Queen Skin
+  const salamanderKingRobe = toSerial('0x40604d0b'); //мешок для Salamander King Skin
+  const salamanderKingCloak = toSerial('0x402d1453'); //мешок для Salamander King Skin
+  const wyrmRobe = toSerial('0x4015da6a'); //мешок для Wyrm Skin
+  const wyrmCloak = toSerial('0x403d11fe'); //мешок для Wyrm Skin
+  const daemonSkin = toSerial('0x4036c018'); //мешок для Daemon Skin
+  const wyvernSkin = toSerial('0x4036c021'); //мешок для Wyvern Skin
+  const mindusaSkin = toSerial('0x4036c01a'); //мешок для Mindusa Skin
+  const salamanderSkin = toSerial('0x4036c01d'); //мешок для Salamander Skin
 
-  var bag30 = toSerial('0x4036c01f'); //мешок для Hat of Darkness
-  var bag31 = toSerial('0x402b04cb'); //мешок для Hat of Nature
-  var bag32 = toSerial('0x4036c00f'); //мешок для Hat of Mind
-  var bag33 = toSerial('0x402b04ca'); //мешок для Hat of Light
-  var bag34 = toSerial('0x402b04cc'); //мешок для Hat of Fire
-  var bag35 = toSerial('0x4006eda6'); //мешок для Enchanted Runestaff
-  var bag36 = toSerial('0x4057736e'); //мешок для Scroll of Fire Bolt (Staff Recharge)
+  const hatOfDarkness = toSerial('0x4036c01f'); //мешок для Hat of Darkness
+  const hatOfNature = toSerial('0x402b04cb'); //мешок для Hat of Nature
+  const harOfMind = toSerial('0x4036c00f'); //мешок для Hat of Mind
+  const hatOfLight = toSerial('0x402b04ca'); //мешок для Hat of Light
+  const hatOfFire = toSerial('0x402b04cc'); //мешок для Hat of Fire
+  const runestaff = toSerial('0x4006eda6'); //мешок для Enchanted Runestaff
+  const scorllOfFirebolt = toSerial('0x4057736e'); //мешок для Scroll of Fire Bolt (Staff Recharge)
 
-  var bag38 = toSerial('0x40350938'); //мешок для кристалов с кладов
+  const jewel = toSerial('0x40350938'); //мешок для кристалов с кладов
 
-  var bag50 = toSerial('0x401b9762'); //мешок для всякого
-  var bag51 = toSerial('0x4022368f'); //мешок для всякого Bloodstone
+  const monsterResources = toSerial('0x401b9762'); //мешок для всякого
+  const bloodstone = toSerial('0x4022368f'); //мешок для всякого Bloodstone
 
-  var bag389 = toSerial('0x403853a7'); //мешок для bandage
-  var bag390 = toSerial('0x403f39fe'); //мешок для trash
+  const bandage = toSerial('0x403853a7'); //мешок для bandage
+  const trash = toSerial('0x403f39fe'); //мешок для trash
 
   interface Item {
     name: string;
@@ -93,308 +95,363 @@ export function Sorting() {
       name: 'gold coin',
       type: toGraphic('0x0eed'),
       color: '0x0000',
-      container: bag1,
+      container: gold,
     },
 
     {
       name: 'Sulfurous Ash',
       type: toGraphic('0x0f8c'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
     {
       name: "Spider's Silk",
       type: toGraphic('0x0f8d'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
     {
       name: 'Blood Moss',
       type: toGraphic('0x0f7b'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
     {
       name: 'Black Pearl',
       type: toGraphic('0x0f7a'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
     {
       name: 'Ginseng',
       type: toGraphic('0x0f85'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
     {
       name: 'Garlic',
       type: toGraphic('0x0f84'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
     {
       name: 'Nightshade',
       type: toGraphic('0x0f88'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
     {
       name: 'Mandrake Root',
       type: toGraphic('0x0f86'),
       color: '0x0000',
-      container: bag2,
+      container: reagents,
     },
 
     {
       name: 'Empty Bottle',
       type: toGraphic('0x0f0e'),
       color: '0x0000',
-      container: bag3,
+      container: alchemy,
     },
 
     {
       name: 'Bolt',
       type: toGraphic('0x1bfb'),
       color: '0x0000',
-      container: bag4,
+      container: arrows,
     },
     {
       name: 'Arrow',
       type: toGraphic('0x0f3f'),
       color: '0x0000',
-      container: bag4,
+      container: arrows,
     },
     {
       name: 'Ice Silk',
       type: toGraphic('0x0F8D'),
       color: '0x0480',
-      container: bag4,
+      container: arrows,
     },
 
     {
       name: 'Treasure Map (lvl 1)',
       type: toGraphic('0x14eb'),
       color: '0x0b16',
-      container: bag6,
+      container: map1,
     },
     {
       name: 'Treasure Map (lvl 2)',
       type: toGraphic('0x14eb'),
       color: '0x0b16',
-      container: bag7,
+      container: map2,
     },
     {
       name: 'Treasure Map (lvl 3)',
       type: toGraphic('0x14eb'),
       color: '0x0b16',
-      container: bag8,
+      container: map3,
     },
     {
       name: 'Treasure Map (lvl 4)',
       type: toGraphic('0x14eb'),
       color: '0x0b16',
-      container: bag9,
+      container: map4,
     },
     {
       name: 'Treasure Map (lvl 5)',
       type: toGraphic('0x14eb'),
       color: '0x0b16',
-      container: bag10,
+      container: map5,
     },
-
+    {
+      name: 'Treasure Map (lvl 6)',
+      type: toGraphic('0x14EB'),
+      color: '0x0B90',
+      container: map6,
+    },
     {
       name: 'Seed of Wisdom',
       type: toGraphic('0x1f1c'),
       color: '0x0ba0',
-      container: bag11,
+      container: seedOfWisdom,
     },
     {
       name: 'Seed of Light',
       type: toGraphic('0x1f1c'),
       color: '0x0b0e',
-      container: bag12,
+      container: seedOfLight,
     },
     {
       name: 'Seed of Darkness',
       type: toGraphic('0x1f1c'),
       color: '0x09c8',
-      container: bag13,
+      container: seedOfDarkness,
     },
     {
       name: 'Seed of Fire',
       type: toGraphic('0x1f1c'),
       color: '0x09b3',
-      container: bag14,
+      container: seedOfFire,
     },
     {
       name: 'Seed of Mind',
       type: toGraphic('0x1f1c'),
       color: '0x099a',
-      container: bag15,
+      container: seedOfMind,
     },
     {
       name: 'Seed of Nature',
       type: toGraphic('0x1f1c'),
       color: '0x0a48',
-      container: bag16,
+      container: seedOfNature,
     },
 
     {
       name: 'Balron Skin',
       type: toGraphic('0x1f03'),
       color: 'any',
-      container: bag18,
+      container: balronRobe,
     },
     {
       name: 'Balron Skin',
       type: toGraphic('0x1515'),
       color: 'any',
-      container: bag19,
+      container: balronCloak,
     },
     {
       name: 'Mindusa Queen Skin',
       type: toGraphic('0x1f03'),
       color: 'any',
-      container: bag20,
+      container: mindusaQueenRobe,
     },
     {
       name: 'Mindusa Queen Skin',
       type: toGraphic('0x1515'),
       color: 'any',
-      container: bag21,
+      container: mindusaQueenCloak,
     },
     {
       name: 'Salamander King Skin',
       type: toGraphic('0x1f03'),
       color: 'any',
-      container: bag22,
+      container: salamanderKingRobe,
     },
     {
       name: 'Salamander King Skin',
       type: toGraphic('0x1515'),
       color: 'any',
-      container: bag23,
+      container: salamanderKingCloak,
     },
     {
       name: 'Wyrm Skin',
       type: toGraphic('0x1f03'),
       color: 'any',
-      container: bag24,
+      container: wyrmRobe,
     },
     {
       name: 'Wyrm Skin',
       type: toGraphic('0x1515'),
       color: 'any',
-      container: bag25,
+      container: wyrmCloak,
     },
 
-    { name: 'Daemon Skin', type: 'any', color: 'any', container: bag26 },
-    { name: 'Wyvern Skin', type: 'any', color: 'any', container: bag27 },
-    { name: 'Mindusa Skin', type: 'any', color: 'any', container: bag28 },
-    { name: 'Salamander Skin', type: 'any', color: 'any', container: bag29 },
+    { name: 'Daemon Skin', type: 'any', color: 'any', container: daemonSkin },
+    { name: 'Wyvern Skin', type: 'any', color: 'any', container: wyvernSkin },
+    { name: 'Mindusa Skin', type: 'any', color: 'any', container: mindusaSkin },
+    {
+      name: 'Salamander Skin',
+      type: 'any',
+      color: 'any',
+      container: salamanderSkin,
+    },
 
-    { name: 'Hat of Darkness', type: 'any', color: 'any', container: bag30 },
-    { name: 'Hat of Nature', type: 'any', color: 'any', container: bag31 },
-    { name: 'Hat of Mind', type: 'any', color: 'any', container: bag32 },
-    { name: 'Hat of Light', type: 'any', color: 'any', container: bag33 },
-    { name: 'Hat of Fire', type: 'any', color: 'any', container: bag34 },
+    {
+      name: 'Hat of Darkness',
+      type: 'any',
+      color: 'any',
+      container: hatOfDarkness,
+    },
+    {
+      name: 'Hat of Nature',
+      type: 'any',
+      color: 'any',
+      container: hatOfNature,
+    },
+    { name: 'Hat of Mind', type: 'any', color: 'any', container: harOfMind },
+    { name: 'Hat of Light', type: 'any', color: 'any', container: hatOfLight },
+    { name: 'Hat of Fire', type: 'any', color: 'any', container: hatOfFire },
 
     {
       name: 'Enchanted Runestaff',
       type: 'any',
       color: 'any',
-      container: bag35,
+      container: runestaff,
     },
     {
       name: 'Scroll of Fire Bolt',
       type: 'any',
       color: 'any',
-      container: bag36,
+      container: scorllOfFirebolt,
     },
 
     {
       name: 'star sapphires',
       type: toGraphic('0x0f0f'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'tourmalines',
       type: toGraphic('0x0f18'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'emeralds',
       type: toGraphic('0x0f10'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'diamonds',
       type: toGraphic('0x0f26'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'sapphires',
       type: toGraphic('0x0f11'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'citrines',
       type: toGraphic('0x0f15'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'amethysts',
       type: toGraphic('0x0f16'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'pieces of amber',
       type: toGraphic('0x0f25'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
     {
       name: 'rubies',
       type: toGraphic('0x0f13'),
       color: '0x0000',
-      container: bag38,
+      container: jewel,
     },
 
-    { name: 'Bloodstone', type: 'any', color: 'any', container: bag50 },
-    { name: 'Balron Heart', type: 'any', color: 'any', container: bag50 },
-    { name: 'cut up leather', type: 'any', color: 'any', container: bag50 },
-    { name: 'Blue Blood', type: 'any', color: 'any', container: bag50 },
-    { name: 'Daemon Bones', type: 'any', color: 'any', container: bag50 },
-    { name: 'cuts of raw ribs', type: 'any', color: 'any', container: bag50 },
-    { name: "Dragon's Blood", type: 'any', color: 'any', container: bag50 },
+    {
+      name: 'Bloodstone',
+      type: 'any',
+      color: 'any',
+      container: monsterResources,
+    },
+    {
+      name: 'Balron Heart',
+      type: 'any',
+      color: 'any',
+      container: monsterResources,
+    },
+    {
+      name: 'cut up leather',
+      type: 'any',
+      color: 'any',
+      container: monsterResources,
+    },
+    {
+      name: 'Blue Blood',
+      type: 'any',
+      color: 'any',
+      container: monsterResources,
+    },
+    {
+      name: 'Daemon Bones',
+      type: 'any',
+      color: 'any',
+      container: monsterResources,
+    },
+    {
+      name: 'cuts of raw ribs',
+      type: 'any',
+      color: 'any',
+      container: monsterResources,
+    },
+    {
+      name: "Dragon's Blood",
+      type: 'any',
+      color: 'any',
+      container: monsterResources,
+    },
 
-    { name: 'Bloodstone', type: 'any', color: 'any', container: bag51 },
+    { name: 'Bloodstone', type: 'any', color: 'any', container: bloodstone },
 
     {
       name: 'bloody bandages',
       type: toGraphic('0x0e20'),
       color: 'any',
-      container: bag389,
+      container: bandage,
     },
     {
       name: 'clean bandages',
       type: toGraphic('0x0e21'),
       color: 'any',
-      container: bag389,
+      container: bandage,
     },
 
     {
       name: 'bag',
       type: toGraphic('0x0e76'),
       color: '0x00bb',
-      container: bag390,
+      container: trash,
     },
   ];
 
@@ -459,10 +516,17 @@ export function Restock() {
 
     cachedItems.forEach((req) => {
       let neededAmount =
-        req.count -
-        Orion.Count(req.graphic, req.color, 'backpack', '', true);
+        req.count - Orion.Count(req.graphic, req.color, 'backpack', '', true);
       if (neededAmount > 0) {
-        const containers = Orion.FindTypeEx('any', 'any', 'ground', '', '', '', true);
+        const containers = Orion.FindTypeEx(
+          'any',
+          'any',
+          'ground',
+          '',
+          '',
+          '',
+          true,
+        );
         const containerSerials = containers
           .filter((container) => container.Serial() != Player.Serial())
           .map((container) => container.Serial());
@@ -502,8 +566,7 @@ export function Restock() {
 
     const successful = cachedItems.every((req) => {
       return (
-        req.count -
-          Orion.Count(req.graphic, req.color, 'backpack', '', true) <=
+        req.count - Orion.Count(req.graphic, req.color, 'backpack', '', true) <=
         0
       );
     });
