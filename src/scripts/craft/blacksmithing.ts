@@ -113,13 +113,13 @@ const BlacksmithConfig: CraftConfig = {
   //       Math.min(BANDAGE_RESTOCK_COUNT, bandagesInChest),
   //       'backpack',
   //     );
-  //     Orion.Wait(100);
+  //     Orion.Wait(ITEM_MOVE_DELAY);
   //     Orion.MoveItem(
   //       Orion.FindType(BLOODY_BANDAGES_GRAPHIC, 'any', 'backpack')[0],
   //       0,
   //       BANDAGE_CHEST,
   //     );
-  //     Orion.Wait(300);
+  //     Orion.Wait(ITEM_MOVE_DELAY);
   //   }
 
   //   Orion.UseSkill('Animal Lore', 'self');

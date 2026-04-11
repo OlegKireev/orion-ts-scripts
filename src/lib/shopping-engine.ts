@@ -1,5 +1,6 @@
 import { checkLag } from './helpers';
 import { openContainer } from './container';
+import { ITEM_MOVE_DELAY } from '@/constants';
 
 // ==========================================
 // ИНТЕРФЕЙСЫ
@@ -201,7 +202,7 @@ export class VendorShopper {
 
         checkLag();
         Orion.MoveItem(vendorItems[j], 0, 'backpack' as Serial);
-        Orion.Wait(300);
+        Orion.Wait(ITEM_MOVE_DELAY);
         Orion.Print('Купил: ' + item.name);
       }
     }
@@ -237,7 +238,7 @@ export class VendorShopper {
       for (var j = 0; j < backpackItems.length; j++) {
         checkLag();
         Orion.MoveItem(backpackItems[j], 0, this.config.storageChestSerial);
-        Orion.Wait(100);
+        Orion.Wait(ITEM_MOVE_DELAY);
       }
     }
 

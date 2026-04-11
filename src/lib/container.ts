@@ -1,3 +1,4 @@
+import { ITEM_MOVE_DELAY } from '@/constants';
 import { checkLag, stopBot } from './helpers';
 import { toGraphic } from './validators';
 
@@ -16,8 +17,6 @@ export interface RestockItem {
   x: number;
   y: number;
 }
-
-const MOVE_DELAY = 100;
 
 export function openContainer(
   serial: Serial,
@@ -82,7 +81,7 @@ export function dropItems(
     for (const foundItem of foundItems) {
       checkLag();
       Orion.MoveItem(foundItem, 0, dropTo);
-      Orion.Wait(MOVE_DELAY);
+      Orion.Wait(ITEM_MOVE_DELAY);
     }
   }
 }
@@ -137,7 +136,7 @@ export function restockItems(
         0,
       );
 
-      msg = Orion.WaitJournal(heavyMsg, start, start + MOVE_DELAY, 'sys');
+      msg = Orion.WaitJournal(heavyMsg, start, start + ITEM_MOVE_DELAY, 'sys');
       Orion.Wait(1);
 
       amount = item.max - Orion.Count(item.type, item.color, targetDrop);

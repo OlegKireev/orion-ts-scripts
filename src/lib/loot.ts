@@ -1,3 +1,4 @@
+import { ITEM_MOVE_DELAY } from '@/constants';
 import { toGraphic } from '@lib/validators';
 
 /**
@@ -6,7 +7,6 @@ import { toGraphic } from '@lib/validators';
  */
 export function loot(itemLists: string[]): void {
   const LOOT_RANGE = 3;
-  const DELAY = 1;
   const CORPSE_GRAPHIC = toGraphic('0x2006');
 
   const itemsType = itemLists.join('|');
@@ -14,7 +14,7 @@ export function loot(itemLists: string[]): void {
   function lootItems(items: Serial[]) {
     for (const itemId of items) {
       Orion.MoveItem(itemId, 0, 'backpack');
-      Orion.Wait(DELAY);
+      Orion.Wait(ITEM_MOVE_DELAY);
     }
   }
 
@@ -28,7 +28,7 @@ export function loot(itemLists: string[]): void {
 
   for (const corpseId of corpses) {
     Orion.UseObject(corpseId);
-    Orion.Wait(DELAY);
+    Orion.Wait(ITEM_MOVE_DELAY);
 
     const items = Orion.FindList(itemsType, corpseId);
 
@@ -39,7 +39,7 @@ export function loot(itemLists: string[]): void {
     lootItems(items);
 
     Orion.Ignore(corpseId);
-    Orion.Wait(DELAY);
+    Orion.Wait(ITEM_MOVE_DELAY);
   }
 
   const groundItems = Orion.FindList(itemsType, 'ground', '', LOOT_RANGE);
@@ -55,7 +55,6 @@ const CONFIG = {
   corpseGraphic: toGraphic('0x2006'),
   radius: 3,
   carveDelay: 100,
-  lootDelay: 1,
   equipDelay: 100,
 };
 
@@ -134,7 +133,7 @@ export function carveAndLoot(itemLists: string[]) {
     if (itemsToLoot && itemsToLoot.length > 0) {
       for (let k = 0; k < itemsToLoot.length; k++) {
         Orion.MoveItem(itemsToLoot[k], 0, 'backpack');
-        Orion.Wait(CONFIG.lootDelay);
+        Orion.Wait(ITEM_MOVE_DELAY);
       }
     }
   }

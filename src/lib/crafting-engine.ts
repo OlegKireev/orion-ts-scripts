@@ -1,3 +1,4 @@
+import { ITEM_MOVE_DELAY } from '@/constants';
 import { checkLag, stopBot } from './helpers';
 import { sendTelegramMessage } from './telegram';
 
@@ -184,7 +185,7 @@ export class UniversalCrafter {
       );
       for (const item of allBackpackMats) {
         Orion.MoveItem(item, 0, this.config.resourcesContainerSerial);
-        Orion.Wait(200);
+        Orion.Wait(ITEM_MOVE_DELAY);
       }
     }
 
@@ -203,7 +204,7 @@ export class UniversalCrafter {
         }
 
         Orion.MoveItem(chestMaterials[0], needToTake, 'backpack');
-        Orion.Wait(100);
+        Orion.Wait(ITEM_MOVE_DELAY);
 
         const haveInBackpack = Orion.Count(
           mat.def.graphic,
@@ -353,7 +354,7 @@ export class UniversalCrafter {
     for (const found of items) {
       checkLag();
       Orion.MoveItem(found, 0, this.config.productsContainerSerial);
-      Orion.Wait(100);
+      Orion.Wait(ITEM_MOVE_DELAY);
     }
   }
 }

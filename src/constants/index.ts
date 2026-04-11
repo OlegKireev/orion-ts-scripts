@@ -132,3 +132,5 @@ export const GUMP_TYPES = [
   'objecthandlesmode',
   'debug',
 ];
+
+export const ITEM_MOVE_DELAY = 1400;

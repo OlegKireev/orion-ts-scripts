@@ -1,3 +1,4 @@
+import { ITEM_MOVE_DELAY } from '@/constants';
 import { carveAndLoot, loot } from '@/lib/loot';
 import { tracking } from '@/lib/tracking';
 import { toGraphic } from '@/lib/validators';
@@ -118,7 +119,7 @@ export function PaintAndCutClothes() {
 
     for (const item of items) {
       Orion.MoveItem(item, 0, 'backpack');
-      Orion.Wait(1);
+      Orion.Wait(ITEM_MOVE_DELAY);
       lootedItems.push(item);
     }
   }

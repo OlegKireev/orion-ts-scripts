@@ -1,3 +1,4 @@
+import { ITEM_MOVE_DELAY } from '@/constants';
 import { checkLag } from '@/lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 
@@ -37,7 +38,7 @@ function pickupFromGround(graphic: Graphic): void {
     const object = Orion.FindObject(items[i]);
     if (object && !object.Locked()) {
       Orion.MoveItem(items[i], 0, 'backpack');
-      Orion.Wait(200);
+      Orion.Wait(ITEM_MOVE_DELAY);
     }
   }
 }
@@ -46,7 +47,7 @@ function storeToTrunk(graphic: Graphic): void {
   const items = Orion.FindType(graphic, 'any', 'backpack');
   for (let i = 0; i < items.length; i++) {
     Orion.MoveItem(items[i], 0, BAG_IN_TRUNK);
-    Orion.Wait(200);
+    Orion.Wait(ITEM_MOVE_DELAY);
   }
 }
 

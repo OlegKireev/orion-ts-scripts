@@ -2,9 +2,9 @@ import { checkLag, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 import { restockItems } from '@/lib/container';
 import { hiding } from '@/lib/hidding';
+import { ITEM_MOVE_DELAY } from '@/constants';
 
 // --- Настройки шахтера ---
-const MOVE_DELAY = 100;
 const WEIGHT_LIMIT = 30; // запас веса до максимума
 
 const FORGE_COORDS: Point2D = { x: 897, y: 1876 };
@@ -267,7 +267,7 @@ export function DropIngots(): void {
   for (const ingot of ingots) {
     checkLag();
     Orion.MoveItem(ingot, 0, ORE_CONTAINER_SERIAL);
-    Orion.Wait(MOVE_DELAY);
+    Orion.Wait(ITEM_MOVE_DELAY);
   }
 
   Orion.Wait(100);
@@ -276,7 +276,7 @@ export function DropIngots(): void {
   for (const ore of ores) {
     checkLag();
     Orion.MoveItem(ore, 0, ORE_CONTAINER_SERIAL);
-    Orion.Wait(MOVE_DELAY);
+    Orion.Wait(ITEM_MOVE_DELAY);
   }
 }
 

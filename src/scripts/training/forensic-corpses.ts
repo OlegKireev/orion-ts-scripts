@@ -1,5 +1,6 @@
 import { toGraphic, toSerial } from '@lib/validators';
 import { checkLag } from '@/lib/helpers';
+import { ITEM_MOVE_DELAY } from '@/constants';
 
 const KILLER_SERIAL = toSerial('0x003D096F');
 const CORPSE_GRAPHIC = toGraphic('0x2006');
@@ -59,13 +60,13 @@ function unEquipWeapons(): void {
   var rightHand = Orion.ObjAtLayer('RightHand');
   if (rightHand) {
     Orion.MoveItem(rightHand.Serial(), 0, 'backpack');
-    Orion.Wait(500);
+    Orion.Wait(ITEM_MOVE_DELAY);
   }
 
   var leftHand = Orion.ObjAtLayer('LeftHand');
   if (leftHand) {
     Orion.MoveItem(leftHand.Serial(), 0, 'backpack');
-    Orion.Wait(500);
+    Orion.Wait(ITEM_MOVE_DELAY);
   }
 }
 

@@ -1,3 +1,4 @@
+import { ITEM_MOVE_DELAY } from '@/constants';
 import { toGraphic, toSerial } from '@lib/validators';
 
 // --------------------
@@ -100,7 +101,7 @@ function restockReagents(reagents: Graphic[]) {
 
       for (let i = 0; i < itemsInBag.length && needed > 0; i++) {
         Orion.MoveItem(itemsInBag[i], needed, 'backpack');
-        Orion.Wait(500); // Даем сфере время переложить предмет
+        Orion.Wait(ITEM_MOVE_DELAY); // Даем сфере время переложить предмет
         needed =
           CONFIG.MINIMUM_REAGENT_COUNT - Orion.Count(reg, 'any', 'backpack'); // Перепроверяем
       }
