@@ -16,12 +16,19 @@ const CACHE_DIR = '.build-cache';
 const pathAliasPlugin = {
   name: 'path-alias',
   setup(build) {
-    build.onResolve({ filter: /^@lib\// }, (args) => ({
-      path: path.resolve(CACHE_DIR, 'lib', args.path.replace(/^@lib\//, '')) + '.js',
-    }));
-    build.onResolve({ filter: /^@\// }, (args) => ({
-      path: path.resolve(CACHE_DIR, args.path.replace(/^@\//, '')) + '.js',
-    }));
+    const resolve = (base) => {
+      const filePath = base + '.js';
+      if (fs.existsSync(filePath)) return { path: filePath };
+      const indexPath = path.join(base, 'index.js');
+      if (fs.existsSync(indexPath)) return { path: indexPath };
+      return { path: filePath };
+    };
+    build.onResolve({ filter: /^@lib\// }, (args) =>
+      resolve(path.resolve(CACHE_DIR, 'lib', args.path.replace(/^@lib\//, ''))),
+    );
+    build.onResolve({ filter: /^@\// }, (args) =>
+      resolve(path.resolve(CACHE_DIR, args.path.replace(/^@\//, ''))),
+    );
   },
 };
 
