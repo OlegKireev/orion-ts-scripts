@@ -4,8 +4,8 @@ import { toGraphic, toSerial } from '@lib/validators';
 // Конфигурация
 // --------------------
 const CONFIG = {
-  CHEST: toSerial('0x403853AC'), // Контейнер с регами
-  REAGENTS_BAG: toSerial('0x40387E89'), // Сумка внутри контейнера с регами
+  CHEST: toSerial('0x4038539F'), // Контейнер с регами
+  REAGENTS_BAG: toSerial('0x4038539F'), // Сумка внутри контейнера с регами
   MINIMUM_REAGENT_COUNT: 5, // Минимальное количество регов в паке
   PEACE_TIMEOUT: 60000, // Макс. время ожидания (в мс) "You are at peace"
 };
@@ -62,9 +62,11 @@ export function Magery() {
       mana = 4;
       delay = 1500;
     } else {
-      spell = 'Poison';
-      mana = 9;
-      delay = 2700;
+      Orion.Print('Не хватает регов');
+      return;
+      // spell = 'Poison';
+      // mana = 9;
+      // delay = 2700;
     }
 
     // 3. Кастуем или медитируем
