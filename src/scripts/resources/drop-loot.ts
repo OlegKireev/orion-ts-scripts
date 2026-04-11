@@ -78,7 +78,7 @@ export function Sorting() {
   const jewel = toSerial('0x40350938'); //мешок для кристалов с кладов
 
   const monsterResources = toSerial('0x401b9762'); //мешок для всякого
-  const bloodstone = toSerial('0x4022368f'); //мешок для всякого Bloodstone
+  const bloodstone = toSerial('0x4022368F'); //мешок для всякого Bloodstone
 
   const bandage = toSerial('0x403853a7'); //мешок для bandage
   const trash = toSerial('0x403f39fe'); //мешок для trash
@@ -387,13 +387,6 @@ export function Sorting() {
       type: toGraphic('0x0f13'),
       color: '0x0000',
       container: jewel,
-    },
-
-    {
-      name: 'Bloodstone',
-      type: 'any',
-      color: 'any',
-      container: monsterResources,
     },
     {
       name: 'Balron Heart',
