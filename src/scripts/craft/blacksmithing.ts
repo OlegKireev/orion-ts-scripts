@@ -129,7 +129,7 @@ const BlacksmithConfig: CraftConfig = {
   // },
 };
 
-export function Autoload() {
+export function Autostart() {
   const crafter = new UniversalCrafter(BlacksmithConfig);
   crafter.run();
 }

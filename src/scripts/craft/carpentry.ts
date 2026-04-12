@@ -1,8 +1,5 @@
 import { toGraphic, toSerial } from '@lib/validators';
-import {
-  CraftConfig,
-  UniversalCrafter,
-} from '@/lib/crafting-engine';
+import { CraftConfig, UniversalCrafter } from '@/lib/crafting-engine';
 
 const TOOL_GRAPHIC = toGraphic('0x1034');
 
@@ -13,13 +10,16 @@ const Config: CraftConfig = {
   recipes: [
     {
       name: 'Parchment',
-      path: ["Miscellaneous", 'Paper'],
+      path: ['Miscellaneous', 'Paper'],
       product: {
         graphic: toGraphic('0x0E34'),
         color: toGraphic('0x0B85'),
       },
       materials: [
-        { def: { graphic: toGraphic('0x1BDD'), color: toGraphic('0x0000')}, req: 1 },
+        {
+          def: { graphic: toGraphic('0x1BDD'), color: toGraphic('0x0000') },
+          req: 1,
+        },
       ],
     },
   ],
@@ -29,7 +29,7 @@ const Config: CraftConfig = {
   },
 };
 
-export function Autoload() {
+export function Autostart() {
   const crafter = new UniversalCrafter(Config);
   crafter.run();
 }
