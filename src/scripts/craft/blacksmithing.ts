@@ -66,13 +66,13 @@ const BlacksmithConfig: CraftConfig = {
       materials: [{ def: MATERIALS.Shadow, req: 20 }],
     },
     {
-      name: 'Gold Chest (wooman)',
-      path: ['Golden armor', 'Golden chest'],
+      name: 'Blue Steel Chest (wooman)',
+      path: ['Blue Steel Armor', 'Blue Steel chest'],
       product: {
         graphic: toGraphic('0x1C04'),
-        color: toGraphic('0x09B5'),
+        color: toGraphic('0x0128'),
       },
-      materials: [{ def: MATERIALS.Gold, req: 20 }],
+      materials: [{ def: MATERIALS.BlueSteel, req: 20 }],
     },
     {
       name: 'Orcish Mace',
