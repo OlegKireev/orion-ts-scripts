@@ -11,10 +11,10 @@ export function loot(itemLists: string[]): void {
 
   const itemsType = itemLists.join('|');
 
-  function lootItems(items: Serial[]) {
+  function lootItems(items: Serial[], delay: number) {
     for (const itemId of items) {
       Orion.MoveItem(itemId, 0, 'backpack');
-      Orion.Wait(ITEM_MOVE_DELAY);
+      Orion.Wait(delay);
     }
   }
 
@@ -28,7 +28,6 @@ export function loot(itemLists: string[]): void {
 
   for (const corpseId of corpses) {
     Orion.UseObject(corpseId);
-    Orion.Wait(ITEM_MOVE_DELAY);
 
     const items = Orion.FindList(itemsType, corpseId);
 
@@ -36,16 +35,15 @@ export function loot(itemLists: string[]): void {
       continue;
     }
 
-    lootItems(items);
+    lootItems(items, ITEM_MOVE_DELAY);
 
     Orion.Ignore(corpseId);
-    Orion.Wait(ITEM_MOVE_DELAY);
   }
 
   const groundItems = Orion.FindList(itemsType, 'ground', '', LOOT_RANGE);
 
   if (groundItems.length) {
-    lootItems(groundItems);
+    lootItems(groundItems, 0);
   }
 }
 
