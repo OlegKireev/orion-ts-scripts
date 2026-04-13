@@ -15,6 +15,7 @@ export function Monitor(): void {
     '0x003B3EDB', // Logi
     '0x00396D32', // Ing
     '0x00232598', // JustBear
+    '0x0038A848', // GAV
 
     '0x003F0E14', // WanZan
     '0x003F0C05', // Beaver
@@ -22,11 +23,7 @@ export function Monitor(): void {
     '0x0032DD44', // Postuh
   ]);
 
-  const knownPillars = toSerial([
-    '0x40101336',
-    '0x401EF113',
-    '0x401011B5'
-  ])
+  const knownPillars = toSerial(['0x40101336', '0x401EF113', '0x401011B5']);
 
   const seenPillars: Serial[] = knownPillars.slice();
   const PILLAR_GRAPHIC = toGraphic('0x0ED4');
