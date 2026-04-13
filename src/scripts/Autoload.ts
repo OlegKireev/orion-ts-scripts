@@ -79,6 +79,11 @@ export function CutCorpse() {
   carveAndLoot(['Resources', 'Miscellaneous']);
 }
 
+export function DrinkInvisibility() {
+  Orion.Say('.di');
+  Orion.WarMode(0);
+}
+
 export function Recall() {
   const runes = Orion.FindType(toGraphic('0x1F14'), '0x0000', 'backpack');
 
