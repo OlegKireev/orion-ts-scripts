@@ -61,8 +61,9 @@ export function Magery() {
       mana = 4;
       delay = 1500;
     } else {
-      Orion.Print('Не хватает регов');
-      return;
+      Orion.Print('Не хватает регов, ждём пополнения...');
+      Orion.Wait(5000);
+      continue;
     }
 
     // 3. Кастуем или медитируем
