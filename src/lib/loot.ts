@@ -49,6 +49,7 @@ export function loot(itemLists: string[]): void {
 
 const CONFIG = {
   knifeGraphics: toGraphic('0x0F51|0x0F52|0x13F6|0x0EC4|0x0EC2'),
+  easyKnifeGraphics: toGraphic('0x10E4'),
   bladedWeaponGraphics: toGraphic('0x0F4B|0x13FA'),
   corpseGraphic: toGraphic('0x2006'),
   radius: 3,
@@ -56,20 +57,26 @@ const CONFIG = {
   equipDelay: 100,
 };
 
-export function carveAndLoot(itemLists: string[]) {
-  const itemsType = itemLists.join('|');
-
+export function carveCorpse() {
   // 1. Проверяем, есть ли в левой руке bladed-оружие, которым можно резать
   const leftHandItem = Orion.ObjAtLayer('LeftHand');
   const rightHandItem = Orion.ObjAtLayer('RightHand');
   const canCarveWithWeapon =
     leftHandItem &&
     CONFIG.bladedWeaponGraphics.indexOf(leftHandItem.Graphic()) !== -1;
+  const easyKnives = Orion.FindType(
+    CONFIG.easyKnifeGraphics,
+    'any',
+    'backpack',
+  );
+  const hasEasyKnife = easyKnives.length > 0;
 
   let carveSerial: Serial;
 
   if (canCarveWithWeapon) {
     carveSerial = leftHandItem.Serial();
+  } else if (hasEasyKnife) {
+    carveSerial = easyKnives[0];
   } else {
     // Ищем нож в рюкзаке
     const knives = Orion.FindType(CONFIG.knifeGraphics, 'any', 'backpack');
@@ -117,22 +124,6 @@ export function carveAndLoot(itemLists: string[]) {
     if (leftHandSerial) {
       Orion.UseObject(leftHandSerial);
       Orion.Wait(CONFIG.equipDelay);
-    }
-  }
-
-  // 6. Лутаем порезанные трупы используя список Find
-  for (let i = 0; i < corpses.length; i++) {
-    const corpseSerial = corpses[i];
-
-    Orion.OpenContainer(corpseSerial);
-    Orion.Wait(CONFIG.carveDelay);
-    const itemsToLoot = Orion.FindList(itemsType, corpseSerial);
-
-    if (itemsToLoot && itemsToLoot.length > 0) {
-      for (let k = 0; k < itemsToLoot.length; k++) {
-        Orion.MoveItem(itemsToLoot[k], 0, 'backpack');
-        Orion.Wait(ITEM_MOVE_DELAY);
-      }
     }
   }
 }

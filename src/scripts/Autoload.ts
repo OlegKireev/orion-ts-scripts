@@ -1,5 +1,5 @@
 import { ITEM_MOVE_DELAY } from '@/constants';
-import { carveAndLoot, loot } from '@/lib/loot';
+import { carveCorpse, loot } from '@/lib/loot';
 import { tracking } from '@/lib/tracking';
 import { toGraphic } from '@/lib/validators';
 
@@ -76,7 +76,8 @@ export function Find() {
 }
 
 export function CutCorpse() {
-  carveAndLoot(['Resources', 'Miscellaneous']);
+  carveCorpse();
+  LootPvm();
 }
 
 export function DrinkInvisibility() {
