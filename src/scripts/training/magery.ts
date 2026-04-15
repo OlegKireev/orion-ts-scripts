@@ -12,7 +12,6 @@ const CONFIG = {
 };
 
 const REAGENTS = {
-  Nightshade: toGraphic('0x0F88'),
   SpiderSilk: toGraphic('0x0F8D'),
   SulfurousAsh: toGraphic('0x0F8C'),
   Garlic: toGraphic('0x0F84'),
@@ -26,7 +25,6 @@ export function Magery() {
   Orion.Wait(200);
 
   const reagentsList = [
-    REAGENTS.Nightshade,
     REAGENTS.SpiderSilk,
     REAGENTS.SulfurousAsh,
     REAGENTS.Garlic,
@@ -57,7 +55,7 @@ export function Magery() {
     if (hasNightSight) {
       spell = 'Night Sight';
       mana = 4;
-      delay = 2000;
+      delay = 1500;
     } else if (hasCure) {
       spell = 'Cure';
       mana = 4;
@@ -65,13 +63,10 @@ export function Magery() {
     } else {
       Orion.Print('Не хватает регов');
       return;
-      // spell = 'Poison';
-      // mana = 9;
-      // delay = 2700;
     }
 
     // 3. Кастуем или медитируем
-    if (Player.Mana() >= mana) {
+    if (Player.Mana() < Player.MaxMana()) {
       Orion.Cast(spell, 'self');
       Orion.Wait(delay); // Ждем откат скилла и идем на новый круг цикла
     } else {
