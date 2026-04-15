@@ -1,5 +1,4 @@
-import { ITEM_MOVE_DELAY } from '@/constants';
-import { OpenNestedBags } from '@/lib/helpers';
+import { OpenNestedBags, moveItem } from '@/lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 
 const baglootpvp = 'backpack' as const;
@@ -462,8 +461,7 @@ export function Sorting() {
         if (Orion.Contains(object.Name(), item.name)) {
           Orion.Print(`Штук ${object.Count()} ${item.name} для сброса`);
           if (Orion.FindObject(item.container)) {
-            Orion.MoveItem(serial, -1, item.container);
-            Orion.Wait(ITEM_MOVE_DELAY);
+            moveItem(serial, -1, item.container);
           } else {
             Orion.Print(`Не удалось найти контейнер ${item.name}, пропускаю`);
           }
@@ -546,8 +544,7 @@ export function Restock() {
               Orion.Count(req.graphic, req.color, 'backpack', '', true);
             const obj = Orion.FindObject(itemSerial);
             if (obj && obj.Container() != Player.Serial() && neededAmount > 0) {
-              Orion.MoveItem(itemSerial, neededAmount);
-              Orion.Wait(ITEM_MOVE_DELAY);
+              moveItem(itemSerial, neededAmount, 'backpack');
             }
           });
         });
@@ -633,8 +630,7 @@ export function unloadBags() {
 
     const items = Orion.FindType('any', 'any', bag);
     items.forEach((item) => {
-      Orion.MoveItem(item, 0, baglootpvp);
-      Orion.Wait(ITEM_MOVE_DELAY);
+      moveItem(item, 0, baglootpvp);
     });
   });
 }

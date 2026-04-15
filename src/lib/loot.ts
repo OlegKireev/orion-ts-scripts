@@ -1,4 +1,5 @@
 import { ITEM_MOVE_DELAY } from '@/constants';
+import { moveItem } from '@lib/helpers';
 import { toGraphic } from '@lib/validators';
 
 /**
@@ -13,8 +14,11 @@ export function loot(itemLists: string[]): void {
 
   function lootItems(items: Serial[], delay: number) {
     for (const itemId of items) {
-      Orion.MoveItem(itemId, 0, 'backpack');
-      Orion.Wait(delay);
+      if (delay > 0) {
+        moveItem(itemId, 0, 'backpack');
+      } else {
+        Orion.MoveItem(itemId, 0, 'backpack');
+      }
     }
   }
 

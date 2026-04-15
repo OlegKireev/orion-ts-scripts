@@ -1,5 +1,5 @@
 import { ITEM_MOVE_DELAY } from '@/constants';
-import { checkLag, stopBot } from './helpers';
+import { checkLag, moveItem, stopBot } from './helpers';
 import { toGraphic } from './validators';
 
 export interface DropItem {
@@ -80,8 +80,7 @@ export function dropItems(
 
     for (const foundItem of foundItems) {
       checkLag();
-      Orion.MoveItem(foundItem, 0, dropTo);
-      Orion.Wait(ITEM_MOVE_DELAY);
+      moveItem(foundItem, 0, dropTo);
     }
   }
 }
@@ -136,7 +135,17 @@ export function restockItems(
         0,
       );
 
-      msg = Orion.WaitJournal(heavyMsg, start, start + ITEM_MOVE_DELAY, 'sys');
+      msg = Orion.WaitJournal(
+        heavyMsg + '|Slow down',
+        start,
+        start + ITEM_MOVE_DELAY,
+        'sys',
+      );
+
+      if (msg && Orion.Contains(msg.Text(), 'Slow down')) {
+        msg = null;
+      }
+
       Orion.Wait(1);
 
       amount = item.max - Orion.Count(item.type, item.color, targetDrop);

@@ -1,6 +1,6 @@
 import { toGraphic } from '@lib/validators';
 import { sendTelegramMessage } from './telegram';
-import { ITEM_MOVE_DELAY } from '@/constants';
+import { moveItem } from './helpers';
 
 const CORPSE_GRAPHIC = toGraphic('0x2006');
 const RESURRECT_COORDS = {
@@ -90,8 +90,7 @@ function handleDeathSequence() {
 
     const itemsInCorpse = Orion.FindType('any', 'any', myCorpse);
     for (const item of itemsInCorpse) {
-      Orion.MoveItem(item, 0, 'backpack');
-      Orion.Wait(ITEM_MOVE_DELAY);
+      moveItem(item, 0, 'backpack');
     }
     Orion.Print('[Resurrect] 🎒 Труп успешно залутан!');
   } else {

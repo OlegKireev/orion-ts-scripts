@@ -1,3 +1,4 @@
+import { ITEM_MOVE_DELAY } from '@/constants';
 import { toGraphic } from './validators';
 
 const LAG_DELAY = 60000;
@@ -23,6 +24,25 @@ export function stopBot(exclusion: string = ''): void {
   Orion.CancelWaitTarget();
   Orion.ClearTimers();
   Orion.Terminate('all', exclusion);
+}
+
+/** Обертка для перемещения предмета с задержкой и ретраем */
+export function moveItem(
+  serial: Serial,
+  count: number,
+  container: Serial,
+  x?: number,
+  y?: number,
+  z?: number,
+): void {
+  const start = Orion.Now();
+  Orion.MoveItem(serial, count, container, x, y, z);
+  Orion.Wait(ITEM_MOVE_DELAY);
+
+  if (Orion.InJournal('Slow down', 'sys', '', '', start)) {
+    Orion.MoveItem(serial, count, container, x, y, z);
+    Orion.Wait(ITEM_MOVE_DELAY);
+  }
 }
 
 export function OpenNestedBags(container?: Serial) {

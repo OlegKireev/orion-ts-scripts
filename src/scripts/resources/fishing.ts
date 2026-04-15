@@ -1,5 +1,4 @@
-import { ITEM_MOVE_DELAY } from '@/constants';
-import { checkLag } from '@/lib/helpers';
+import { checkLag, moveItem } from '@/lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 
 const POLE_TYPE = toGraphic('0x0dbf'); // удочка
@@ -37,8 +36,7 @@ function pickupFromGround(graphic: Graphic): void {
   for (let i = 0; i < items.length; i++) {
     const object = Orion.FindObject(items[i]);
     if (object && !object.Locked()) {
-      Orion.MoveItem(items[i], 0, 'backpack');
-      Orion.Wait(ITEM_MOVE_DELAY);
+      moveItem(items[i], 0, 'backpack');
     }
   }
 }
@@ -46,8 +44,7 @@ function pickupFromGround(graphic: Graphic): void {
 function storeToTrunk(graphic: Graphic): void {
   const items = Orion.FindType(graphic, 'any', 'backpack');
   for (let i = 0; i < items.length; i++) {
-    Orion.MoveItem(items[i], 0, BAG_IN_TRUNK);
-    Orion.Wait(ITEM_MOVE_DELAY);
+    moveItem(items[i], 0, BAG_IN_TRUNK);
   }
 }
 

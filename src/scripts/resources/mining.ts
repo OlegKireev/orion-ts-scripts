@@ -1,8 +1,7 @@
-import { checkLag, stopBot } from '@lib/helpers';
+import { checkLag, moveItem, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 import { restockItems } from '@/lib/container';
 import { hiding } from '@/lib/hidding';
-import { ITEM_MOVE_DELAY } from '@/constants';
 
 // --- Настройки шахтера ---
 const WEIGHT_LIMIT = 30; // запас веса до максимума
@@ -266,8 +265,7 @@ export function DropIngots(): void {
   const ingots = Orion.FindType(INGOT_TYPE, 'any', 'backpack');
   for (const ingot of ingots) {
     checkLag();
-    Orion.MoveItem(ingot, 0, ORE_CONTAINER_SERIAL);
-    Orion.Wait(ITEM_MOVE_DELAY);
+    moveItem(ingot, 0, ORE_CONTAINER_SERIAL);
   }
 
   Orion.Wait(100);
@@ -275,8 +273,7 @@ export function DropIngots(): void {
   const ores = Orion.FindType(ORE_TYPE, 'any', 'backpack');
   for (const ore of ores) {
     checkLag();
-    Orion.MoveItem(ore, 0, ORE_CONTAINER_SERIAL);
-    Orion.Wait(ITEM_MOVE_DELAY);
+    moveItem(ore, 0, ORE_CONTAINER_SERIAL);
   }
 }
 

@@ -1,6 +1,4 @@
-import { ITEM_MOVE_DELAY } from '@/constants';
-import { checkLag, stopBot } from './helpers';
-import { sendTelegramMessage } from './telegram';
+import { checkLag, moveItem, stopBot } from './helpers';
 
 // ==========================================
 // ИНТЕРФЕЙСЫ
@@ -184,8 +182,7 @@ export class UniversalCrafter {
         'backpack',
       );
       for (const item of allBackpackMats) {
-        Orion.MoveItem(item, 0, this.config.resourcesContainerSerial);
-        Orion.Wait(ITEM_MOVE_DELAY);
+        moveItem(item, 0, this.config.resourcesContainerSerial);
       }
     }
 
@@ -203,8 +200,7 @@ export class UniversalCrafter {
           break;
         }
 
-        Orion.MoveItem(chestMaterials[0], needToTake, 'backpack');
-        Orion.Wait(ITEM_MOVE_DELAY);
+        moveItem(chestMaterials[0], needToTake, 'backpack');
 
         const haveInBackpack = Orion.Count(
           mat.def.graphic,
@@ -353,8 +349,7 @@ export class UniversalCrafter {
     const items = Orion.FindType(item.graphic, item.color, 'backpack');
     for (const found of items) {
       checkLag();
-      Orion.MoveItem(found, 0, this.config.productsContainerSerial);
-      Orion.Wait(ITEM_MOVE_DELAY);
+      moveItem(found, 0, this.config.productsContainerSerial);
     }
   }
 }
