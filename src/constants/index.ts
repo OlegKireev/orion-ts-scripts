@@ -133,4 +133,4 @@ export const GUMP_TYPES = [
   'debug',
 ];
 
-export const ITEM_MOVE_DELAY = 600;
+export const ITEM_MOVE_DELAY = 550;

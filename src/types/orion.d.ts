@@ -57,6 +57,7 @@ declare namespace Orion {
    * @param serial Серийник отправителя.
    * @param color Цвет сообщения.
    * @param startTime Время, начиная с которого искать (timestamp).
+   * @param startTime Время, до которого искать (timestamp).
    * @returns Объект сообщения, если найдено, иначе null.
    */
   function InJournal(
@@ -65,6 +66,7 @@ declare namespace Orion {
     serial?: string | number,
     color?: string,
     startTime?: number,
+    endTime?: number,
   ): any;
 
   function ClearJournal(): void;

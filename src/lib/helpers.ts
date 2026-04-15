@@ -36,10 +36,11 @@ export function moveItem(
   z?: number,
 ): void {
   const start = Orion.Now();
+  const end = start + ITEM_MOVE_DELAY;
   Orion.MoveItem(serial, count, container, x, y, z);
   Orion.Wait(ITEM_MOVE_DELAY);
 
-  if (Orion.InJournal('Slow down', 'sys', '', '', start)) {
+  if (Orion.InJournal('Slow down', 'sys', 0, 'any', start, end)) {
     Orion.MoveItem(serial, count, container, x, y, z);
     Orion.Wait(ITEM_MOVE_DELAY);
   }
