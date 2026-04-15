@@ -87,3 +87,18 @@ export function OpenNestedBags(container?: Serial) {
 
   Orion.Print('Все сумки открыты.');
 }
+
+export function getPlayerRace() {
+  const RACE_MAP: Record<string, string> = {
+    'светлый эльф': 'Elf',
+    орк: 'Orc',
+    'тёмный эльф': 'Drow',
+    гном: 'Dwarf',
+    имперец: 'Imperian',
+  };
+
+  const rawRace = Player.FullName();
+  const processedRace = rawRace.replace(/"/g, '').toLowerCase();
+
+  return RACE_MAP[processedRace];
+}

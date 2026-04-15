@@ -4,6 +4,8 @@
 declare namespace Player {
   /** Возвращает имя персонажа. */
   function Name(): string;
+  /** Возвращает расу на русском языке */
+  function FullName(): string;
   /** Возвращает текущее количество жизней (HP). */
   function Hits(): number;
   /** Возвращает максимальных количество жизней (HP). */

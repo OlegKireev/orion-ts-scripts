@@ -1,4 +1,4 @@
-import { OpenNestedBags, moveItem } from '@/lib/helpers';
+import { OpenNestedBags, getPlayerRace, moveItem } from '@/lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 
 const baglootpvp = 'backpack' as const;
@@ -476,9 +476,8 @@ export function Sorting() {
 
 // Ресток из листа
 export function Restock() {
-  var thetitle = Player.Title(); // для выбора расы под скрипты, на ЕП это реализовать нельзя, можно сделать по серийникам персов
+  const race = getPlayerRace();
 
-  Orion.Print(thetitle);
   // переменные: сумки/сундуки для добора
   const chest = toSerial('0x4037662D'); //основная сумка, занесена в Lists
   const regsBag = toSerial('0x4038539F'); //сумка для регов
@@ -492,7 +491,8 @@ export function Restock() {
     Orion.Wait(50);
   });
 
-  const list = Orion.GetFindList('RestockElf');
+  const list = Orion.GetFindList(race);
+
   if (list) {
     const requiredItems = list.Items();
 
