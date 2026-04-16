@@ -213,3 +213,47 @@ export function TargetNext() {
 }
 
 export { combatExpUtilization } from '@/lib/exp';
+
+export function ToggleArmorMode() {
+  const TOGGLE_ARMOR_BUTTON_INDEX = 20;
+  const INFO_TEXT = 'Включена система поглощения повреждений';
+
+  Orion.Say('.ep');
+
+  if (Orion.WaitForGump(1000)) {
+    const gump = Orion.GetGump('last');
+    if (gump === null || gump.Replayed()) {
+      return;
+    }
+
+    const gumpHook = Orion.CreateGumpHook(TOGGLE_ARMOR_BUTTON_INDEX);
+    if (!gumpHook) {
+      return;
+    }
+
+    const start = Orion.Now();
+    gump.Select(gumpHook);
+
+    const modeMessage = Orion.WaitJournal(
+      INFO_TEXT,
+      start,
+      start + 1000,
+      'any',
+    );
+
+    if (!modeMessage) {
+      return;
+    }
+
+    const escapedPhrase = INFO_TEXT.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedPhrase + '\\s*(.*?)\\s*\\.');
+    const match = modeMessage.Text().match(regex);
+    const value = match ? match[1] : null;
+
+    if (!value) {
+      return;
+    }
+
+    Orion.CharPrint('self', 0x0021, value);
+  }
+}
