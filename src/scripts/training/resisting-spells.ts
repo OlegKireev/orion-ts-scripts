@@ -76,7 +76,7 @@ function hasFireFieldAround(x: number, y: number): boolean {
     'any',
     'ground',
     'item',
-    1,
+    CASTER_MAX_DISTANCE,
   );
 
   for (let i = 0; i < fields.length; i++) {
