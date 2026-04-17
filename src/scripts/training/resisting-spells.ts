@@ -211,8 +211,8 @@ export function ResistingSpellsWalker() {
 // Режим 3: Парная прокачка — кастер
 // Следит за напарником и кастует Fire Field под него, когда стенка исчезла.
 // ==========================================
-export function ResistingSpellsCaster(partnerSerial?: Serial) {
-  const target = partnerSerial || WALKER_SERIAL;
+export function ResistingSpellsCaster() {
+  const target = WALKER_SERIAL;
 
   Orion.Print('Запускаем прокачку Magic Resistance (режим кастера)...');
 
@@ -232,6 +232,7 @@ export function ResistingSpellsCaster(partnerSerial?: Serial) {
 
     const partnerX = partner.X();
     const partnerY = partner.Y();
+    const partnerZ = partner.Z();
 
     // Проверяем, есть ли уже стенка рядом с напарником
     if (hasFireFieldAround(partnerX, partnerY)) {
@@ -247,7 +248,7 @@ export function ResistingSpellsCaster(partnerSerial?: Serial) {
     }
 
     Orion.Print('Стенка под напарником пропала. Кастуем Fire Field...');
-    Orion.WaitTargetObject(target);
+    Orion.WaitTargetTile('any', partnerX, partnerY, partnerZ);
     Orion.Cast('Fire Field');
     Orion.Wait(CASTING_DURATION_MS);
   }
