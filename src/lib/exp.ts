@@ -1,3 +1,4 @@
+import { selectGumpButton } from './gump';
 import { toGraphic } from './validators';
 
 export function combatExpUtilization() {
@@ -106,15 +107,7 @@ export function combatExpUtilization() {
       Orion.CloseGump('generic');
       Orion.UseFromGround(PILLAR_EXP_DEF.graphic, PILLAR_EXP_DEF.color);
 
-      if (Orion.WaitForGump(1000)) {
-        const gump = Orion.GetGump('last');
-        if (gump !== null && !gump.Replayed()) {
-          const gumpHook = Orion.CreateGumpHook(buttonNumber);
-          if (gumpHook) {
-            gump.Select(gumpHook);
-          }
-        }
-      }
+      selectGumpButton(buttonNumber);
 
       const result = Orion.WaitJournal(
         'You transfer|Too few|while being|can not|increased|Cancelled|Unexpected',
