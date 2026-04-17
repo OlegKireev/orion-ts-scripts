@@ -260,7 +260,7 @@ export function ResistingSpellsCaster() {
     }
 
     // Стенки нет — ждём достаточной маны и кастуем
-    if (Player.Mana() < 14) {
+    if (Player.Mana() < Player.MaxMana()) {
       Orion.UseSkill('Meditation');
       Orion.Wait(1000);
       continue;
