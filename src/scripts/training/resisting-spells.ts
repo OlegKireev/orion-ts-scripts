@@ -216,6 +216,12 @@ export function ResistingSpellsCaster() {
 
   Orion.Print('Запускаем прокачку Magic Resistance (режим кастера)...');
 
+  // Фиксируем точку каста по первым валидным координатам напарника,
+  // чтобы стенка всегда кастовалась в одно и то же место (центр маршрута ходока).
+  let anchorX = -1;
+  let anchorY = -1;
+  let anchorZ = 0;
+
   while (true) {
     const partner = Orion.FindObject(target);
     if (!partner) {
@@ -230,26 +236,46 @@ export function ResistingSpellsCaster() {
       continue;
     }
 
-    const partnerX = partner.X();
-    const partnerY = partner.Y();
-    const partnerZ = partner.Z();
+    // Первый успешный контакт — запоминаем точку каста
+    if (anchorX === -1) {
+      anchorX = partner.X();
+      anchorY = partner.Y();
+      anchorZ = partner.Z();
+      Orion.Print('Точка каста зафиксирована: ' + anchorX + ',' + anchorY);
+    }
 
-    // Проверяем, есть ли уже стенка рядом с напарником
-    if (hasFireFieldAround(partnerX, partnerY)) {
+    // Проверяем, есть ли уже стенка в зафиксированной точке
+    if (hasFireFieldAround(anchorX, anchorY)) {
       Orion.Wait(CASTER_CHECK_INTERVAL_MS);
       continue;
     }
 
-    // Стенки под напарником нет — ждём полной маны и кастуем
+    // Не кастуем, пока напарник не вернулся достаточно близко к точке каста,
+    // иначе стенка ляжет мимо и он в неё не попадёт
+    const dx = Math.abs(partner.X() - anchorX);
+    const dy = Math.abs(partner.Y() - anchorY);
+    if (dx > 1 || dy > 1) {
+      Orion.Wait(CASTER_CHECK_INTERVAL_MS);
+      continue;
+    }
+
+    // Стенки нет — ждём достаточной маны и кастуем
     if (Player.Mana() < 14) {
       Orion.UseSkill('Meditation');
       Orion.Wait(1000);
       continue;
     }
 
-    Orion.Print('Стенка под напарником пропала. Кастуем Fire Field...');
-    Orion.WaitTargetTile('any', partnerX, partnerY, partnerZ);
+    Orion.Print('Стенка пропала. Кастуем Fire Field в точку каста...');
+    Orion.WaitTargetTile('any', anchorX, anchorY, anchorZ);
     Orion.Cast('Fire Field');
     Orion.Wait(CASTING_DURATION_MS);
+
+    // После каста подтверждаем, что стенка появилась, прежде чем идти на следующий тик.
+    const waitStart = Orion.Now();
+    while (Orion.Now() - waitStart < CASTING_DURATION_MS) {
+      if (hasFireFieldAround(anchorX, anchorY)) break;
+      Orion.Wait(200);
+    }
   }
 }
