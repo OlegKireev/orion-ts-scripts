@@ -32,6 +32,7 @@ export function loot(itemLists: string[]): void {
 
   for (const corpseId of corpses) {
     Orion.UseObject(corpseId);
+    Orion.Wait(100);
 
     const items = Orion.FindList(itemsType, corpseId);
 
