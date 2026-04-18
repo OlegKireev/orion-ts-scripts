@@ -67,7 +67,7 @@ export function Magery() {
     }
 
     // 3. Кастуем или медитируем
-    if (Player.Mana() === Player.MaxMana()) {
+    if (Player.Mana() > mana) {
       Orion.Cast(spell, 'self');
       Orion.Wait(delay); // Ждем откат скилла и идем на новый круг цикла
     } else {
