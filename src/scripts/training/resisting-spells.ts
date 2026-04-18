@@ -1,6 +1,8 @@
 import { sendTelegramMessage } from '@/lib/telegram';
 import { toGraphic, toSerial } from '@lib/validators';
 
+export { Eating } from '@/lib/eating';
+
 const FIRE_FIELD_GRAPHICS = toGraphic('0x398C|0x3996');
 const HEAL_COOLDOWN_MS = 5000; // Задержка между командами .bs, чтобы не спамить сервер
 const CASTING_DURATION_MS = 3000; // Примерное время каста (подстрой под свой физл/каст спид)
@@ -26,6 +28,8 @@ interface WalkerState {
 }
 
 function initWalkerState(): WalkerState {
+  Orion.Exec('Eating', true);
+
   return {
     startX: Player.X(),
     startY: Player.Y(),
@@ -270,6 +274,7 @@ export function ResistingSpellsCaster() {
     Orion.WaitTargetTile('any', anchorX, anchorY, anchorZ);
     Orion.Cast('Fire Field');
     Orion.Wait(CASTING_DURATION_MS);
+    Orion.UseSkill('Meditation');
 
     // После каста подтверждаем, что стенка появилась, прежде чем идти на следующий тик.
     const waitStart = Orion.Now();
