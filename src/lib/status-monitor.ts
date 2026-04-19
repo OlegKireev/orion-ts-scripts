@@ -16,6 +16,7 @@ export function Monitor(): void {
     '0x00396D32', // Ing
     '0x00232598', // JustBear
     '0x0038A848', // GAV
+    '0x00585AB7', // LCF
 
     '0x003F0E14', // WanZan
     '0x003F0C05', // Beaver
