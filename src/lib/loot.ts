@@ -55,7 +55,7 @@ export function loot(itemLists: string[]): void {
 const CONFIG = {
   knifeGraphics: toGraphic('0x0F51|0x0F52|0x13F6|0x0EC4|0x0EC2'),
   easyKnifeGraphics: toGraphic('0x10E4'),
-  bladedWeaponGraphics: toGraphic('0x0F4B|0x13FA'),
+  bladedWeaponGraphics: toGraphic('0x0F4B|0x13FA|0x13B5'),
   corpseGraphic: toGraphic('0x2006'),
   radius: 3,
   carveDelay: 100,
