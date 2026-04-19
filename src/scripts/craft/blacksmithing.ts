@@ -23,16 +23,28 @@ const BlacksmithConfig: CraftConfig = {
   productsContainerSerial: toSerial('0x403F39FE'),
   batchSize: 3,
   recipes: [
+    // {
+    //   name: 'Morning Star',
+    //   path: ["executioner's axe", 'mace', 'Morning Star'],
+    //   product: {
+    //     graphic: toGraphic('0x0F5C'),
+    //     color: toGraphic('0x0400'),
+    //   },
+    //   materials: [
+    //     { def: MATERIALS.Silver, req: 10 },
+    //     { def: MATERIALS.Bronze, req: 10 },
+    //   ],
+    // },
     {
-      name: 'Morning Star',
-      path: ["executioner's axe", 'mace', 'Morning Star'],
+      name: 'Orcish Mace',
+      path: ["executioner's axe", 'mace', 'Orcish Mace'],
       product: {
-        graphic: toGraphic('0x0F5C'),
-        color: toGraphic('0x0400'),
+        graphic: toGraphic('0x13B3'),
+        color: toGraphic('0x0A7E'),
       },
       materials: [
-        { def: MATERIALS.Silver, req: 10 },
-        { def: MATERIALS.Bronze, req: 10 },
+        { def: MATERIALS.Bronze, req: 7 },
+        { def: MATERIALS.Rusty, req: 15 },
       ],
     },
     {
@@ -73,18 +85,6 @@ const BlacksmithConfig: CraftConfig = {
         color: toGraphic('0x0128'),
       },
       materials: [{ def: MATERIALS.BlueSteel, req: 20 }],
-    },
-    {
-      name: 'Orcish Mace',
-      path: ["executioner's axe", 'mace', 'Orcish Mace'],
-      product: {
-        graphic: toGraphic('0x13B3'),
-        color: toGraphic('0x0A7E'),
-      },
-      materials: [
-        { def: MATERIALS.Bronze, req: 7 },
-        { def: MATERIALS.Rusty, req: 15 },
-      ],
     },
   ],
 
