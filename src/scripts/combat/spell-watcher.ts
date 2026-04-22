@@ -23,6 +23,8 @@ interface ItemDef {
 interface WatcherState {
   currentSchool: School | null;
   currentSkinSerial: Serial | null;
+  defaultSkinSerials: Serial[];
+  isDefaultEquipped: boolean;
 }
 
 const SCRIPT_NAME = 'SpellWatcher';
@@ -36,6 +38,9 @@ const JOURNAL_WAIT_TIMEOUT_MS = 800;
 
 /** Микропауза между тиками главного цикла (мс). */
 const LOOP_TICK_MS = 50;
+
+/** Сколько ждать тишины (без новых мантр) перед возвратом к дефолтному набору (мс). */
+const IDLE_RESET_TIMEOUT_MS = 10000;
 
 /** Цвет каста в журнале */
 const MANTRA_MESSAGE_COLOR = '0x03B2';
@@ -215,6 +220,58 @@ function isSkinEquipped(serial: Serial | null): boolean {
   return obj.Container() === Player.Serial();
 }
 
+/** Собирает графики всех возможных шкур из SCHOOL_SKINS в единый паттерн. */
+function getAllSkinGraphics(): Graphic {
+  const parts: string[] = [];
+  const seen: Record<string, boolean> = {};
+  for (const key in SCHOOL_SKINS) {
+    const g = SCHOOL_SKINS[key as School].graphic;
+    for (const part of g.split('|')) {
+      if (!seen[part]) {
+        seen[part] = true;
+        parts.push(part);
+      }
+    }
+  }
+  return toGraphic(parts.join('|'));
+}
+
+/** На старте запоминает серийники шкур, которые уже надеты на персонаже. */
+function captureDefaultSkins(): Serial[] {
+  const allGraphics = getAllSkinGraphics();
+  const equipped = Orion.FindType(
+    allGraphics,
+    'any',
+    Player.Serial(),
+    '',
+    '',
+    '',
+    false,
+  );
+  return equipped || [];
+}
+
+/** Возвращает надетый по умолчанию набор шкур. */
+function equipDefaultSkins(state: WatcherState): void {
+  if (state.isDefaultEquipped) return;
+
+  if (state.defaultSkinSerials.length === 0) {
+    state.isDefaultEquipped = true;
+    state.currentSchool = null;
+    state.currentSkinSerial = null;
+    return;
+  }
+
+  for (const serial of state.defaultSkinSerials) {
+    Orion.UseObject(serial);
+  }
+
+  state.isDefaultEquipped = true;
+  state.currentSchool = null;
+  state.currentSkinSerial = null;
+  Orion.Print(`[${SCRIPT_NAME}] Возврат к дефолтному набору шкур`);
+}
+
 /** Надевает шкуру нужной школы из рюкзака. */
 function equipSkin(school: School, state: WatcherState): void {
   // Уже надета нужная шкура — ничего не делаем.
@@ -237,7 +294,7 @@ function equipSkin(school: School, state: WatcherState): void {
   );
 
   if (!foundSkins || foundSkins.length === 0) {
-    Orion.Print(`[${SpellWatcher}] Шкура школы ${school} не найдена в рюкзаке`);
+    Orion.Print(`[${SCRIPT_NAME}] Шкура школы ${school} не найдена в рюкзаке`);
     return;
   }
 
@@ -249,6 +306,7 @@ function equipSkin(school: School, state: WatcherState): void {
 
   state.currentSchool = school;
   state.currentSkinSerial = serial;
+  state.isDefaultEquipped = false;
 }
 
 // ============================================================================
@@ -258,13 +316,21 @@ function equipSkin(school: School, state: WatcherState): void {
 export function SpellWatcher(): void {
   Orion.Print(`[${SCRIPT_NAME}] Запуск отслеживания вражеских кастов`);
 
+  const defaultSkinSerials = captureDefaultSkins();
+  Orion.Print(
+    `[${SCRIPT_NAME}] Дефолтных шкур зафиксировано: ${defaultSkinSerials.length}`,
+  );
+
   const state: WatcherState = {
     currentSchool: null,
     currentSkinSerial: null,
+    defaultSkinSerials,
+    isDefaultEquipped: true,
   };
 
   Orion.ClearJournal();
   let lastCheck = Orion.Now();
+  let lastCastTime = Orion.Now();
 
   while (!Player.Dead()) {
     const now = Orion.Now();
@@ -280,16 +346,23 @@ export function SpellWatcher(): void {
     if (msg) {
       lastCheck = now + JOURNAL_WAIT_TIMEOUT_MS;
       const spell = resolveSchoolFromMessage(msg.Text());
-      if (!spell) {
-        continue;
+      if (spell) {
+        lastCastTime = Orion.Now();
+        equipSkin(spell.school, state);
+        Orion.Print(
+          `[${SCRIPT_NAME}] ${spell.school}: ${spell.mantra} (${spell.name}) → шкура надета`,
+        );
       }
-
-      equipSkin(spell.school, state);
-      Orion.Print(
-        `[${SCRIPT_NAME}] ${spell.school}: ${spell.mantra} (${spell.name}) → шкура надета`,
-      );
     } else {
       lastCheck = now;
+    }
+
+    // Возврат к дефолтному набору после тишины.
+    if (
+      !state.isDefaultEquipped &&
+      Orion.Now() - lastCastTime >= IDLE_RESET_TIMEOUT_MS
+    ) {
+      equipDefaultSkins(state);
     }
 
     checkLag();

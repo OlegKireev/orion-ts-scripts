@@ -535,7 +535,36 @@ declare namespace Orion {
    * @param layer слой для поиска
    */
   function ObjAtLayer(
-    layer: 'RightHand' | 'LeftHand',
+    layer:
+      | 'RightHand'
+      | 'LeftHand'
+      | 'Shoes'
+      | 'Pants'
+      | 'Shirt'
+      | 'Helmet'
+      | 'Gloves'
+      | 'Ring'
+      | 'Talisman'
+      | 'Necklace'
+      | 'Hair'
+      | 'Waist'
+      | 'InnerTorso'
+      | 'Bracelet'
+      | 'Face'
+      | 'Beard'
+      | 'MidTorso'
+      | 'Earrings'
+      | 'Arms'
+      | 'Cloak'
+      | 'Backpack'
+      | 'Robe'
+      | 'Eggs'
+      | 'Legs'
+      | 'Mount'
+      | 'Buy'
+      | 'Resale'
+      | 'Sell'
+      | 'Bank',
     container?: Serial,
   ): GameObject | null;
 
