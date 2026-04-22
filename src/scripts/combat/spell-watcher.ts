@@ -1,21 +1,10 @@
 /**
- * Spell Watcher — отслеживает мантры кастов в журнале и надевает резист-амулет
- * соответствующей школы магии, если рядом замечен враждебный кастер.
- *
- * ВНИМАНИЕ:
- *  - Распределение заклинаний по школам (nature/fire/mind/dark) ориентировочное
- *    для классического UO. На кастомном сервере — проверить и скорректировать.
- *  - SCHOOL_AMULETS содержит placeholder'ы (0x0000). Нужно заполнить реальными
- *    graphic и color ваших амулетов.
- *  - ENEMY_NOTO_FILTER / ENEMY_DETECTION_RADIUS — подстроить под сервер.
+ * Spell Watcher — отслеживает мантры кастов в журнале и надевает резист-шкуру
+ * соответствующей школы магии.
  */
 
 import { checkLag } from '@lib/helpers';
-import { toGraphic, toSerial } from '@lib/validators';
-
-// ============================================================================
-// ТИПЫ
-// ============================================================================
+import { toGraphic } from '@lib/validators';
 
 type School = 'nature' | 'fire' | 'mind' | 'dark' | 'light';
 
@@ -26,25 +15,21 @@ interface SpellDef {
   school: School;
 }
 
-interface AmuletDef {
+interface ItemDef {
   graphic: Graphic;
   color: string;
 }
 
 interface WatcherState {
   currentSchool: School | null;
-  currentAmuletSerial: Serial | null;
+  currentSkinSerial: Serial | null;
 }
+
+const SCRIPT_NAME = 'SpellWatcher';
 
 // ============================================================================
 // КОНСТАНТЫ (КОНФИГУРАЦИЯ)
 // ============================================================================
-
-/** Радиус поиска враждебного кастера в тайлах. */
-const ENEMY_DETECTION_RADIUS = 12;
-
-/** Фильтр по notoriety для определения "враг". */
-const ENEMY_NOTO_FILTER = 'gray|red|orange|murderer';
 
 /** Максимальное время блокировки WaitJournal за один тик (мс). */
 const JOURNAL_WAIT_TIMEOUT_MS = 800;
@@ -52,24 +37,17 @@ const JOURNAL_WAIT_TIMEOUT_MS = 800;
 /** Микропауза между тиками главного цикла (мс). */
 const LOOP_TICK_MS = 50;
 
-/** Пауза после надевания амулета — дать серверу обработать swap (мс). */
-const EQUIP_COOLDOWN_MS = 750;
+/** Цвет каста в журнале */
+const MANTRA_MESSAGE_COLOR = '0x03B2';
 
-/**
- * Амулеты по школам магии. TODO: заполнить реальными graphic + color.
- * Формат color — строка hex (напр. '0x0000' для без-цвета, '0x0A7B' для крашеного).
- */
-const SCHOOL_AMULETS: Record<School, AmuletDef> = {
+/** Шкуры по школам магии.*/
+const SCHOOL_SKINS: Record<School, ItemDef> = {
   nature: { graphic: toGraphic('0x1F03|0x1515'), color: '0x0A93' },
   fire: { graphic: toGraphic('0x1F03|0x1515'), color: '0x0A61' },
   mind: { graphic: toGraphic('0x1F03|0x1515'), color: '0x0BA2' },
   dark: { graphic: toGraphic('0x1F03|0x1515'), color: '0x0B73' },
   light: { graphic: toGraphic('0x1F03|0x1515'), color: '0x0001' },
 };
-
-// ============================================================================
-// ДАННЫЕ: 64 стандартных спелла UO + школы
-// ============================================================================
 
 const SPELL_DATA: SpellDef[] = [
   // Круг 1
@@ -229,86 +207,28 @@ function resolveSchoolFromMessage(text: string): SpellDef | null {
   return null;
 }
 
-/** Ищет ближайшего враждебного кастера в радиусе. */
-function detectEnemyCaster(): Serial | null {
-  const humans = Orion.FindType(
-    'any',
-    'any',
-    'ground',
-    'human',
-    ENEMY_DETECTION_RADIUS,
-    ENEMY_NOTO_FILTER,
-  );
-  const mobs = Orion.FindType(
-    'any',
-    'any',
-    'ground',
-    'mobile',
-    ENEMY_DETECTION_RADIUS,
-    ENEMY_NOTO_FILTER,
-  );
-
-  const candidates: Serial[] = [];
-  const seen: Record<string, boolean> = {};
-  const selfSerial = Player.Serial();
-
-  for (const s of humans) {
-    if (s !== selfSerial && !seen[s]) {
-      seen[s] = true;
-      candidates.push(s);
-    }
-  }
-  for (const s of mobs) {
-    if (s !== selfSerial && !seen[s]) {
-      seen[s] = true;
-      candidates.push(s);
-    }
-  }
-
-  if (candidates.length === 0) {
-    return null;
-  }
-
-  const px = Player.X();
-  const py = Player.Y();
-  let bestSerial: Serial | null = null;
-  let bestDist = Infinity;
-
-  for (const serial of candidates) {
-    const obj = Orion.FindObject(toSerial(serial));
-    if (!obj) continue;
-    const dist = Math.abs(obj.X() - px) + Math.abs(obj.Y() - py);
-    if (dist < bestDist) {
-      bestDist = dist;
-      bestSerial = serial;
-    }
-  }
-
-  return bestSerial;
-}
-
-/** Проверяет, надет ли указанный амулет (лежит на персонаже). */
-function isAmuletEquipped(serial: Serial | null): boolean {
+/** Проверяет, надета ли указанная шкура */
+function isSkinEquipped(serial: Serial | null): boolean {
   if (!serial) return false;
   const obj = Orion.FindObject(serial);
   if (!obj) return false;
   return obj.Container() === Player.Serial();
 }
 
-/** Надевает амулет нужной школы из рюкзака. */
-function equipAmulet(school: School, state: WatcherState): void {
-  // Уже надет нужный — ничего не делаем.
+/** Надевает шкуру нужной школы из рюкзака. */
+function equipSkin(school: School, state: WatcherState): void {
+  // Уже надета нужная шкура — ничего не делаем.
   if (
     state.currentSchool === school &&
-    isAmuletEquipped(state.currentAmuletSerial)
+    isSkinEquipped(state.currentSkinSerial)
   ) {
     return;
   }
 
-  const amulet = SCHOOL_AMULETS[school];
-  const found = Orion.FindType(
-    amulet.graphic,
-    amulet.color,
+  const skin = SCHOOL_SKINS[school];
+  const foundSkins = Orion.FindType(
+    skin.graphic,
+    skin.color,
     'backpack',
     '',
     '',
@@ -316,25 +236,19 @@ function equipAmulet(school: School, state: WatcherState): void {
     true,
   );
 
-  if (!found || found.length === 0) {
-    Orion.Print(`[SpellWatcher] Амулет школы ${school} не найден в рюкзаке`);
+  if (!foundSkins || foundSkins.length === 0) {
+    Orion.Print(`[${SpellWatcher}] Шкура школы ${school} не найдена в рюкзаке`);
     return;
   }
 
-  const serial = found[0];
-  const start = Orion.Now();
-  // MoveItem на себя — движок сам определит нужный слой и свапнет старое.
-  Orion.MoveItem(serial, 1, Player.Serial());
-  Orion.Wait(EQUIP_COOLDOWN_MS);
+  const serial = foundSkins[0];
 
-  // Анти-спам "Slow down" — повтор один раз.
-  if (Orion.InJournal('Slow down', 'sys', 0, 'any', start)) {
-    Orion.MoveItem(serial, 1, Player.Serial());
-    Orion.Wait(EQUIP_COOLDOWN_MS);
+  for (const skin of foundSkins) {
+    Orion.UseObject(skin);
   }
 
   state.currentSchool = school;
-  state.currentAmuletSerial = serial;
+  state.currentSkinSerial = serial;
 }
 
 // ============================================================================
@@ -342,11 +256,11 @@ function equipAmulet(school: School, state: WatcherState): void {
 // ============================================================================
 
 export function SpellWatcher(): void {
-  Orion.Print('[SpellWatcher] Запуск отслеживания вражеских кастов');
+  Orion.Print(`[${SCRIPT_NAME}] Запуск отслеживания вражеских кастов`);
 
   const state: WatcherState = {
     currentSchool: null,
-    currentAmuletSerial: null,
+    currentSkinSerial: null,
   };
 
   Orion.ClearJournal();
@@ -358,9 +272,9 @@ export function SpellWatcher(): void {
       MANTRA_PATTERN,
       lastCheck,
       now + JOURNAL_WAIT_TIMEOUT_MS,
-      'sys|any',
+      'ignoreself|ignorefriends',
       '0',
-      'any',
+      MANTRA_MESSAGE_COLOR,
     );
 
     if (msg) {
@@ -370,17 +284,9 @@ export function SpellWatcher(): void {
         continue;
       }
 
-      const enemy = detectEnemyCaster();
-      if (!enemy) {
-        Orion.Print(
-          `[SpellWatcher] Услышано "${spell.mantra}" (${spell.name}), но врагов в радиусе нет`,
-        );
-        continue;
-      }
-
-      equipAmulet(spell.school, state);
+      equipSkin(spell.school, state);
       Orion.Print(
-        `[SpellWatcher] ${spell.school}: ${spell.mantra} (${spell.name}) → амулет надет`,
+        `[${SCRIPT_NAME}] ${spell.school}: ${spell.mantra} (${spell.name}) → шкура надета`,
       );
     } else {
       lastCheck = now;
@@ -390,10 +296,10 @@ export function SpellWatcher(): void {
     Orion.Wait(LOOP_TICK_MS);
   }
 
-  Orion.Print('[SpellWatcher] Остановлен');
+  Orion.Print(`[${SCRIPT_NAME}] Остановлен`);
 }
 
 export function StopSpellWatcher(): void {
   Orion.Terminate('SpellWatcher');
-  Orion.Print('[SpellWatcher] Завершение по запросу');
+  Orion.Print(`[${SCRIPT_NAME}] Завершение по запросу`);
 }
