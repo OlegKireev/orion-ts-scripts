@@ -3,7 +3,6 @@
  * соответствующей школы магии.
  */
 
-import { checkLag } from '@lib/helpers';
 import { toGraphic } from '@lib/validators';
 
 type School = 'nature' | 'fire' | 'mind' | 'dark' | 'light';
@@ -365,7 +364,6 @@ export function SpellWatcher(): void {
       equipDefaultSkins(state);
     }
 
-    checkLag();
     Orion.Wait(LOOP_TICK_MS);
   }
 
