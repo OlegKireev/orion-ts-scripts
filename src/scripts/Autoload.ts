@@ -212,8 +212,6 @@ export function TargetNext() {
   }
 }
 
-export { combatExpUtilization } from '@/lib/exp';
-
 export function ToggleArmorMode() {
   const TOGGLE_ARMOR_BUTTON_INDEX = 20;
   const INFO_TEXT = 'Включена система поглощения повреждений';
