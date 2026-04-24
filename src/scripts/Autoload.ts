@@ -255,3 +255,9 @@ export function ToggleArmorMode() {
     Orion.CharPrint('self', 0x0021, value);
   }
 }
+
+export function Hiding() {
+  Orion.WarMode(0);
+  Orion.UseSkill('Hiding');
+  Orion.AddDisplayTimer('hiding', 5500, 'UnderChar', 'Line|Bar', 'Hiding...');
+}

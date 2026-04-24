@@ -414,6 +414,30 @@ declare namespace Orion {
 
   /** Сбрасывает все внутренние таймеры Orion. */
   function ClearTimers(): void;
+  /** Нарисовать таймер отображения в окне клиента.
+   * @param id Идентификатор таймера.
+   * @param timer Время в миллисекундах.
+   * @param position Позиция таймера. По умолчанию "RightTop"
+   * @param shape Форма таймера. По умолчанию "Circle|Bar"
+   * @param label Текст таймера.
+   * @param x Координата X.
+   * @param y Координата Y.
+   * @param textColor Цвет текста.
+   * @param font Шрифт.
+   * @param bgColor Цвет фона.
+   */
+  function AddDisplayTimer(
+    id: string,
+    timer: number,
+    position?: string,
+    shape?: string,
+    label?: string,
+    x?: number,
+    y?: number,
+    textColor?: string,
+    font?: string,
+    bgColor?: string,
+  ): void;
 
   /**
    * Завершает работу скриптов.
