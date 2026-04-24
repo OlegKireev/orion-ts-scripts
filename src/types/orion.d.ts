@@ -48,7 +48,7 @@ declare namespace Orion {
     sender?: string,
     serial?: string,
     color?: string,
-  ): JournalMessage;
+  ): JournalMessage | null;
 
   /**
    * Проверяет, есть ли сообщение в журнале.
@@ -438,6 +438,9 @@ declare namespace Orion {
     font?: string,
     bgColor?: string,
   ): void;
+
+  /** Удаляет таймер отображения в окне клиента. */
+  function RemoveDisplayTimer(id: string): void;
 
   /**
    * Завершает работу скриптов.

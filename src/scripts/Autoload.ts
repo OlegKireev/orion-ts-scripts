@@ -257,7 +257,27 @@ export function ToggleArmorMode() {
 }
 
 export function Hiding() {
+  const HIDDING_DELAY = 5500;
+  const TIMER_ID = 'hiding';
+  const now = Orion.Now();
+
   Orion.WarMode(0);
   Orion.UseSkill('Hiding');
-  Orion.AddDisplayTimer('hiding', 5500, 'UnderChar', 'Line|Bar', 'Hiding...');
+  Orion.AddDisplayTimer(
+    TIMER_ID,
+    HIDDING_DELAY,
+    'UnderChar',
+    'Line|Bar',
+    'Hiding...',
+  );
+
+  const isFailed = Orion.WaitJournal(
+    "You can't seem to hide here",
+    now,
+    now + HIDDING_DELAY,
+  );
+
+  if (isFailed) {
+    Orion.RemoveDisplayTimer(TIMER_ID);
+  }
 }
