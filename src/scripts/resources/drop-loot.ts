@@ -1,7 +1,11 @@
 import { OpenNestedBags, getPlayerRace, moveItem } from '@/lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 
-const baglootpvp = 'backpack' as const;
+const UNLOAD_COORDS = {
+  x: 894,
+  y: 1874,
+  z: 6,
+};
 
 //Кликер итемов
 function ClickAllItems() {
@@ -9,7 +13,7 @@ function ClickAllItems() {
   for (let i = 0; i < clicks.length; i++) {
     const serial = clicks[i];
     Orion.Click(serial);
-    Orion.Wait(100);
+    Orion.Wait(10);
   }
 }
 
@@ -23,7 +27,9 @@ export function Sorting() {
     Orion.WalkTo(chestObject.X(), chestObject.Y(), chestObject.Z(), 2);
   }
 
-  Orion.UseObject(baglootpvp);
+  Orion.WalkTo(UNLOAD_COORDS.x, UNLOAD_COORDS.y, UNLOAD_COORDS.z, 0);
+
+  Orion.UseObject('backpack');
   Orion.Wait(500);
 
   unloadBags();
@@ -450,7 +456,7 @@ export function Sorting() {
 
   ITEM_LIST.forEach((item) => {
     Orion.ResetIgnoreList();
-    const serials = Orion.FindType(item.type, item.color, baglootpvp);
+    const serials = Orion.FindType(item.type, item.color, 'backpack');
     if (serials.length) {
       serials.forEach((serial) => {
         const object = Orion.FindObject(serial);
@@ -459,7 +465,7 @@ export function Sorting() {
         }
 
         if (Orion.Contains(object.Name(), item.name)) {
-          Orion.Print(`Штук ${object.Count()} ${item.name} для сброса`);
+          Orion.Print(`Сбрасываю ${object.Count()} ${item.name}`);
           if (Orion.FindObject(item.container)) {
             moveItem(serial, -1, item.container);
           } else {
@@ -549,7 +555,7 @@ export function Restock() {
           });
         });
       }
-      Orion.Print('Got ' + req.comment + ' ' + req.count + ' to unload');
+      Orion.Print(`Взял ${req.count} ${req.comment}`);
     });
 
     Orion.Print('Пополнился ресами');
@@ -564,7 +570,7 @@ export function Restock() {
 
     return successful;
   } else {
-    Orion.Print('Не удалось найти список для текущего класса.');
+    Orion.Print('Не удалось найти список для текущего класса');
     return false;
   }
 }
@@ -621,7 +627,7 @@ export function Restock() {
 // // Функция для разгрузки предметов из сумок
 export function unloadBags() {
   const boxes = toGraphic('0x0E7D|0x09AA|0x0E75|0x0E76|0x09B0'); //сумки
-  const bags = Orion.FindType(boxes, 'any', baglootpvp);
+  const bags = Orion.FindType(boxes, 'any', 'backpack');
 
   bags.forEach((bag) => {
     Orion.UseObject(bag);
@@ -630,7 +636,7 @@ export function unloadBags() {
 
     const items = Orion.FindType('any', 'any', bag);
     items.forEach((item) => {
-      moveItem(item, 0, baglootpvp);
+      moveItem(item, 0, 'backpack');
     });
   });
 }

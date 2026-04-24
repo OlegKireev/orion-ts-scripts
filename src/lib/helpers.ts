@@ -85,7 +85,7 @@ export function OpenNestedBags(container?: Serial) {
     }
   }
 
-  Orion.Print('Все сумки открыты.');
+  Orion.Print('Все сумки открыты');
 }
 
 export function getPlayerRace() {
