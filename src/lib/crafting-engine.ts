@@ -1,31 +1,27 @@
+import { Item } from '@/constants/items';
 import { checkLag, moveItem, stopBot } from './helpers';
+import { sendTelegramMessage } from './telegram';
 
 // ==========================================
 // ИНТЕРФЕЙСЫ
 // ==========================================
-export interface MaterialDef {
-  graphic: Graphic;
-  color: string;
-}
-
-export type MenuPathNode = string | { graphic: Graphic };
+export type MenuPathNode = string | number;
 
 export interface CraftRecipe {
   /** Название предмета */
   name: string;
   /** Полный путь пунктов меню, например ["executioner's axe", 'mace', 'War Mace'] */
   path: MenuPathNode[];
-  /** Graphic и color предмета */
-  product: MaterialDef;
-  /** Какие материалы и сколько их нужно на крафт 1 предмета  */
-  materials: { def: MaterialDef; req: number }[];
+  /** Graphic и color предмета, и куда его класть */
+  product: {
+    def: Item;
+    container?: Serial;
+  };
+  /** Какие материалы, сколько и откуда брать на крафт 1 предмета  */
+  materials: { def: Item; req: number; container: Serial }[];
 }
 
 export interface CraftConfig {
-  /** Откуда берем материалы */
-  resourcesContainerSerial: Serial;
-  /** Куда кладем результат крафта */
-  productsContainerSerial: Serial; //
   /** На сколько предметов брать реусрсов за раз */
   batchSize: number;
   /** Рецепты в порядке приоритета */
@@ -49,7 +45,7 @@ export interface CraftConfig {
 export class UniversalCrafter {
   private config: CraftConfig;
   private endMessages: string;
-  private allMaterials: MaterialDef[] = [];
+  private allMaterials: { def: Item; container: Serial }[] = [];
 
   constructor(config: CraftConfig) {
     this.config = config;
@@ -57,12 +53,13 @@ export class UniversalCrafter {
       config.endMessage ||
       'You put the|You failed|You have no|You have gainer|Ваша попытка провалилась|Вы успешно сделали';
 
-    const uniqueMaterials: Record<string, MaterialDef> = {};
+    const uniqueMaterials: Record<string, { def: Item; container: Serial }> =
+      {};
 
     for (const recipe of config.recipes) {
       for (const material of recipe.materials) {
         const key = `${material.def.graphic}_${material.def.color}`;
-        uniqueMaterials[key] = material.def;
+        uniqueMaterials[key] = material;
       }
     }
 
@@ -113,6 +110,9 @@ export class UniversalCrafter {
             Orion.Print(`Нет ресурсов для ${recipe.name}. Остановка.`);
             Orion.PlayWav('Alarm');
             stopBot();
+            sendTelegramMessage(
+              `**${Player.Name()}:** Закончились ресурсы для крафта`,
+            );
             return;
           }
 
@@ -120,7 +120,7 @@ export class UniversalCrafter {
 
           // Запоминаем количество таких предметов в рюкзаке ДО ковки
           const countBefore = Orion.Count(
-            recipe.product.graphic,
+            recipe.product.def.graphic,
             'any',
             'backpack',
           );
@@ -129,7 +129,7 @@ export class UniversalCrafter {
 
           // Считаем ПОСЛЕ ковки
           const countAfter = Orion.Count(
-            recipe.product.graphic,
+            recipe.product.def.graphic,
             'any',
             'backpack',
           );
@@ -153,7 +153,7 @@ export class UniversalCrafter {
       const chestAmount = Orion.Count(
         mat.def.graphic,
         mat.def.color,
-        this.config.resourcesContainerSerial,
+        mat.container,
       );
       if (chestAmount < mat.req * amount) {
         return false;
@@ -163,10 +163,12 @@ export class UniversalCrafter {
   }
 
   private findAvailableRecipe(): CraftRecipe | null {
-    Orion.UseObject(this.config.resourcesContainerSerial);
-    Orion.Wait(200);
-
     for (const recipe of this.config.recipes) {
+      for (const material of recipe.materials) {
+        Orion.UseObject(material.container);
+        Orion.Wait(100);
+      }
+
       if (this.hasResourcesFor(recipe, this.config.batchSize)) {
         return recipe;
       }
@@ -175,14 +177,14 @@ export class UniversalCrafter {
   }
 
   private prepareMaterials(recipe: CraftRecipe, amount: number): void {
-    for (const matDef of this.allMaterials) {
-      const allBackpackMats = Orion.FindType(
-        matDef.graphic,
-        matDef.color,
+    for (const material of this.allMaterials) {
+      const allBackpackMaterials = Orion.FindType(
+        material.def.graphic,
+        material.def.color,
         'backpack',
       );
-      for (const item of allBackpackMats) {
-        moveItem(item, 0, this.config.resourcesContainerSerial);
+      for (const item of allBackpackMaterials) {
+        moveItem(item, 0, material.container);
       }
     }
 
@@ -194,7 +196,7 @@ export class UniversalCrafter {
         const chestMaterials = Orion.FindType(
           mat.def.graphic,
           mat.def.color,
-          this.config.resourcesContainerSerial,
+          mat.container,
         );
         if (chestMaterials.length === 0) {
           break;
@@ -231,39 +233,7 @@ export class UniversalCrafter {
         // Идем с конца пути к началу
         for (let i = recipe.path.length - 1; i >= currentLevel; i--) {
           const node = recipe.path[i];
-
-          if (typeof node === 'string') {
-            // Если это обычная строка - выбираем по тексту
-            menu.Select(node);
-          } else {
-            // Если это объект с графикой - ищем индекс!
-            let targetIndex = -1;
-            const count = menu.ItemsCount();
-
-            // 1. Принудительно делаем из нашей графики ('0x1415') десятичное число
-            const searchGraphicDec = parseInt(String(node.graphic), 16);
-
-            for (let j = 0; j < count; j++) {
-              // 2. Убеждаемся, что значение из меню тоже воспринимается TS как число
-              const menuItemGraphicDec = Number(menu.ItemGraphic(j));
-
-              // Теперь мы сравниваем number === number, TypeScript счастлив!
-              if (menuItemGraphicDec === searchGraphicDec) {
-                targetIndex = j;
-                break;
-              }
-            }
-
-            if (targetIndex !== -1) {
-              menu.Select(targetIndex);
-            } else {
-              Orion.Print(
-                `[ОШИБКА] В меню нет предмета с графикой ${node.graphic}`,
-              );
-              break;
-            }
-          }
-
+          menu.Select(node);
           Orion.Wait(100);
 
           // Проверяем, сменилось ли окно
@@ -345,11 +315,18 @@ export class UniversalCrafter {
     }
   }
 
-  private moveCraftedItems(item: MaterialDef): void {
-    const items = Orion.FindType(item.graphic, item.color, 'backpack');
+  private moveCraftedItems(product: { def: Item; container?: Serial }): void {
+    if (!product.container) {
+      return;
+    }
+    const items = Orion.FindType(
+      product.def.graphic,
+      product.def.color,
+      'backpack',
+    );
     for (const found of items) {
       checkLag();
-      moveItem(found, 0, this.config.productsContainerSerial);
+      moveItem(found, 0, product.container);
     }
   }
 }

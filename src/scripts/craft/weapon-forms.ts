@@ -1,32 +1,28 @@
 import { toGraphic, toSerial } from '@lib/validators';
-import {
-  CraftConfig,
-  type MaterialDef,
-  UniversalCrafter,
-} from '@/lib/crafting-engine';
+import { CraftConfig, UniversalCrafter } from '@/lib/crafting-engine';
+import { INGOTS, LOGS } from '@/constants/items';
 
-const MATERIALS: Record<string, MaterialDef> = {
-  MoonStone: { graphic: toGraphic('0x1BEF'), color: '0x0035' },
-  Logs: { graphic: toGraphic('0x1BDD'), color: '0x0000' },
-  Iron: { graphic: toGraphic('0x1BEF'), color: '0x0000' },
-} as const;
+const INGOTS_CONTAINER = toSerial('0x403853AB');
+const LOGS_CONTAINER = toSerial('0x403853A1');
+const WEAPON_FORM_CONTAINER = toSerial('0x40613D1B');
 
 const BlacksmithConfig: CraftConfig = {
-  resourcesContainerSerial: toSerial('0x403853A1'),
-  productsContainerSerial: toSerial('0x40613D1B'),
   batchSize: 2,
   recipes: [
     {
       name: 'Weapon Form',
       path: ['tool kit', 'Weapon Form'],
       product: {
-        graphic: toGraphic('0x13A8'),
-        color: toGraphic('0x0455'),
+        def: {
+          graphic: toGraphic('0x13A8'),
+          color: toGraphic('0x0455'),
+        },
+        container: WEAPON_FORM_CONTAINER,
       },
       materials: [
-        { def: MATERIALS.Iron, req: 100 },
-        { def: MATERIALS.MoonStone, req: 10 },
-        { def: MATERIALS.Logs, req: 50 },
+        { def: INGOTS.Iron, req: 100, container: INGOTS_CONTAINER },
+        { def: INGOTS.MoonStone, req: 10, container: INGOTS_CONTAINER },
+        { def: LOGS.Logs, req: 50, container: LOGS_CONTAINER },
       ],
     },
   ],
@@ -37,10 +33,13 @@ const BlacksmithConfig: CraftConfig = {
   },
 };
 
-export function Autostart() {
-  const productChest = toSerial('0x403853AB');
-  Orion.UseObject(productChest);
+export function WeaponForms() {
+  Orion.UseObject(INGOTS_CONTAINER);
 
   const crafter = new UniversalCrafter(BlacksmithConfig);
   crafter.run();
+}
+
+export function Autostart() {
+  Orion.Exec('WeaponForms', true);
 }

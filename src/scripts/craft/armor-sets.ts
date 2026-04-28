@@ -1,52 +1,29 @@
 import { toGraphic, toSerial } from '@lib/validators';
 import {
   CraftConfig,
-  MaterialDef,
   UniversalCrafter,
   CraftRecipe,
 } from '@lib/crafting-engine';
 import { checkLag } from '@/lib/helpers';
-
-// ==========================================
-// ⚙️ НАСТРОЙКИ ПЕРЕД СТАРТОМ
-// Изменяй эти значения перед запуском скрипта!
-// ==========================================
-const RESOURCE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Откуда брать инготы
-const PRODUCTS_CONTAINER_SERIAL = toSerial('0x403853A9'); // Куда складывать готовую броню
-
-// Справочник материалов
-const MATERIALS: Record<string, MaterialDef> = {
-  Rusty: { graphic: toGraphic('0x1BEF'), color: '0x09EB' },
-  OldCopper: { graphic: toGraphic('0x1BEF'), color: '0x09E8' },
-  Bronze: { graphic: toGraphic('0x1BEF'), color: '0x06D6' },
-  Copper: { graphic: toGraphic('0x1BE3'), color: '0x0000' },
-  Steel: { graphic: toGraphic('0x1BEF'), color: '0x09F1' },
-  Silver: { graphic: toGraphic('0x1BF5'), color: '0x0000' },
-  Gold: { graphic: toGraphic('0x1BE9'), color: '0x09B5' },
-  Shadow: { graphic: toGraphic('0x1BEF'), color: '0x0770' },
-  Bluesteel: { graphic: toGraphic('0x1BEF'), color: '0x0128' },
-  Rose: { graphic: toGraphic('0x1BEF'), color: '0x0665' },
-  Agapite: { graphic: toGraphic('0x1BEF'), color: '0x0400' },
-  Bloodrock: { graphic: toGraphic('0x1BEF'), color: '0x09CF' },
-  Verite: { graphic: toGraphic('0x1BEF'), color: '0x0BAA' },
-  Valorite: { graphic: toGraphic('0x1BEF'), color: '0x0515' },
-  Mytheril: { graphic: toGraphic('0x1BEF'), color: '0x052D' },
-  Blackrock: { graphic: toGraphic('0x1BEF'), color: '0x0455' },
-};
+import { INGOTS } from '@/constants/items';
 
 // Глобальное состояние.
 // В Orion оно сохранится в памяти, пока макрос не выгрузят.
 // Это удобно: при следующем запуске гамп запомнит твой прошлый выбор!
-let state = {
-  type: 'plate' as 'plate' | 'chain',
+let state: {
+  type: 'plate' | 'chain';
+  material: keyof typeof INGOTS;
+  count: number;
+} = {
+  type: 'plate',
   material: 'Bluesteel',
   count: 1,
 };
 // ==========================================
 // ФАБРИКА РЕЦЕПТОВ (Генератор полного сета)
 // ==========================================
-function getPlateSetRecipes(materialName: string): CraftRecipe[] {
-  const mat = MATERIALS[materialName];
+function getPlateSetRecipes(materialName: keyof typeof INGOTS): CraftRecipe[] {
+  const mat = INGOTS[materialName];
 
   if (!mat) {
     Orion.Print(`[ОШИБКА] Материал ${materialName} не найден в словаре!`);
@@ -58,32 +35,32 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
       {
         name: `${materialName} chainmail coif`,
         path: ['Colored Armor', 'Chainmail Coif'],
-        product: { graphic: toGraphic('0x13BB'), color: 'any' },
-        materials: [{ def: mat, req: 10 }],
+        product: { def: { graphic: toGraphic('0x13BB'), color: 'any' } },
+        materials: [{ def: mat, req: 10, container: toSerial('0x403853AB') }],
       },
       {
         name: `${materialName} chainmail leggings`,
         path: ['Colored Armor', 'Chainmail Leggings'],
-        product: { graphic: toGraphic('0x13BE'), color: 'any' },
-        materials: [{ def: mat, req: 18 }],
+        product: { def: { graphic: toGraphic('0x13BE'), color: 'any' } },
+        materials: [{ def: mat, req: 18, container: toSerial('0x403853AB') }],
       },
       {
         name: `${materialName} chainmail tunic`,
         path: ['Colored Armor', 'Chainmail tunic'],
-        product: { graphic: toGraphic('0x13BF'), color: 'any' },
-        materials: [{ def: mat, req: 20 }],
+        product: { def: { graphic: toGraphic('0x13BF'), color: 'any' } },
+        materials: [{ def: mat, req: 20, container: toSerial('0x403853AB') }],
       },
       {
         name: `${materialName} ringmail gloves`,
         path: ['Colored Armor', 'Ringmail Gloves'],
-        product: { graphic: toGraphic('0x13EB'), color: 'any' },
-        materials: [{ def: mat, req: 10 }],
+        product: { def: { graphic: toGraphic('0x13EB'), color: 'any' } },
+        materials: [{ def: mat, req: 10, container: toSerial('0x403853AB') }],
       },
       {
         name: `${materialName} ringmail sleeves`,
         path: ['Colored Armor', 'Ringmail Sleeves'],
-        product: { graphic: toGraphic('0x13EE'), color: 'any' },
-        materials: [{ def: mat, req: 14 }],
+        product: { def: { graphic: toGraphic('0x13EE'), color: 'any' } },
+        materials: [{ def: mat, req: 14, container: toSerial('0x403853AB') }],
       },
     ];
   }
@@ -92,38 +69,38 @@ function getPlateSetRecipes(materialName: string): CraftRecipe[] {
     {
       name: `${materialName} Plate Chest`,
       path: ['Colored Armor', '6'],
-      product: { graphic: toGraphic('0x1415'), color: 'any' },
-      materials: [{ def: mat, req: 28 }],
+      product: { def: { graphic: toGraphic('0x1415'), color: 'any' } },
+      materials: [{ def: mat, req: 28, container: toSerial('0x403853AB') }],
     },
     {
       name: `${materialName} Plate Helmet`,
       path: ['Colored Armor', 'Helmet'],
-      product: { graphic: toGraphic('0x1412'), color: 'any' },
-      materials: [{ def: mat, req: 15 }],
+      product: { def: { graphic: toGraphic('0x1412'), color: 'any' } },
+      materials: [{ def: mat, req: 15, container: toSerial('0x403853AB') }],
     },
     {
       name: `${materialName} Plate Gorget`,
       path: ['Colored Armor', 'Gorget'],
-      product: { graphic: toGraphic('0x1413'), color: 'any' },
-      materials: [{ def: mat, req: 8 }],
+      product: { def: { graphic: toGraphic('0x1413'), color: 'any' } },
+      materials: [{ def: mat, req: 8, container: toSerial('0x403853AB') }],
     },
     {
       name: `${materialName} Plate Gauntlets`,
       path: ['Colored Armor', 'Gauntlets'],
-      product: { graphic: toGraphic('0x1414'), color: 'any' },
-      materials: [{ def: mat, req: 14 }],
+      product: { def: { graphic: toGraphic('0x1414'), color: 'any' } },
+      materials: [{ def: mat, req: 14, container: toSerial('0x403853AB') }],
     },
     {
       name: `${materialName} Plate Arms`,
       path: ['Colored Armor', 'Arms'],
-      product: { graphic: toGraphic('0x1410'), color: 'any' },
-      materials: [{ def: mat, req: 18 }],
+      product: { def: { graphic: toGraphic('0x1410'), color: 'any' } },
+      materials: [{ def: mat, req: 18, container: toSerial('0x403853AB') }],
     },
     {
       name: `${materialName} Plate Leggings`,
       path: ['Colored Armor', 'Leggings'],
-      product: { graphic: toGraphic('0x1411'), color: 'any' },
-      materials: [{ def: mat, req: 20 }],
+      product: { def: { graphic: toGraphic('0x1411'), color: 'any' } },
+      materials: [{ def: mat, req: 20, container: toSerial('0x403853AB') }],
     },
   ];
 }
@@ -139,9 +116,6 @@ function StartArmorCrafting(): void {
   }
 
   const ArmorConfig: CraftConfig = {
-    resourcesContainerSerial: RESOURCE_CONTAINER_SERIAL,
-    productsContainerSerial: PRODUCTS_CONTAINER_SERIAL,
-
     mode: 'set',
     batchSize: state.count,
     recipes: recipes,
@@ -156,7 +130,7 @@ function StartArmorCrafting(): void {
   crafter.run();
 }
 
-const AVAILABLE_MATERIALS = Object.keys(MATERIALS);
+const AVAILABLE_MATERIALS = Object.keys(INGOTS) as (keyof typeof INGOTS)[];
 
 export function CraftMenu() {
   const gumpSerial = 777; // Уникальный ID нашего гампа
@@ -370,9 +344,13 @@ export function CraftGumpCallback() {
   Shared.AddVar('craftGumpCode', code);
 }
 
-export function Autostart() {
+export function ArmorSets() {
   checkLag();
   if (!Orion.ScriptRunning('CraftMenu')) {
     Orion.Exec('CraftMenu', true);
   }
+}
+
+export function Autostart() {
+  Orion.Exec('ArmorSets', true);
 }
