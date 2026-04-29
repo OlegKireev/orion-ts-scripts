@@ -102,3 +102,9 @@ export function getPlayerRace() {
 
   return RACE_MAP[processedRace];
 }
+
+export function teleportLogout() {
+  Orion.Cast('Teleport', 'self');
+  Orion.Wait(100);
+  Orion.LogOut();
+}

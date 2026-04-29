@@ -2,6 +2,7 @@ import { checkLag, moveItem, stopBot } from '@lib/helpers';
 import { toGraphic, toSerial } from '@/lib/validators';
 import { restockItems } from '@/lib/container';
 import { hiding } from '@/lib/hidding';
+import { REAGENTS } from '@/constants/items';
 
 // --- Настройки шахтера ---
 const WEIGHT_LIMIT = 30; // запас веса до максимума
@@ -295,8 +296,8 @@ export function Replenishment(): void {
         name: 'pickaxe',
         type: TOOL_TYPE,
         color: 'any',
-        max: 4,
-        min: 3,
+        max: 2,
+        min: 1,
         box: 'self',
         x: -1,
         y: -1,
@@ -307,6 +308,26 @@ export function Replenishment(): void {
         color: 'any',
         max: 10,
         min: 5,
+        box: 'self',
+        x: -1,
+        y: -1,
+      },
+      {
+        name: 'blood moss',
+        type: REAGENTS.BloodMoss.graphic,
+        color: REAGENTS.BloodMoss.color,
+        max: 2,
+        min: 1,
+        box: 'self',
+        x: -1,
+        y: -1,
+      },
+      {
+        name: 'mandrake root',
+        type: REAGENTS.MandrakeRoot.graphic,
+        color: REAGENTS.MandrakeRoot.color,
+        max: 2,
+        min: 1,
         box: 'self',
         x: -1,
         y: -1,

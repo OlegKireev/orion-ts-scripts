@@ -10,7 +10,7 @@ export interface DropItem {
 export interface RestockItem {
   name: string;
   type: Graphic;
-  color: Graphic;
+  color: string;
   max: number;
   min: number;
   box: Serial;

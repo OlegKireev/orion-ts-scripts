@@ -1,3 +1,4 @@
+import { teleportLogout } from './helpers';
 import { sendTelegramMessage } from './telegram';
 import { toGraphic, toSerial } from './validators';
 
@@ -24,7 +25,16 @@ export function Monitor(): void {
     '0x0032DD44', // Postuh
   ]);
 
-  const knownPillars = toSerial(['0x40101336', '0x401EF113', '0x401011B5']);
+  const enemies = toSerial([
+    '0x00143511', // Gainer
+    '0x003C6BA1', // Bart
+    '0x003E2D46', // Crusader
+    '0x003F0B6C', // rOod
+    '0x003BDD53', // Judy Doe
+    '0x003EB2F6', // Vue
+  ]);
+
+  const knownPillars = toSerial(['0x401EF113']);
 
   const seenPillars: Serial[] = knownPillars.slice();
   const PILLAR_GRAPHIC = toGraphic('0x0ED4');
@@ -86,6 +96,13 @@ export function Monitor(): void {
       const enemyObj = Orion.FindObject(toSerial(serial));
       if (enemyObj && enemyObj.Name() !== Player.Name()) {
         enemyNames += `${enemyObj.Name()} `;
+      }
+
+      if (enemies.indexOf(serial) !== -1) {
+        sendTelegramMessage(
+          `Пришел уебок ${enemyObj?.Name()}! Пытаюсь улететь.`,
+        );
+        teleportLogout();
       }
     }
 

@@ -635,4 +635,9 @@ declare namespace Orion {
     skill: SkillName,
     status: 'Up' | 'Down' | 'Lock',
   ): void;
+
+  /**
+   * Выйти из игры (не закрывая клиент, выход на стартовый экран).
+   */
+  function LogOut(): void;
 }
