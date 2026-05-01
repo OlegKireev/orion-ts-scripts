@@ -5,10 +5,11 @@ import { hiding } from '@/lib/hidding';
 import { REAGENTS } from '@/constants/items';
 
 // --- Настройки шахтера ---
-const WEIGHT_LIMIT = 30; // запас веса до максимума
+const WEIGHT_LIMIT = 300; // запас веса до максимума
 
-const FORGE_COORDS: Point2D = { x: 897, y: 1876 };
-const CONTAINER_COORDS: Point2D = { x: 895, y: 1876 };
+const HOME_COORDS = { x: 894, y: 1893, z: 0 } satisfies Point2D;
+const FORGE_COORDS: Point2D = { x: 897, y: 1878 };
+const CONTAINER_COORDS: Point2D = { x: 895, y: 1878 };
 const MINE_COORDS: Point2D = { x: 772, y: 1697 };
 
 const ORE_CONTAINER_SERIAL = toSerial('0x403853AB'); // Контейнер для инготов
@@ -27,12 +28,15 @@ const BAD_TILES: Point2D[] = [{ x: 1265, y: 1270 }];
 // Глобальная настройка журнала при загрузке скрипта
 Orion.JournalIgnoreCase(true);
 
-// ==========================================
-// ЭКСПОРТИРУЕМЫЕ ФУНКЦИИ (ТОЧКИ ВХОДА ORION)
-// ==========================================
+export function Observe(): void {
+  Orion.Exec('ObserveAdmin', true);
+  Orion.Exec('ObservePlayers', true, ['logout']);
+  Orion.Exec('ObservePillars', true);
+  Orion.Exec('ObserveDeath', true);
+}
 
 export function Autostart(): void {
-  Orion.Exec('Monitor', true);
+  Observe();
   Orion.Exec('Eating', true);
   Orion.Exec('Resurrect', true);
   Replenishment();
@@ -41,9 +45,15 @@ export function Autostart(): void {
 }
 
 export { Eating } from '@/lib/eating';
-export { Monitor } from '@/lib/status-monitor';
 export { getGumpResponse, markTiles } from './mark-tiles';
 export { Resurrect } from '@/lib/resurrect';
+export {
+  ObserveAdmin,
+  ObserveDeath,
+  ObservePillars,
+  ObservePlayers,
+  ObserveEnemies,
+} from '@/lib/observe';
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {
@@ -124,16 +134,16 @@ export function Dig(): void {
     checkLag();
     setBadTiles();
 
-    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 0, 255, false)) {
+    if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 0, 255, 0, 1)) {
       Orion.Print(`Can't walk to ${tile.x} ${tile.y}`);
       Orion.Wait(100);
       continue;
     }
 
-    hiding();
-
     for (let x = -2; x <= 2; x++) {
       for (let y = -2; y <= 2; y++) {
+        hiding();
+
         if (
           (x === 0 && y === 0) ||
           (Math.abs(x) === 2 && Math.abs(y) === 2) ||
@@ -161,12 +171,13 @@ export function Dig(): void {
             !Orion.UseType(TOOL_TYPE)
           ) {
             Orion.CancelWaitTarget();
+            GoToHome();
             SmeltOre();
             DropIngots();
             Replenishment();
             ReturnToMine();
 
-            if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 0, 255, true, true)) {
+            if (!Orion.WalkTo(tile.x, tile.y, Player.Z(), 0, 255, 1, 1)) {
               Orion.Print("Can't walk back to mining tile");
               break;
             }
@@ -209,10 +220,15 @@ export function Mining(): void {
   }
 }
 
-export function SmeltOre(): void {
-  Orion.Print('Иду плавить руду');
+export function GoToHome(): void {
   checkLag();
-  Orion.WalkTo(FORGE_COORDS.x, FORGE_COORDS.y, Player.Z(), 1, 255, false, true);
+  Orion.Print('Иду домой');
+  Orion.WalkTo(HOME_COORDS.x, HOME_COORDS.y, HOME_COORDS.z, 0, 255, 1, 1);
+}
+
+export function SmeltOre(): void {
+  checkLag();
+  Orion.WalkTo(FORGE_COORDS.x, FORGE_COORDS.y, Player.Z(), 1, 255, 0, 1);
   Orion.Wait(500);
 
   const forge = Orion.FindType(FORGE_TYPE, 'any', 'ground', '', 2);
@@ -248,7 +264,8 @@ export function DropIngots(): void {
     Player.Z(),
     1,
     255,
-    true,
+    1,
+    1,
   );
 
   const chestObj = Orion.FindObject(ORE_CONTAINER_SERIAL);
@@ -287,7 +304,8 @@ export function Replenishment(): void {
     Player.Z(),
     1,
     255,
-    true,
+    1,
+    1,
   );
 
   restockItems(
@@ -342,17 +360,20 @@ export function Replenishment(): void {
 }
 
 export function ReturnToMine(): void {
+  Orion.Terminate('ObserveEnemies');
   Orion.Print('Возвращаюсь в шахту');
   checkLag();
-  Orion.WalkTo(MINE_COORDS.x, MINE_COORDS.y, Player.Z(), 1, 255, true, true);
+  Orion.WalkTo(MINE_COORDS.x, MINE_COORDS.y, Player.Z(), 1, 255, 1, 1);
   if (!Orion.ScriptRunning('Mining')) {
     Orion.Exec('Mining', true);
   }
+  Orion.Exec('ObserveEnemies', true, ['wait-at-home']);
 }
 
 export function Finish(): void {
   stopBot('Finish|SmeltOre|DropIngots');
   Orion.Wait(100);
+  GoToHome();
   SmeltOre();
   DropIngots();
 }

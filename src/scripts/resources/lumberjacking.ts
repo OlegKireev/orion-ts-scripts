@@ -262,16 +262,30 @@ const ROUTES: Point2D[][] = [
 
 export function Autostart(): void {
   Orion.JournalIgnoreCase(true);
-  Orion.Exec('Monitor', true);
+  Orion.Exec('Observe', true);
   Orion.Exec('Eating', true);
   Orion.Exec('Resurrect', true);
   checkLag();
   Lumberjacking(); // Вызываем напрямую
 }
 
-export { Monitor } from '@/lib/status-monitor';
+export {
+  ObserveAdmin,
+  ObserveDeath,
+  ObservePillars,
+  ObservePlayers,
+  ObserveEnemies,
+} from '@/lib/observe';
+
 export { Eating } from '@/lib/eating';
 export { Resurrect } from '@/lib/resurrect';
+
+export function Observe(): void {
+  Orion.Exec('ObserveAdmin', true);
+  Orion.Exec('ObservePlayers', true);
+  Orion.Exec('ObservePillars', true);
+  Orion.Exec('ObserveDeath', true);
+}
 
 function setBadTiles(): void {
   for (const tile of BAD_TILES) {
@@ -310,14 +324,14 @@ function walkToSafe(
   x: number,
   y: number,
   distance: number,
-  run: boolean,
+  run: number,
 ): boolean {
   const startX = Player.X();
   const startY = Player.Y();
   const deadline = Orion.Now() + WALK_STUCK_TIMEOUT;
 
   // Запускаем движение
-  const result = Orion.WalkTo(x, y, Player.Z(), distance, 255, run, true);
+  const result = Orion.WalkTo(x, y, Player.Z(), distance, 255, run, 1);
 
   if (result) return true;
 
@@ -350,7 +364,7 @@ function Hack(): void {
     checkLag();
     setBadTiles();
 
-    if (!walkToSafe(tile.x, tile.y, 1, false)) {
+    if (!walkToSafe(tile.x, tile.y, 1, 0)) {
       Orion.Print(`Can't walk to ${tile.x} ${tile.y}`);
       Orion.Wait(100);
       continue;
@@ -381,7 +395,7 @@ function Hack(): void {
         checkLag();
 
         // Возвращаемся к дереву
-        if (!walkToSafe(tile.x, tile.y, 1, true)) {
+        if (!walkToSafe(tile.x, tile.y, 1, 1)) {
           Orion.Print(`Can't walk back to ${tile.x} ${tile.y}`);
           break; // Прерываем рубку текущего дерева и идем к следующему
         }
@@ -411,7 +425,7 @@ function Hack(): void {
 }
 
 export function DropLogs() {
-  Orion.WalkTo(HOME_COORDS.x, HOME_COORDS.y, Player.Z(), 0, 255, false, true);
+  Orion.WalkTo(HOME_COORDS.x, HOME_COORDS.y, Player.Z(), 0, 255, 0, 1);
   checkLag();
   const chestObj = Orion.FindObject(CHEST_SERIAL);
   if (!chestObj) {
@@ -422,7 +436,7 @@ export function DropLogs() {
   }
 
   checkLag();
-  Orion.WalkTo(chestObj.X(), chestObj.Y(), chestObj.Z(), 1, 255, true, true);
+  Orion.WalkTo(chestObj.X(), chestObj.Y(), chestObj.Z(), 1, 255, 0, 1);
   dropItems(LUMBER_DROP, 'backpack', CHEST_SERIAL);
 }
 
@@ -432,6 +446,6 @@ export function Replenishment() {
 
 export function Finish(): void {
   stopBot('Finish|DropLogs');
-	Orion.Wait(100);
+  Orion.Wait(100);
   DropLogs();
 }
