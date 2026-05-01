@@ -43,10 +43,11 @@ export function ObserveEnemies(action: 'wait-at-home'): void {
           1,
           1,
         );
+        Orion.Exec('Finish', true);
         const WAITING_MINUTES = 5;
         const waitingTime = WAITING_MINUTES * 60 * 1000;
         Orion.Print(`Жду ${WAITING_MINUTES} минут...`);
-        Orion.PauseScript('all', 'ObserveEnemies');
+        Orion.PauseScript('all', 'ObserveEnemies|Finish');
         Orion.Wait(waitingTime);
         Orion.ResumeScript('all');
       }
@@ -177,8 +178,9 @@ export function ObservePlayers(action?: 'logout') {
       }
     }
 
-    if (humans.length > 0) {
-      const enemyNames = humans.map((enemy) => enemy.Name()).join(', ');
+    const enemyNames = humans.map((enemy) => enemy.Name()).join(', ');
+
+    if (enemyNames.trim().length > 0) {
       sendTelegramMessage(
         `🤨 ${Player.Name()}: Кто-то тут есть: ${enemyNames} ${getCurrentTime()}`,
       );

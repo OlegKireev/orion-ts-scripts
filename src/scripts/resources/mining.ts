@@ -8,7 +8,7 @@ import { REAGENTS } from '@/constants/items';
 const WEIGHT_LIMIT = 300; // запас веса до максимума
 
 const HOME_COORDS = { x: 894, y: 1893, z: 0 } satisfies Point2D;
-const FORGE_COORDS: Point2D = { x: 897, y: 1878 };
+const FORGE_COORDS: Point2D = { x: 897, y: 1876 };
 const CONTAINER_COORDS: Point2D = { x: 895, y: 1878 };
 const MINE_COORDS: Point2D = { x: 772, y: 1697 };
 
@@ -222,6 +222,7 @@ export function Mining(): void {
 
 export function GoToHome(): void {
   checkLag();
+  Orion.Terminate('ObserveEnemies');
   Orion.Print('Иду домой');
   Orion.WalkTo(HOME_COORDS.x, HOME_COORDS.y, HOME_COORDS.z, 0, 255, 1, 1);
 }
@@ -231,7 +232,7 @@ export function SmeltOre(): void {
   Orion.WalkTo(FORGE_COORDS.x, FORGE_COORDS.y, Player.Z(), 1, 255, 0, 1);
   Orion.Wait(500);
 
-  const forge = Orion.FindType(FORGE_TYPE, 'any', 'ground', '', 2);
+  const forge = Orion.FindType(FORGE_TYPE, 'any', 'ground', '', 3);
 
   if (!forge.length) {
     Orion.Print('Плавилка не найдена!');
