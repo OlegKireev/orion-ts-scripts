@@ -1,5 +1,6 @@
 import { ITEM_MOVE_DELAY } from '@/constants';
 import { toGraphic } from './validators';
+import { REAGENTS } from '@/constants/items';
 
 const LAG_DELAY = 60000;
 
@@ -104,6 +105,32 @@ export function getPlayerRace() {
 }
 
 export function teleportLogout() {
+  if (Orion.SkillValue('Magery') < 300) {
+    Orion.Print('Для телепорта недостаточно magery!');
+    return;
+  }
+
+  const bloodMoss = Orion.FindType(
+    REAGENTS.BloodMoss.graphic,
+    REAGENTS.BloodMoss.color,
+    'backpack',
+  );
+  const mandrakeRoot = Orion.FindType(
+    REAGENTS.MandrakeRoot.graphic,
+    REAGENTS.MandrakeRoot.color,
+    'backpack',
+  );
+
+  if (bloodMoss.length < 1 || mandrakeRoot.length < 1) {
+    Orion.Print('Для телепорта недостаточно реагентов!');
+    return;
+  }
+
+  if (Orion.SkillValue('Magery') < 300) {
+    Orion.Print('Для телепорта недостаточно magery!');
+    return;
+  }
+
   Orion.Cast('Teleport', 'self');
   Orion.Wait(100);
   Orion.LogOut();

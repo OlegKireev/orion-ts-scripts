@@ -166,7 +166,7 @@ export function FollowTarget() {
       break;
     }
 
-    Orion.WalkTo(obj.X(), obj.Y(), obj.Z(), 1, 255, true, true);
+    Orion.WalkTo(obj.X(), obj.Y(), obj.Z(), 1, 255, 1, 1);
     Orion.Wait(200);
   }
 }

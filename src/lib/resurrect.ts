@@ -58,8 +58,8 @@ function handleDeathSequence() {
     Player.Z(),
     0,
     255,
-    true,
-    true,
+    1,
+    1,
   );
 
   while (Player.Dead()) {
@@ -71,7 +71,7 @@ function handleDeathSequence() {
       const targetX = RESURRECT_COORDS.x + offset.dx;
       const targetY = RESURRECT_COORDS.y + offset.dy;
 
-      Orion.WalkTo(targetX, targetY, Player.Z(), 0, 255, true, true);
+      Orion.WalkTo(targetX, targetY, Player.Z(), 0, 255, 1, 1);
 
       Orion.Wait(300);
     }
@@ -79,7 +79,7 @@ function handleDeathSequence() {
 
   Orion.Print('[Resurrect] ✨ Воскресли! Возвращаемся за лутом...');
 
-  Orion.WalkTo(deathX, deathY, deathZ, 0, 255, true, true);
+  Orion.WalkTo(deathX, deathY, deathZ, 0, 255, 1, 1);
 
   const corpses = Orion.FindType(CORPSE_GRAPHIC, 'any', 'ground', 'fast', 3);
 

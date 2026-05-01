@@ -90,7 +90,7 @@ export class VendorShopper {
 
   private walkTo(coords: Point2D): void {
     checkLag();
-    Orion.WalkTo(coords.x, coords.y, Player.Z(), 1, 255, true, true);
+    Orion.WalkTo(coords.x, coords.y, Player.Z(), 1, 255, 1, 1);
   }
 
   private useTravelBook(runeName: string): void {
@@ -152,7 +152,7 @@ export class VendorShopper {
       }
 
       // Подходим к NPC
-      Orion.WalkTo(npc.X(), npc.Y(), npc.Z(), 1, 255, true, true);
+      Orion.WalkTo(npc.X(), npc.Y(), npc.Z(), 1, 255, 1, 1);
       Orion.Wait(300);
 
       // Говорим buy

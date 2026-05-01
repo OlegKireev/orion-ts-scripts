@@ -106,7 +106,7 @@ function stepAlongField(state: WalkerState): void {
     : state.startX - STEP_OFFSET;
 
   if (Player.X() !== targetX) {
-    Orion.WalkTo(targetX, state.startY, state.startZ, 0, 255, false);
+    Orion.WalkTo(targetX, state.startY, state.startZ, 0, 255, 0);
   } else {
     state.stepForward = !state.stepForward;
   }
@@ -115,7 +115,7 @@ function stepAlongField(state: WalkerState): void {
 /** Возврат на стартовые координаты, если ходока снесло со спота. */
 function returnToStart(state: WalkerState): boolean {
   if (Player.X() !== state.startX || Player.Y() !== state.startY) {
-    Orion.WalkTo(state.startX, state.startY, state.startZ, 0, 255, false);
+    Orion.WalkTo(state.startX, state.startY, state.startZ, 0, 255, 0);
     Orion.Wait(500);
     return true;
   }

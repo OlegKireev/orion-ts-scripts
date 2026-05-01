@@ -3,6 +3,7 @@ type Color = string;
 interface Point2D {
   x: number;
   y: number;
+  z?: number;
 }
 
 declare type OrionGlobalSerial =

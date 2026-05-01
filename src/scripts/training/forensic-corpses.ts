@@ -76,7 +76,7 @@ function dieToKiller(): void {
 
   // Подходим к убийце
   checkLag();
-  Orion.WalkTo(killer.X(), killer.Y(), killer.Z(), 1, 255, true, true);
+  Orion.WalkTo(killer.X(), killer.Y(), killer.Z(), 1, 255, 1, 1);
   Orion.Wait(300);
 
   // Включаем боевой режим и бьём
@@ -104,8 +104,8 @@ function resurrect(): void {
     Player.Z(),
     0,
     255,
-    true,
-    true,
+    1,
+    1,
   );
 
   // Ходим по точке ресалки пока не воскреснем
@@ -117,8 +117,8 @@ function resurrect(): void {
       Player.Z(),
       0,
       255,
-      true,
-      true,
+      1,
+      1,
     );
     Orion.Wait(1000);
     attempts++;
@@ -141,9 +141,9 @@ function returnToStart(x: number, y: number, z: number): void {
   var killer = Orion.FindObject(KILLER_SERIAL);
   if (killer && Orion.GetDistance(killer.X(), killer.Y()) <= SAFE_DISTANCE) {
     // Идём к начальной точке, но останавливаемся на безопасном расстоянии
-    Orion.WalkTo(x, y, z, SAFE_DISTANCE, 255, true, true);
+    Orion.WalkTo(x, y, z, SAFE_DISTANCE, 255, 1, 1);
   } else {
-    Orion.WalkTo(x, y, z, 0, 255, true, true);
+    Orion.WalkTo(x, y, z, 0, 255, 1, 1);
   }
 
   Orion.Wait(500);
