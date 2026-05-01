@@ -142,8 +142,6 @@ export function Dig(): void {
 
     for (let x = -2; x <= 2; x++) {
       for (let y = -2; y <= 2; y++) {
-        hiding();
-
         if (
           (x === 0 && y === 0) ||
           (Math.abs(x) === 2 && Math.abs(y) === 2) ||
@@ -154,7 +152,7 @@ export function Dig(): void {
 
         let miningFinished = false;
         do {
-          Orion.Wait(1);
+          hiding();
           checkLag();
 
           const start = Orion.Now();
