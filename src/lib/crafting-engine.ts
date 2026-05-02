@@ -46,6 +46,8 @@ export class UniversalCrafter {
   private config: CraftConfig;
   private endMessages: string;
   private allMaterials: { def: Item; container: Serial }[] = [];
+  private successCount: number = 0;
+  private failCount: number = 0;
 
   constructor(config: CraftConfig) {
     this.config = config;
@@ -84,12 +86,31 @@ export class UniversalCrafter {
       const recipeToCraft = this.findAvailableRecipe();
       if (!recipeToCraft) {
         Orion.Print('Нет ресурсов. Остановка.');
+        this.printStats();
+        this.printRemainingResources();
         stopBot();
         return;
       }
       this.prepareMaterials(recipeToCraft, this.config.batchSize);
       for (let i = 0; i < this.config.batchSize; i++) {
+        const countBefore = Orion.Count(
+          recipeToCraft.product.def.graphic,
+          'any',
+          'backpack',
+        );
         this.craftItem(recipeToCraft);
+        const countAfter = Orion.Count(
+          recipeToCraft.product.def.graphic,
+          'any',
+          'backpack',
+        );
+        if (countAfter > countBefore) {
+          this.successCount++;
+        } else {
+          this.failCount++;
+        }
+        this.printStats();
+        this.printRemainingResources();
         this.moveCraftedItems(recipeToCraft.product);
       }
     }
@@ -136,16 +157,51 @@ export class UniversalCrafter {
 
           if (countAfter > countBefore) {
             isSuccess = true;
-            Orion.Print(`${recipe.name} успешно выкован!`);
+            this.successCount++;
+            Orion.Print(`${recipe.name} успешно создан!`);
             this.moveCraftedItems(recipe.product); // Убираем готовую часть в сундук
           } else {
-            Orion.Print(`Фейл при ковке ${recipe.name}. Пробуем еще раз...`);
+            this.failCount++;
+            Orion.Print(`Фейл при крафте ${recipe.name}. Пробуем еще раз...`);
           }
+          this.printStats();
+          this.printRemainingResources();
         }
       }
     }
-    Orion.Print(`Успешно выковано комплектов: ${this.config.batchSize}!`);
+    Orion.Print(`Успешно создано комплектов: ${this.config.batchSize}!`);
     Orion.PlayWav('AutoPage');
+  }
+
+  private printStats(): void {
+    const total = this.successCount + this.failCount;
+    if (total === 0) {
+      return;
+    }
+    const successRate = ((this.successCount / total) * 100).toFixed(1);
+    const failRate = ((this.failCount / total) * 100).toFixed(1);
+    Orion.Print(
+      `Статистика: попыток ${total} | успехов ${this.successCount} (${successRate}%) | фейлов ${this.failCount} (${failRate}%)`,
+    );
+  }
+
+  private printRemainingResources(): void {
+    for (const recipe of this.config.recipes) {
+      let minItems = Infinity;
+      for (const mat of recipe.materials) {
+        const chestAmount = Orion.Count(
+          mat.def.graphic,
+          mat.def.color,
+          mat.container,
+        );
+        const possible = Math.floor(chestAmount / mat.req);
+        if (possible < minItems) {
+          minItems = possible;
+        }
+      }
+      const remaining = minItems === Infinity ? 0 : minItems;
+      Orion.Print(`Осталось ресурсов на ${recipe.name}: ${remaining} шт.`);
+    }
   }
 
   private hasResourcesFor(recipe: CraftRecipe, amount: number): boolean {
