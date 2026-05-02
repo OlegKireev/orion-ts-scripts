@@ -145,6 +145,7 @@ export function ObservePlayers(action?: 'logout') {
     '0x003E2D46', // Crusader
     '0x003F0B6C', // rOod
     '0x003BDD53', // Judy Doe
+    '0x003F0C0F', // 4ever
   ]);
 
   while (true) {

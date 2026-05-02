@@ -1,4 +1,4 @@
-import { ITEM_MOVE_DELAY } from '@/constants';
+import { LOOT_DELAY } from '@/constants';
 import { moveItem } from '@lib/helpers';
 import { toGraphic } from '@lib/validators';
 
@@ -40,7 +40,7 @@ export function loot(itemLists: string[]): void {
       continue;
     }
 
-    lootItems(items, ITEM_MOVE_DELAY);
+    lootItems(items, LOOT_DELAY);
 
     Orion.Ignore(corpseId);
   }

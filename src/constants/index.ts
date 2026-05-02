@@ -134,3 +134,4 @@ export const GUMP_TYPES = [
 ];
 
 export const ITEM_MOVE_DELAY = 250;
+export const LOOT_DELAY = 550;

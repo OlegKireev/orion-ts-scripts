@@ -1,4 +1,4 @@
-import { ITEM_MOVE_DELAY } from '@/constants';
+import { LOOT_DELAY } from '@/constants';
 import { checkLag, moveItem, stopBot } from './helpers';
 import { toGraphic } from './validators';
 
@@ -138,7 +138,7 @@ export function restockItems(
       msg = Orion.WaitJournal(
         heavyMsg + '|Slow down',
         start,
-        start + ITEM_MOVE_DELAY,
+        start + LOOT_DELAY,
         'sys',
       );
 

@@ -27,7 +27,7 @@ export function Sorting() {
     Orion.WalkTo(chestObject.X(), chestObject.Y(), chestObject.Z(), 2);
   }
 
-  Orion.WalkTo(UNLOAD_COORDS.x, UNLOAD_COORDS.y, UNLOAD_COORDS.z, 0);
+  Orion.WalkTo(UNLOAD_COORDS.x, UNLOAD_COORDS.y, UNLOAD_COORDS.z, 1);
 
   Orion.UseObject('backpack');
   Orion.Wait(500);

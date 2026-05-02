@@ -1,4 +1,4 @@
-import { ITEM_MOVE_DELAY } from '@/constants';
+import { LOOT_DELAY } from '@/constants';
 import { toGraphic } from './validators';
 import { REAGENTS } from '@/constants/items';
 
@@ -37,13 +37,13 @@ export function moveItem(
   z?: number,
 ): void {
   const start = Orion.Now();
-  const end = start + ITEM_MOVE_DELAY;
+  const end = start + LOOT_DELAY;
   Orion.MoveItem(serial, count, container, x, y, z);
-  Orion.Wait(ITEM_MOVE_DELAY);
+  Orion.Wait(LOOT_DELAY);
 
   if (Orion.InJournal('Slow down', 'sys', 0, 'any', start, end)) {
     Orion.MoveItem(serial, count, container, x, y, z);
-    Orion.Wait(ITEM_MOVE_DELAY);
+    Orion.Wait(LOOT_DELAY);
   }
 }
 
