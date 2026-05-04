@@ -173,12 +173,23 @@ export function Sorting() {
       container: arrows,
     },
     {
+      name: 'feathers',
+      type: toGraphic('0x1BD1'),
+      color: '0x0000',
+      container: arrows,
+    },
+    {
       name: 'Ice Silk',
       type: toGraphic('0x0F8D'),
       color: '0x0480',
       container: arrows,
     },
-
+    {
+      name: 'Phoenix Feather',
+      type: toGraphic('0x0DFA'),
+      color: '0x09DC',
+      container: arrows,
+    },
     {
       name: 'Treasure Map (lvl 1)',
       type: toGraphic('0x14eb'),
