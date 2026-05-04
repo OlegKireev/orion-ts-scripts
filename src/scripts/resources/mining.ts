@@ -185,7 +185,7 @@ export function Dig(): void {
             !Orion.InJournal(msg, 'my|sys', 0, 'any', start) &&
             Orion.Now() < start + delay
           ) {
-            Orion.Wait(100);
+            Orion.Wait(50);
           }
 
           if (Orion.InJournal('pickaxe damaged', 'my|sys', 0, 'any', start)) {
@@ -359,7 +359,10 @@ export function Replenishment(): void {
 }
 
 export function ReturnToMine(): void {
-  Orion.Terminate('ObserveEnemies');
+  if (Orion.ScriptRunning('ObserveEnemies')) {
+    Orion.Terminate('ObserveEnemies');
+    Orion.Wait(200);
+  }
   Orion.Print('Возвращаюсь в шахту');
   checkLag();
   Orion.WalkTo(MINE_COORDS.x, MINE_COORDS.y, Player.Z(), 1, 255, 1, 1);
