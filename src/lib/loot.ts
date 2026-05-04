@@ -14,11 +14,7 @@ export function loot(itemLists: string[]): void {
 
   function lootItems(items: Serial[], delay: number) {
     for (const itemId of items) {
-      if (delay > 0) {
-        moveItem(itemId, 0, 'backpack');
-      } else {
-        Orion.MoveItem(itemId, 0, 'backpack');
-      }
+      moveItem(itemId, 0, 'backpack', delay);
     }
   }
 
