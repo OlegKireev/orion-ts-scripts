@@ -8,7 +8,7 @@ export interface SpellDef {
   duration: number;
 }
 
-export const SPELLS: SpellDef[] = [
+export const SPELLS = [
   // Круг 1
   // { circle: 1, name: 'Clumsy', mantra: 'Uus Jux', school: 'mind' },
   // { circle: 1, name: 'Create Food', mantra: 'In Mani Ylem', school: 'nature' },
@@ -17,10 +17,22 @@ export const SPELLS: SpellDef[] = [
     name: 'Feeblemind',
     mantra: 'Rel Wis',
     school: 'mind',
-    duration: 800,
+    duration: 1000,
   },
-  // { circle: 1, name: 'Heal', mantra: 'In Mani', school: 'light' },
-  // { circle: 1, name: 'Magic Arrow', mantra: 'In Por Ylem', school: 'fire' },
+  {
+    circle: 1,
+    name: 'Heal',
+    mantra: 'In Mani',
+    school: 'light',
+    duration: 1000,
+  },
+  {
+    circle: 1,
+    name: 'Magic Arrow',
+    mantra: 'In Por Ylem',
+    school: 'fire',
+    duration: 1000,
+  },
   // { circle: 1, name: 'Night Sight', mantra: 'In Lor', school: 'mind' },
   // { circle: 1, name: 'Reactive Armor', mantra: 'Flam Sanct', school: 'nature' },
   // { circle: 1, name: 'Weaken', mantra: 'Des Mani', school: 'mind' },
@@ -30,22 +42,28 @@ export const SPELLS: SpellDef[] = [
     name: 'Agility',
     mantra: 'Ex Uus',
     school: 'light',
-    duration: 1500,
+    duration: 1200,
   },
   {
     circle: 2,
     name: 'Cunning',
     mantra: 'Uus Wis',
     school: 'mind',
-    duration: 1500,
+    duration: 1200,
   },
-  // { circle: 2, name: 'Cure', mantra: 'An Nox', school: 'nature' },
+  {
+    circle: 2,
+    name: 'Cure',
+    mantra: 'An Nox',
+    school: 'nature',
+    duration: 1200,
+  },
   {
     circle: 2,
     name: 'Harm',
     mantra: 'An Mani',
     school: 'nature',
-    duration: 800,
+    duration: 1200,
   },
   // { circle: 2, name: 'Magic Trap', mantra: 'In Jux', school: 'mind' },
   // { circle: 2, name: 'Magic Untrap', mantra: 'An Jux', school: 'mind' },
@@ -54,14 +72,14 @@ export const SPELLS: SpellDef[] = [
     name: 'Protection',
     mantra: 'Uus Sanct',
     school: 'light',
-    duration: 1500,
+    duration: 1200,
   },
   {
     circle: 2,
     name: 'Strength',
     mantra: 'Uus Mani',
     school: 'light',
-    duration: 1500,
+    duration: 1200,
   },
   // Круг 3
   {
@@ -69,14 +87,14 @@ export const SPELLS: SpellDef[] = [
     name: 'Bless',
     mantra: 'Rel Sanct',
     school: 'light',
-    duration: 2000,
+    duration: 1700,
   },
   {
     circle: 3,
     name: 'Fireball',
     mantra: 'Vas Flam',
     school: 'fire',
-    duration: 2000,
+    duration: 1700,
   },
   // { circle: 3, name: 'Magic Lock', mantra: 'An Por', school: 'mind' },
   {
@@ -84,7 +102,7 @@ export const SPELLS: SpellDef[] = [
     name: 'Poison',
     mantra: 'In Nox',
     school: 'dark',
-    duration: 2000,
+    duration: 1700,
   },
   // { circle: 3, name: 'Telekinesis', mantra: 'Ort Por Ylem', school: 'mind' },
   // { circle: 3, name: 'Teleport', mantra: 'Rel Por', school: 'mind' },
@@ -108,23 +126,29 @@ export const SPELLS: SpellDef[] = [
     name: 'Curse',
     mantra: 'Des Sanct',
     school: 'dark',
-    duration: 2500,
+    duration: 2300,
   },
   // { circle: 4, name: 'Fire Field', mantra: 'In Flam Grav', school: 'fire' },
-  // { circle: 4, name: 'Greater Heal', mantra: 'In Vas Mani', school: 'nature' },
+  {
+    circle: 4,
+    name: 'Greater Heal',
+    mantra: 'In Vas Mani',
+    school: 'light',
+    duration: 2300,
+  },
   {
     circle: 4,
     name: 'Lightning',
     mantra: 'Por Ort Grav',
     school: 'nature',
-    duration: 2500,
+    duration: 2300,
   },
   {
     circle: 4,
     name: 'Mana Drain',
     mantra: 'Ort Rel',
     school: 'mind',
-    duration: 2500,
+    duration: 2300,
   },
   // { circle: 4, name: 'Recall', mantra: 'Kal Ort Por', school: 'mind' },
   // Круг 5
@@ -136,30 +160,37 @@ export const SPELLS: SpellDef[] = [
   // },
   // { circle: 5, name: 'Dispel Field', mantra: 'An Grav', school: 'mind' },
   // { circle: 5, name: 'Incognito', mantra: 'Kal In Ex', school: 'mind' },
-  // {
-  //   circle: 5,
-  //   name: 'Magic Reflection',
-  //   mantra: 'In Jux Sanct',
-  //   school: 'mind',
-  // },
+  {
+    circle: 5,
+    name: 'Magic Reflection',
+    mantra: 'In Jux Sanct',
+    school: 'light',
+    duration: 2700,
+  },
   {
     circle: 5,
     name: 'Mind Blast',
     mantra: 'Por Corp Wis',
     school: 'mind',
-    duration: 3000,
+    duration: 2700,
   },
   {
     circle: 5,
     name: 'Paralyze',
     mantra: 'An Ex Por',
     school: 'mind',
-    duration: 3000,
+    duration: 2700,
   },
   // { circle: 5, name: 'Poison Field', mantra: 'In Nox Grav', school: 'nature' },
   // { circle: 5, name: 'Summon Creature', mantra: 'Kal Xen', school: 'dark' },
   // Круг 6
-  // { circle: 6, name: 'Dispel', mantra: 'An Ort', school: 'mind' },
+  {
+    circle: 6,
+    name: 'Dispel',
+    mantra: 'An Ort',
+    school: 'mind',
+    duration: 3500,
+  },
   {
     circle: 6,
     name: 'Energy Bolt',
@@ -258,4 +289,6 @@ export const SPELLS: SpellDef[] = [
   //   mantra: 'Kal Vas Xen An Flam',
   //   school: 'dark',
   // },
-];
+] as const satisfies SpellDef[];
+
+export type SpellName = (typeof SPELLS)[number]['name'];
