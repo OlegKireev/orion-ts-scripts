@@ -149,6 +149,8 @@ export function ObservePlayers(action?: 'logout') {
     '0x003F0B6C', // rOod
     '0x003BDD53', // Judy Doe
     '0x003F0C0F', // 4ever
+    '0x003CE287', // Stiga
+    '0x003F0D59', // Gektor
   ]);
 
   while (true) {
