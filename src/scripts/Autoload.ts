@@ -8,7 +8,7 @@ export function LootPvm() {
 }
 
 export function LootPvp() {
-  loot(['Weapons', 'Armors', 'Money']);
+  loot(['Weapons', 'Armors', 'Money', 'Treasures'], true);
 }
 
 export function CloseAllMenus() {

@@ -2,52 +2,6 @@ import { LOOT_DELAY } from '@/constants';
 import { moveItem } from '@lib/helpers';
 import { toGraphic } from '@lib/validators';
 
-/**
- * Базовая функция для лута трупов
- * @param itemLists Массив названий списков (из вкладки Lists -> Find)
- */
-export function loot(itemLists: string[]): void {
-  const LOOT_RANGE = 3;
-  const CORPSE_GRAPHIC = toGraphic('0x2006');
-
-  const itemsType = itemLists.join('|');
-
-  function lootItems(items: Serial[], delay: number) {
-    for (const itemId of items) {
-      moveItem(itemId, 0, 'backpack', delay);
-    }
-  }
-
-  const corpses = Orion.FindType(
-    CORPSE_GRAPHIC,
-    'any',
-    'ground',
-    '',
-    LOOT_RANGE,
-  );
-
-  for (const corpseId of corpses) {
-    Orion.UseObject(corpseId);
-    Orion.Wait(100);
-
-    const items = Orion.FindList(itemsType, corpseId);
-
-    if (!items || !items.length) {
-      continue;
-    }
-
-    lootItems(items, LOOT_DELAY);
-
-    Orion.Ignore(corpseId);
-  }
-
-  const groundItems = Orion.FindList(itemsType, 'ground', '', LOOT_RANGE);
-
-  if (groundItems.length) {
-    lootItems(groundItems, 0);
-  }
-}
-
 const CONFIG = {
   knifeGraphics: toGraphic('0x0F51|0x0F52|0x13F6|0x0EC4|0x0EC2'),
   easyKnifeGraphics: toGraphic('0x10E4'),
@@ -126,5 +80,58 @@ export function carveCorpse() {
       Orion.UseObject(leftHandSerial);
       Orion.Wait(CONFIG.equipDelay);
     }
+  }
+}
+
+/**
+ * Базовая функция для лута трупов
+ * @param itemLists Массив названий списков (из вкладки Lists -> Find)
+ */
+export function loot(
+  itemLists: string[],
+  shouldCarveCorpse: boolean = false,
+): void {
+  if (shouldCarveCorpse) {
+    carveCorpse();
+  }
+
+  const LOOT_RANGE = 3;
+  const CORPSE_GRAPHIC = toGraphic('0x2006');
+
+  const itemsType = itemLists.join('|');
+
+  function lootItems(items: Serial[], delay: number) {
+    for (const itemId of items) {
+      moveItem(itemId, 0, 'backpack', delay);
+    }
+  }
+
+  const corpses = Orion.FindType(
+    CORPSE_GRAPHIC,
+    'any',
+    'ground',
+    '',
+    LOOT_RANGE,
+  );
+
+  for (const corpseId of corpses) {
+    Orion.UseObject(corpseId);
+    Orion.Wait(100);
+
+    const items = Orion.FindList(itemsType, corpseId);
+
+    if (!items || !items.length) {
+      continue;
+    }
+
+    lootItems(items, LOOT_DELAY);
+
+    Orion.Ignore(corpseId);
+  }
+
+  const groundItems = Orion.FindList(itemsType, 'ground', '', LOOT_RANGE);
+
+  if (groundItems.length) {
+    lootItems(groundItems, 0);
   }
 }
